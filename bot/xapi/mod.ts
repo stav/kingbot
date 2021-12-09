@@ -1,11 +1,12 @@
 import Socket from './socket.ts'
+import Status from './status.ts'
 
 type KeyMap = {
   [key: string]: () => void
 }
 
 const cmdFunctions: KeyMap = {
-  0 : () => console.log('All systems normal'),
+  0 : Status.print,
   1 : Socket.connect,
   2 : Socket.ping,
   3 : Socket.login,

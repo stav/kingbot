@@ -29,8 +29,13 @@ function _send(data: InputData) {
   socket.send(JSON.stringify(data))
 }
 
-function status() {
+function _status() {
   return Status[socket?.readyState]
+}
+
+function status() {
+  _send({ command: 'getVersion' })
+  return `Socket ${socket.url} ${config.accountId} ${_status()}`
 }
 
 function connect() {
@@ -63,15 +68,16 @@ function logout() {
 
 function close() {
   _isOpen() && socket.close()
-  console.log(status())
+  console.log(_status())
 }
 
 function handleEvent(event: any) {
-  console.log(status())
+  console.log(_status())
 }
 
 export default {
   connect,
+  status,
   logout,
   login,
   close,
