@@ -1,4 +1,4 @@
-import Xapi from './xapi.ts'
+import Xapi from './xapi/mod.ts'
 
 async function start() {
   await Xapi.start()
