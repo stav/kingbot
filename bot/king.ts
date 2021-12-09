@@ -21,6 +21,19 @@ function ping() {
   socket.send('{ "command": "ping" }');
 }
 
+function login() {
+  const data = {
+    command: "login",
+    arguments: {
+      userId: "1000",
+      password: "PASSWORD",
+      appId: "test",
+      appName: "test",
+    }
+  }
+  socket.send(JSON.stringify(data));
+}
+
 function close() {
   console.log('Closing')
   socket.close()
@@ -33,8 +46,14 @@ type KeyMap = {
 const cmdFunctions: KeyMap = {
   0 : () => console.log('All systems normal'),
   1 : connect,
-  2 : close,
   3 : ping,
+  2 : close,
+  4 : login,
+  5 : ()=>{},
+  6 : ()=>{},
+  7 : ()=>{},
+  8 : ()=>{},
+  9 : ()=>{},
 }
 
 function printCommands(): void {
