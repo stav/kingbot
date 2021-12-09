@@ -1,57 +1,4 @@
-import config from './config.ts'
-
-console.log('config', config.accountId)
-
-// wss://ws.xtb.com/demo
-// wss://ws.xtb.com/demoStream
-// wss://ws.xtb.com/real
-// wss://ws.xtb.com/realStream
-let socket: WebSocket
-
-const url = 'wss://ws.xtb.com/' + config.type
-
-enum Status {
-  CONNECTING = 0,
-  OPEN       = 1,
-  CLOSING    = 2,
-  CLOSED     = 3,
-}
-
-function connect() {
-  console.log('Connecting with', url)
-  socket = new WebSocket(url);
-  socket.onopen = handleEvent
-  socket.onclose = handleEvent
-  socket.onmessage = (message: MessageEvent) => { console.log(message.data) }
-  console.log('socket', socket)
-}
-
-function ping() {
-  socket.send('{ "command": "ping" }');
-}
-
-function login() {
-  const data = {
-    command: 'login',
-    arguments: {
-      userId: config.accountId,
-      password: config.password,
-      appName: 'KingBot',
-    }
-  }
-  socket.send(JSON.stringify(data));
-}
-
-function close() {
-  if (socket?.readyState === Status.OPEN) {
-    socket.close()
-  }
-  console.log(Status[socket && socket.readyState])
-}
-
-function handleEvent(event: any) {
-  console.log(Status[socket && socket.readyState])
-}
+import Socket from './socket.ts'
 
 type KeyMap = {
   [key: string]: () => void
@@ -59,11 +6,11 @@ type KeyMap = {
 
 const cmdFunctions: KeyMap = {
   0 : () => console.log('All systems normal'),
-  1 : connect,
-  2 : ping,
-  3 : login,
-  4 : close,
-  5 : ()=>{},
+  1 : Socket.connect,
+  2 : Socket.ping,
+  3 : Socket.login,
+  4 : Socket.logout,
+  5 : Socket.close,
   6 : ()=>{},
   7 : ()=>{},
   8 : ()=>{},
