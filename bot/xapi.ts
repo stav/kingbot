@@ -1,3 +1,17 @@
+import { Config } from "https://raw.githubusercontent.com/stav/config/readjson/mod.ts"
+
+type ConfigData = {
+  accountId: number
+  password: string
+  type: 'real' | 'demo'
+}
+
+type ConfigXapi = {
+  Xapi: ConfigData
+}
+
+const config: ConfigData = ((await Config.load({ file: 'local' })) as ConfigXapi).Xapi
+console.log('config', config.accountId)
 
 // wss://ws.xtb.com/demo
 // wss://ws.xtb.com/demoStream
@@ -5,7 +19,7 @@
 // wss://ws.xtb.com/realStream
 let socket: WebSocket
 
-const url = 'wss://ws.xtb.com/demo'
+const url = 'wss://ws.xtb.com/' + config.type
 
 enum Status {
   CONNECTING = 0,
@@ -19,9 +33,7 @@ function connect() {
   socket = new WebSocket(url);
   socket.onopen = handleEvent
   socket.onclose = handleEvent
-  socket.onmessage = (message: any) => {
-    console.log(message.data)
-  }
+  socket.onmessage = (message: MessageEvent) => { console.log(message.data) }
   console.log('socket', socket)
 }
 
@@ -31,12 +43,11 @@ function ping() {
 
 function login() {
   const data = {
-    command: "login",
+    command: 'login',
     arguments: {
-      userId: "1000",
-      password: "PASSWORD",
-      appId: "test",
-      appName: "test",
+      userId: config.accountId,
+      password: config.password,
+      appName: 'KingBot',
     }
   }
   socket.send(JSON.stringify(data));

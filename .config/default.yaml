@@ -1,0 +1,6 @@
+# https://deno.land/x/config
+
+Xapi:
+  accountId: 1234567
+  password: secret
+  type: demo # real / demo
