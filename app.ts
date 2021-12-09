@@ -1,3 +1,3 @@
 import KingBot from './bot/king.ts'
 
-KingBot()
+KingBot.start()
