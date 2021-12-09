@@ -1,16 +1,5 @@
-import { Config } from "https://raw.githubusercontent.com/stav/config/readjson/mod.ts"
+import config from './config.ts'
 
-type ConfigData = {
-  accountId: number
-  password: string
-  type: 'real' | 'demo'
-}
-
-type ConfigXapi = {
-  Xapi: ConfigData
-}
-
-const config: ConfigData = ((await Config.load({ file: 'local' })) as ConfigXapi).Xapi
 console.log('config', config.accountId)
 
 // wss://ws.xtb.com/demo
