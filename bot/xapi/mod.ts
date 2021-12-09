@@ -20,8 +20,7 @@ const cmdFunctions: KeyMap = {
 
 function printCommands(): void {
   for (const _ in cmdFunctions) {
-    const func = cmdFunctions[_]
-    console.log(JSON.stringify(_), func)
+    console.log(JSON.stringify(_), cmdFunctions[_])
   }
 }
 

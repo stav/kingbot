@@ -21,24 +21,24 @@ type InputData = {
   prettyPrint?: boolean
 }
 
-function _isOpen() {
+function _isOpen(): boolean {
   return socket?.readyState === Status.OPEN
 }
 
-function _send(data: InputData) {
+function _send(data: InputData): void {
   socket.send(JSON.stringify(data))
 }
 
-function _status() {
+function _status(): string {
   return Status[socket?.readyState]
 }
 
-function status() {
+function status(): string {
   _send({ command: 'getVersion' })
   return `Socket ${socket.url} ${config.accountId} ${_status()}`
 }
 
-function connect() {
+function connect(): void {
   console.log('Connecting with', url)
   socket = new WebSocket(url);
   socket.onopen = handleEvent
@@ -46,11 +46,11 @@ function connect() {
   socket.onmessage = (message: MessageEvent) => { console.log(message.data) }
 }
 
-function ping() {
+function ping(): void {
   _isOpen() && _send({ command: 'ping' })
 }
 
-function login() {
+function login(): void {
   const data = {
     command: 'login',
     arguments: {
@@ -59,7 +59,7 @@ function login() {
       appName: 'KingBot',
     }
   }
-  socket.send(JSON.stringify(data));
+  _isOpen() && _send(data)
 }
 
 function logout() {
