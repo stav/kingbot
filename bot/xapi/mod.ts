@@ -1,4 +1,4 @@
-import Socket from './socket.ts'
+import Socket from './socket/mod.ts'
 import Status from './status.ts'
 
 type KeyMap = {
