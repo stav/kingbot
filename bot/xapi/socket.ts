@@ -1,4 +1,5 @@
 import config from './config.ts'
+import { TRADE_RECORD } from "./socket.d.ts";
 
 // wss://ws.xtb.com/demo
 // wss://ws.xtb.com/demoStream
@@ -18,6 +19,7 @@ enum Status {
 type InputData = {
   command: string
   arguments?: any
+  customTag?: string
   prettyPrint?: boolean
 }
 
@@ -62,6 +64,40 @@ function login(): void {
   _isOpen() && _send(data)
 }
 
+async function _sync (data: InputData): Promise<any[]> {
+  const _data = Object.assign({ customTag: 'randomy' }, data)
+  console.log('data', _data)
+  const options = { once: true }
+  let result: any
+
+  function listener(event: MessageEvent) {
+    result = JSON.parse(event.data)
+  }
+  socket.addEventListener('message', listener, options)
+  _send(_data)
+
+  while (!result) {
+    console.log('not yet')
+    await new Promise(res => setTimeout(res, 100))
+    console.log(' yet')
+  }
+  console.log('result', result)
+
+  return result.returnData
+}
+
+async function trades (): Promise<TRADE_RECORD[]> {
+  const data = {
+    command: 'getTrades',
+    arguments: {
+      openedOnly: false,
+    }
+  }
+  const trades = await _sync(data)
+  console.log('trades', trades)
+  return trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
+}
+
 function logout() {
   _isOpen() && _send({ command: 'logout' })
 }
@@ -78,6 +114,7 @@ function handleEvent(event: any) {
 export default {
   connect,
   status,
+  trades,
   logout,
   login,
   close,
