@@ -1,9 +1,5 @@
 import { InputData } from './socket.d.ts'
-import { Status } from './const.ts'
-
-function isOpen(socket: WebSocket): boolean {
-  return socket?.readyState === Status.OPEN
-}
+import { isOpen } from './util.ts'
 
 export function send(data: InputData, socket: WebSocket): void {
   if (!isOpen(socket)) {
@@ -13,6 +9,7 @@ export function send(data: InputData, socket: WebSocket): void {
 }
 
 export async function sync (data: InputData, socket: WebSocket): Promise<any> {
+  // TODO Also check for logged in
   if (!isOpen(socket)) {
     return console.error('Cannot sync, socket is not open', socket)
   }
@@ -29,6 +26,7 @@ export async function sync (data: InputData, socket: WebSocket): Promise<any> {
   socket.addEventListener('message', listener, { once: true })
   send(_data, socket)
 
+  // TODO Timeout eventually, don't wait forever
   while (!result) {
     console.log('wait')
     await new Promise(res => setTimeout(res, 100))
