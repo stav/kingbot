@@ -65,25 +65,25 @@ function login(): void {
 }
 
 async function _sync (data: InputData): Promise<any[]> {
-  const _data = Object.assign({ customTag: 'randomy' }, data)
-  console.log('data', _data)
-  const options = { once: true }
+  const customTag = Math.random().toString()
+  const _data = Object.assign({ customTag }, data)
   let result: any
 
   function listener(event: MessageEvent) {
-    result = JSON.parse(event.data)
+    const response = JSON.parse(event.data)
+    if (response.customTag === customTag) {
+      result = response.returnData
+    }
   }
-  socket.addEventListener('message', listener, options)
+  socket.addEventListener('message', listener, { once: true })
   _send(_data)
 
   while (!result) {
-    console.log('not yet')
+    console.log('wait')
     await new Promise(res => setTimeout(res, 100))
-    console.log(' yet')
   }
-  console.log('result', result)
 
-  return result.returnData
+  return result
 }
 
 async function trades (): Promise<TRADE_RECORD[]> {
