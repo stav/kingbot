@@ -1,5 +1,16 @@
 // deno-lint-ignore-file
 
+/** KingBot */
+
+export type InputData = {
+  command: string
+  arguments?: any
+  customTag?: string
+  prettyPrint?: boolean
+}
+
+/** Xapi */
+
 export declare enum CMD_FIELD {
   BUY = 0,
   SELL = 1,

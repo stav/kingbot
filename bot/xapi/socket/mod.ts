@@ -1,27 +1,9 @@
+import { InputData, TRADE_RECORD } from './socket.d.ts'
+import { Status } from './const.ts'
 import config from './config.ts'
-import { TRADE_RECORD } from "./socket.d.ts";
+import url from './url.ts'
 
-// wss://ws.xtb.com/demo
-// wss://ws.xtb.com/demoStream
-// wss://ws.xtb.com/real
-// wss://ws.xtb.com/realStream
 let socket: WebSocket
-
-const url = 'wss://ws.xtb.com/' + config.type
-
-enum Status {
-  CONNECTING = 0,
-  OPEN       = 1,
-  CLOSING    = 2,
-  CLOSED     = 3,
-}
-
-type InputData = {
-  command: string
-  arguments?: any
-  customTag?: string
-  prettyPrint?: boolean
-}
 
 function _isOpen(): boolean {
   return socket?.readyState === Status.OPEN
