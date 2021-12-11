@@ -1,9 +1,10 @@
+import { KingResponse, XapiDataResponse } from './send.d.ts'
 import { TRADE_RECORD } from './socket.d.ts'
 import { send, sync } from './send.ts'
-import { cprint } from './util.ts'
+import KingSocket from './king.ts'
 import Connect from './connect.ts'
 
-let socket: WebSocket
+let socket: KingSocket
 
 function _cmd (command: string): void {
   send({ command }, socket)
@@ -30,20 +31,25 @@ function ping (): void {
 }
 
 function print (): void {
-  _cmd('getVersion') // TODO relying on console log of message as side effect
-  cprint.call(socket)
+  socket.print()
 }
 
-async function trades (): Promise<TRADE_RECORD[]> {
+async function trades (): Promise<void> {
   const data = {
     command: 'getTrades',
     arguments: {
       openedOnly: false,
     }
   }
-  const trades: TRADE_RECORD[] = await sync(data, socket)
-  console.log('trades', trades)
-  return trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
+  const response: KingResponse = await sync(data, socket)
+  if (response.status) {
+    const trades: TRADE_RECORD[] = (<XapiDataResponse>response).returnData
+    trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
+    console.log('trades', trades)
+  }
+  else {
+    console.error('Trades', response)
+  }
 }
 
 export default {

@@ -1,18 +1,16 @@
-import { isOpen, cprint } from './util.ts'
-import { send } from './send.ts'
+import { KingResponse, XapiLoginResponse } from "./send.d.ts";
+import { send, sync } from './send.ts'
+import { isOpen } from './util.ts'
+import KingSocket from './king.ts'
 import config from './config.ts'
 import url from './url.ts'
 
-function newSocket(): WebSocket {
+function newSocket(): KingSocket {
   console.log('Connecting with', url)
-  const socket = new WebSocket(url);
-  socket.onopen = cprint.bind(socket)
-  socket.onclose = cprint.bind(socket)
-  socket.onmessage = (message: MessageEvent) => { console.log(message.data) }
-  return socket
+  return new KingSocket(url)
 }
 
-function login(socket: WebSocket): void {
+async function login(socket: KingSocket): Promise<void> {
   const data = {
     command: 'login',
     arguments: {
@@ -21,16 +19,20 @@ function login(socket: WebSocket): void {
       appName: 'KingBot',
     }
   }
-  send(data, socket)
+  const response: KingResponse = await sync(data, socket)
+  if (response.status) {
+    socket.session = (<XapiLoginResponse>response).streamSessionId
+  }
 }
 
-function logout(socket: WebSocket) {
+function logout(socket: KingSocket) {
   send({ command: 'logout' }, socket)
+  socket.session = ''
 }
 
-function close(socket: WebSocket) {
+function close(socket: KingSocket) {
   isOpen(socket) && socket.close()
-  cprint.call(socket)
+  socket.print()
 }
 
 export default {
