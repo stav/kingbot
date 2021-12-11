@@ -1,13 +1,13 @@
-import { isOpen, status } from './util.ts'
+import { isOpen, cprint } from './util.ts'
 import { send } from './send.ts'
 import config from './config.ts'
 import url from './url.ts'
 
-function get(): WebSocket {
+function newSocket(): WebSocket {
   console.log('Connecting with', url)
   const socket = new WebSocket(url);
-  socket.onopen = () => console.log(status(socket))
-  socket.onclose = () => console.log(status(socket))
+  socket.onopen = cprint.bind(socket)
+  socket.onclose = cprint.bind(socket)
   socket.onmessage = (message: MessageEvent) => { console.log(message.data) }
   return socket
 }
@@ -30,12 +30,12 @@ function logout(socket: WebSocket) {
 
 function close(socket: WebSocket) {
   isOpen(socket) && socket.close()
-  console.log(status(socket))
+  cprint.call(socket)
 }
 
 export default {
+  newSocket,
   logout,
   login,
   close,
-  get,
 }

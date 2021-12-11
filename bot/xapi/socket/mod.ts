@@ -1,8 +1,7 @@
-import { status as _status } from './util.ts'
 import { TRADE_RECORD } from './socket.d.ts'
 import { send, sync } from './send.ts'
+import { cprint } from './util.ts'
 import Connect from './connect.ts'
-import config from './config.ts'
 
 let socket: WebSocket
 
@@ -11,7 +10,7 @@ function _cmd (command: string): void {
 }
 
 function connect () {
-  socket = Connect.get()
+  socket = Connect.newSocket()
 }
 
 function login () {
@@ -30,12 +29,9 @@ function ping (): void {
   _cmd('ping')
 }
 
-function status (): string {
-  _cmd('getVersion')
-  const id = config.accountId
-  const url = socket.url
-  const status = _status(socket)
-  return `Socket ${url} ${id} ${status}`
+function print (): void {
+  _cmd('getVersion') // TODO relying on console log of message as side effect
+  cprint.call(socket)
 }
 
 async function trades (): Promise<TRADE_RECORD[]> {
@@ -45,7 +41,7 @@ async function trades (): Promise<TRADE_RECORD[]> {
       openedOnly: false,
     }
   }
-  const trades = await sync(data, socket)
+  const trades: TRADE_RECORD[] = await sync(data, socket)
   console.log('trades', trades)
   return trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
 }
@@ -54,8 +50,8 @@ export default {
   ping,
   close,
   login,
+  print,
   logout,
-  status,
   trades,
   connect,
 }

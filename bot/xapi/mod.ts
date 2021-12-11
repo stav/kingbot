@@ -1,12 +1,11 @@
 import Socket from './socket/mod.ts'
-import Status from './status.ts'
 
 type KeyMap = {
   [key: string]: () => void
 }
 
 const cmdFunctions: KeyMap = {
-  0 : Status.print,
+  0 : Socket.print,
   1 : Socket.connect,
   2 : Socket.ping,
   3 : Socket.login,
@@ -18,7 +17,7 @@ const cmdFunctions: KeyMap = {
   9 : ()=>{},
 }
 
-function printCommands(): void {
+function printCommands (): void {
   for (const _ in cmdFunctions) {
     console.log(JSON.stringify(_), cmdFunctions[_])
   }
@@ -36,15 +35,12 @@ async function* getInput (): AsyncGenerator<string, void, void> {
   }
 }
 
-async function* getCommandFunction (): AsyncGenerator<()=>void, void, void> {
+async function start (): Promise<void> {
   for await (const input of getInput()) {
-    if (input) yield input in cmdFunctions ? cmdFunctions[ input ] : printCommands
-  }
-}
-
-async function start() {
-  for await (const command of getCommandFunction()) {
-    command()
+    if (input)
+      input in cmdFunctions
+        ? cmdFunctions[input]()
+        : printCommands()
   }
   console.log()
 }

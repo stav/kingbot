@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import { InputData } from './socket.d.ts'
 import { isOpen } from './util.ts'
 
