@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 export interface XapiLoginResponse {
   status: true;
   streamSessionId: string;

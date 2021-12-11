@@ -45,7 +45,7 @@ async function trades (): Promise<void> {
   if (response.status) {
     const trades: TRADE_RECORD[] = (<XapiDataResponse>response).returnData
     trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
-    console.log('trades', trades)
+    console.info('trades', trades)
   }
   else {
     console.error('Trades', response)

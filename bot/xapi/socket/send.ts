@@ -3,12 +3,12 @@ import { KingResponse } from './send.d.ts'
 import { InputData } from './socket.d.ts'
 import { isOpen } from './util.ts'
 import KingSocket from './king.ts'
+import Logger from '../../../log/mod.ts'
 
 export function send(data: InputData, socket: KingSocket): void {
-  if (!isOpen(socket)) {
-    return console.error('Cannot send, socket is not open', socket)
+  if (isOpen(socket)) {
+    socket.send(JSON.stringify(data))
   }
-  socket.send(JSON.stringify(data))
 }
 
 export async function sync (data: InputData, socket: KingSocket): Promise<KingResponse> {
@@ -19,7 +19,7 @@ export async function sync (data: InputData, socket: KingSocket): Promise<KingRe
   let timeout = 0
   let result: any
 
-  console.log('Syncing', _data)
+  Logger.info('Syncing', JSON.stringify(_data))
 
   function listener(message: MessageEvent) {
     const data = JSON.parse(message.data)

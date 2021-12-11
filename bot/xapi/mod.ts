@@ -19,18 +19,22 @@ const cmdFunctions: KeyMap = {
 
 function printCommands (): void {
   for (const _ in cmdFunctions) {
-    console.log(JSON.stringify(_), cmdFunctions[_])
+    console.info(JSON.stringify(_), cmdFunctions[_])
   }
 }
 
 async function* getInput (): AsyncGenerator<string, void, void> {
+  // https://github.com/dmitriytat/keypress/blob/master/mod.ts
+  const prompt = new TextEncoder().encode('\n> ')
+  const decoder = new TextDecoder()
   let n
 
   while (n !== null) {
-    const buf = new Uint8Array(1024);
-    await Deno.stdout.write(new TextEncoder().encode('\n> '));
-    n = <number>await Deno.stdin.read(buf);
-    const input: string = new TextDecoder().decode(buf.subarray(0, n));
+    const buffer = new Uint8Array(1024)
+    const reader = Deno.stdin.read(buffer)
+    await Deno.stdout.write(prompt)
+    n = <number>await reader
+    const input: string = decoder.decode(buffer.subarray(0, n))
     yield input.trim()
   }
 }
@@ -42,7 +46,7 @@ async function start (): Promise<void> {
         ? cmdFunctions[input]()
         : printCommands()
   }
-  console.log()
+  console.info()
 }
 
 export default {

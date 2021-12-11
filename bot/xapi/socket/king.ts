@@ -1,5 +1,6 @@
 import { State } from './const.ts'
 import config from './config.ts'
+import Logger from '../../../log/mod.ts'
 
 export default class KingSocket extends WebSocket {
   session = ''
@@ -9,7 +10,7 @@ export default class KingSocket extends WebSocket {
     this.onopen = this.print
     this.onclose = this._gotClose
     this.onerror = this._gotError
-    this.onmessage = (message: MessageEvent) => { console.log(message.data) }
+    this.onmessage = this._gotMessage
   }
 
   private _state () {
@@ -20,9 +21,13 @@ export default class KingSocket extends WebSocket {
     this.session = ''
   }
 
-  private _gotError (error: Event | ErrorEvent) {
-    console.error((<ErrorEvent>error).message)
+  private _gotError (e: Event | ErrorEvent) {
+    Logger.error((<ErrorEvent>e).message)
     this.print()
+  }
+
+  private _gotMessage (message: MessageEvent) {
+    Logger.info(message.data)
   }
 
   // version () {
@@ -35,7 +40,7 @@ export default class KingSocket extends WebSocket {
     const ses = this.session
     const url = this.url
     const stat = this._state()
-    console.log(`Socket  ${url}  ${id}  ${stat}  ${ses}`)
+    console.info(`Socket  ${url}  ${id}  ${stat}  ${ses}`)
   }
 
 }

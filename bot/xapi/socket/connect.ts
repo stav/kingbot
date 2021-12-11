@@ -6,7 +6,7 @@ import config from './config.ts'
 import url from './url.ts'
 
 function newSocket(): KingSocket {
-  console.log('Connecting with', url)
+  console.info('Connecting with', url)
   return new KingSocket(url)
 }
 
