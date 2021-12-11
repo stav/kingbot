@@ -1,6 +1,6 @@
+import Logger from '../../../log.ts'
 import { State } from './const.ts'
 import config from './config.ts'
-import Logger from '../../../log/mod.ts'
 
 export default class KingSocket extends WebSocket {
   session = ''

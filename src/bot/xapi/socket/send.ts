@@ -1,9 +1,9 @@
 // deno-lint-ignore-file no-explicit-any
+import Logger from '../../../log.ts'
 import { KingResponse } from './send.d.ts'
 import { InputData } from './socket.d.ts'
 import { isOpen } from './util.ts'
 import KingSocket from './king.ts'
-import Logger from '../../../log/mod.ts'
 
 export function send(data: InputData, socket: KingSocket): void {
   if (isOpen(socket)) {
