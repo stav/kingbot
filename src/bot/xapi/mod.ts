@@ -5,16 +5,16 @@ type KeyMap = {
 }
 
 const cmdFunctions: KeyMap = {
-  0 : Socket.print,
   1 : Socket.connect,
   2 : Socket.ping,
   3 : Socket.login,
   4 : Socket.trades,
-  5 : Socket.logout,
-  6 : Socket.close,
+  5 : Socket.trade,
+  6 : ()=>{},
   7 : ()=>{},
-  8 : ()=>{},
-  9 : ()=>{},
+  8 : Socket.logout,
+  9 : Socket.close,
+  0 : Socket.print,
 }
 
 function printCommands (): void {

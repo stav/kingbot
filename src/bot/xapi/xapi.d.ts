@@ -1,25 +1,7 @@
 // deno-lint-ignore-file
+import { CMD_FIELD, TYPE_FIELD } from './xapi.ts'
 
-export declare enum CMD_FIELD {
-  BUY = 0,
-  SELL = 1,
-  BUY_LIMIT = 2,
-  SELL_LIMIT = 3,
-  BUY_STOP = 4,
-  SELL_STOP = 5,
-  BALANCE = 6,
-  CREDIT = 7,
-}
-
-export declare enum TYPE_FIELD {
-  OPEN = 0,
-  PENDING = 1,
-  CLOSE = 2,
-  MODIFY = 3,
-  DELETE = 4,
-}
-
-export declare enum STATE_FIELD {
+declare enum STATE_FIELD {
   MODIFIED = "Modified",
   DELETED = "Deleted",
 }
