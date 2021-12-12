@@ -1,4 +1,14 @@
 // deno-lint-ignore-file no-explicit-any
+
+export type InputData = {
+  command: string
+  arguments?: any
+  customTag?: string
+  prettyPrint?: boolean
+}
+
+/** Responses */
+
 export interface XapiLoginResponse {
   status: true;
   streamSessionId: string;

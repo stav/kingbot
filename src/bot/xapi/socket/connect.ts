@@ -1,6 +1,4 @@
-import { KingResponse, XapiLoginResponse } from "./send.d.ts";
-import { send, sync } from './send.ts'
-import { isOpen } from './util.ts'
+import { KingResponse, XapiLoginResponse } from "./king.d.ts";
 import KingSocket from './king.ts'
 import config from './config.ts'
 import url from './url.ts'
@@ -19,19 +17,19 @@ async function login(socket: KingSocket): Promise<void> {
       appName: 'KingBot',
     }
   }
-  const response: KingResponse = await sync(data, socket)
+  const response: KingResponse = await socket.sync(data)
   if (response.status) {
     socket.session = (<XapiLoginResponse>response).streamSessionId
   }
 }
 
 function logout(socket: KingSocket) {
-  send({ command: 'logout' }, socket)
+  socket.sendx({ command: 'logout' })
   socket.session = ''
 }
 
 function close(socket: KingSocket) {
-  isOpen(socket) && socket.close()
+  socket.isOpen && socket.close()
   socket.print()
 }
 

@@ -1,16 +1,5 @@
 // deno-lint-ignore-file
 
-/** KingBot */
-
-export type InputData = {
-  command: string
-  arguments?: any
-  customTag?: string
-  prettyPrint?: boolean
-}
-
-/** Xapi */
-
 export declare enum CMD_FIELD {
   BUY = 0,
   SELL = 1,
@@ -64,4 +53,18 @@ export interface TRADE_RECORD {
   expirationString?: string;
   type?: TYPE_FIELD;
   state?: STATE_FIELD;
+}
+
+export interface TRADE_TRANS_INFO {
+  cmd: CMD_FIELD
+  customComment: string | null
+  expiration: number | Date
+  offset: number
+  order: number
+  price: number
+  sl: number
+  symbol: string
+  tp: number
+  type: TYPE_FIELD
+  volume: number
 }
