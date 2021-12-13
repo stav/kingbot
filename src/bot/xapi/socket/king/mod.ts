@@ -1,11 +1,10 @@
-import Logger from '../../../log.ts'
-import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
-import { TRADE_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
-import { InputData, KingResponse, XapiDataResponse } from './king.d.ts'
-import { State } from './const.ts'
-import config from './config.ts'
-
-import Socket from './mod.ts' // XXX TODO Circular reference
+import Logger from '../../../../log.ts'
+import { CMD_FIELD, TYPE_FIELD } from '../../xapi.ts'
+import { TRADE_RECORD, TRADE_TRANS_INFO } from '../../xapi.d.ts'
+import { State } from '../const.ts'
+import config from '../config.ts'
+import Socket from '../mod.ts' // XXX TODO Circular reference
+import { InputData, KingResponse, XapiDataResponse } from './mod.d.ts'
 
 export default class KingSocket extends WebSocket {
 

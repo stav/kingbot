@@ -1,4 +1,4 @@
-import KingSocket from './king.ts'
+import KingSocket from './king/mod.ts' // XXX TODO Circular reference
 import Connect from './connect.ts'
 
 let socket: KingSocket
