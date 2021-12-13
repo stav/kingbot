@@ -5,10 +5,12 @@ import { State } from '../const.ts'
 import config from '../config.ts'
 import Socket from '../mod.ts' // XXX TODO Circular reference
 import { InputData, KingResponse, XapiDataResponse } from './mod.d.ts'
+import status from './status.ts'
 
 export default class KingSocket extends WebSocket {
 
   session = ''
+  status = status
 
   constructor (url: string) {
     super(url)
@@ -40,11 +42,6 @@ export default class KingSocket extends WebSocket {
     Logger.info(message.data)
   }
 
-  // version () {
-  //   const response: KingResponse = await sync({ command: 'getVersion' }, socket)
-  //   return response.status ? (<XapiDataResponse>response).returnData.version : ''
-  // }
-
   get isOpen (): boolean {
     return this.readyState === State.OPEN
   }
@@ -74,13 +71,14 @@ export default class KingSocket extends WebSocket {
 
     Logger.info('Syncing', JSON.stringify(_data))
 
-    function listener(message: MessageEvent) {
-      const data = JSON.parse(message.data)
-      if (data.customTag === customTag) {
-        result = data
+    const listener = (message: MessageEvent) => {
+      const mData = JSON.parse(message.data)
+      if (mData.customTag === customTag) {
+        result = mData
+        this.removeEventListener('message', listener)
       }
     }
-    this.addEventListener('message', listener, { once: true })
+    this.addEventListener('message', listener)
     this.sendx(_data)
 
     while (!result) {
