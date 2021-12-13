@@ -24,12 +24,9 @@ async function login(socket: KingSocket): Promise<void> {
 }
 
 function logout(socket: KingSocket) {
-  socket.sendx({ command: 'logout' })
   socket.session = ''
-}
-
-function close(socket: KingSocket) {
-  socket.isOpen && socket.close()
+  socket.sendx({ command: 'logout' })
+  socket.close(1000) // Server will close the connection as well
   socket.print()
 }
 
@@ -37,5 +34,4 @@ export default {
   newSocket,
   logout,
   login,
-  close,
 }

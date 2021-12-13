@@ -21,6 +21,7 @@ interface XapiLogoutResponse {
 export interface XapiDataResponse {
   status: true;
   returnData: any;
+  customTag: string;
 }
 
 interface XapiErrorResponse {

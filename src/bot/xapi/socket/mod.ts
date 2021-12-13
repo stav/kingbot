@@ -4,22 +4,31 @@ import Connect from './connect.ts'
 let socket: KingSocket
 
 function connect () {
-  socket = Connect.newSocket()
+  if (!socket || !socket.isOpen) {
+    socket = Connect.newSocket()
+  }
 }
 
 function login () {
+  connect()
   Connect.login(socket)
 }
 
 function logout () {
-  Connect.logout(socket)
+  if (socket?.session) {
+    Connect.logout(socket)
+  }
 }
 
 function close () {
-  Connect.close(socket)
+  if (socket) {
+    socket.isOpen && socket.close(1000)
+    socket.print()
+  }
 }
 
 function ping (): void {
+  connect()
   socket.sendx({ command: 'ping' })
 }
 
@@ -28,10 +37,12 @@ function print (): void {
 }
 
 function trade (): void {
+  connect()
   socket.trade()
 }
 
 function trades (): void {
+  connect()
   socket.trades()
 }
 
