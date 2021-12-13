@@ -5,6 +5,8 @@ import { InputData, KingResponse, XapiDataResponse } from './king.d.ts'
 import { State } from './const.ts'
 import config from './config.ts'
 
+import Socket from './mod.ts' // XXX TODO Circular reference
+
 export default class KingSocket extends WebSocket {
 
   session = ''
@@ -21,8 +23,13 @@ export default class KingSocket extends WebSocket {
     return State[this.readyState]
   }
 
-  private _gotClose (_event: CloseEvent) {
+  private _gotClose (event: CloseEvent) {
     this.session = ''
+    Logger.info('Closed with code', event.code)
+    if (event.code !== 1000) {
+      Logger.info('Restarting')
+      setTimeout(Socket.connect, 1000)
+    }
   }
 
   private _gotError (e: Event | ErrorEvent) {
