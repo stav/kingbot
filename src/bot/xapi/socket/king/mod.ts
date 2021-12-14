@@ -1,27 +1,27 @@
 import Logger from '../../../../log.ts'
+
 import { CMD_FIELD, TYPE_FIELD } from '../../xapi.ts'
 import { TRADE_RECORD, TRADE_TRANS_INFO } from '../../xapi.d.ts'
+
 import { State } from '../const.ts'
-import config from '../config.ts'
 import Socket from '../mod.ts' // XXX TODO Circular reference
+
 import { InputData, KingResponse, XapiDataResponse } from './mod.d.ts'
 import status from './status.ts'
+import print from './print.ts'
 
 export default class KingSocket extends WebSocket {
 
   session = ''
   status = status
+  print = print
 
   constructor (url: string) {
     super(url)
-    this.onopen = this.print
+    this.onopen = this.print.bind(this)
     this.onclose = this._gotClose
     this.onerror = this._gotError
     this.onmessage = this._gotMessage
-  }
-
-  private _state () {
-    return State[this.readyState]
   }
 
   private _gotClose (event: CloseEvent) {
@@ -42,16 +42,12 @@ export default class KingSocket extends WebSocket {
     Logger.info(message.data)
   }
 
-  get isOpen (): boolean {
-    return this.readyState === State.OPEN
+  protected state () {
+    return State[this.readyState]
   }
 
-  print () {
-    const id = config.accountId
-    const ses = this.session
-    const url = this.url
-    const stat = this._state()
-    console.info(`Socket  ${url}  ${id}  ${stat}  ${ses}`)
+  get isOpen (): boolean {
+    return this.readyState === State.OPEN
   }
 
   sendx (data: InputData): void {
