@@ -1,4 +1,4 @@
-import config from '../config.ts'
+import config from '../../config.ts'
 import KingSocket from './mod.ts'
 
 export default function print (this: KingSocket) {

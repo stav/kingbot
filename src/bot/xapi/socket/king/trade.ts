@@ -1,4 +1,4 @@
-import { CMD_FIELD, TYPE_FIELD } from '../../xapi.ts'
+import { CMD_FIELD, TYPE_FIELD } from '../../mod.ts'
 import { TRADE_RECORD, TRADE_TRANS_INFO } from '../../xapi.d.ts'
 import { InputData, KingResponse, XapiDataResponse } from './mod.d.ts'
 import KingSocket from './mod.ts'

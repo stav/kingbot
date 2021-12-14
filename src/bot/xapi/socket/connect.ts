@@ -1,7 +1,7 @@
 import { KingResponse, XapiLoginResponse } from './king/mod.d.ts'
 import KingSocket from './king/mod.ts'
-import config from './config.ts'
-import url from './url.ts'
+import config from '../config.ts'
+import url from '../url.ts'
 
 function newSocket(): KingSocket {
   console.info('Connecting with', url)
