@@ -2,11 +2,14 @@ import Logger from '../../../log.ts'
 
 import { KingCat } from '../mod.ts'
 import print from '../print.ts'
-import url from '../url.ts'
 
 export default class KingStream extends KingCat {
 
   print = print
+
+  constructor (account: any) {
+    super(account)
+  }
 
   private _gotClose (event: CloseEvent) {
     Logger.info('Socket closed with code', event.code)
@@ -23,7 +26,7 @@ export default class KingStream extends KingCat {
 
   connect () {
     if (!this.socket || !this.isOpen) {
-      this.socket = new WebSocket(url)
+      this.socket = new WebSocket(this.url)
       this.socket.onopen = this.print.bind(this)
       this.socket.onclose = this._gotClose
       this.socket.onerror = this._gotError.bind(this)

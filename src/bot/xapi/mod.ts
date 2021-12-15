@@ -9,6 +9,19 @@ export class KingCat {
 
   socket: WebSocket | null = null
   session = ''
+  account
+
+  constructor (account: any) {
+    this.account = account
+  }
+
+  get url(){
+    // wss://ws.xtb.com/demo
+    // wss://ws.xtb.com/demoStream
+    // wss://ws.xtb.com/real
+    // wss://ws.xtb.com/realStream
+    return 'wss://ws.xtb.com/' + this.account.type
+  }
 
   protected state (): string | undefined {
     if (this.socket)

@@ -1,9 +1,7 @@
 import Logger from '../../../log.ts'
 
 import { KingCat } from '../mod.ts'
-import config from '../config.ts'
 import print from '../print.ts'
-import url from '../url.ts'
 
 import { KingResponse, XapiLoginResponse } from './mod.d.ts'
 import { trade, trades } from './trade.ts'
@@ -18,6 +16,10 @@ export default class KingSocket extends KingCat {
   story = story
   sendx = sendx
   sync = sync
+
+  constructor (account: any) {
+    super(account)
+  }
 
   private _gotClose (event: CloseEvent): void {
     this.session = ''
@@ -40,7 +42,7 @@ export default class KingSocket extends KingCat {
 
   connect (): void {
     if (!this.socket || !this.isOpen) {
-      this.socket = new WebSocket(url)
+      this.socket = new WebSocket(this.url)
       this.socket.onopen = this.print.bind(this)
       this.socket.onclose = this._gotClose.bind(this)
       this.socket.onerror = this._gotError.bind(this)
@@ -56,8 +58,8 @@ export default class KingSocket extends KingCat {
     const data = {
       command: 'login',
       arguments: {
-        userId: config.accountId,
-        password: config.password,
+        userId: this.account.accountId,
+        password: this.account.password,
         appName: 'KingBot',
       }
     }

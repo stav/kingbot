@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import Logger from "../log.ts"
-import KingConn from './conn.ts'
+import KingCount from "./count.ts"
 
 type KeyMap = {
   [key: string]: string
@@ -11,17 +11,26 @@ type KeyMap = {
  * Mapping of available command shortcuts to commands
  */
 const funcMap: KeyMap = {
-  1 : 'connect',     // KingConn.connect
-  2 : 'ping',        // KingConn.ping
-  3 : 'login',       // KingConn.login
-  4 : 'story',       // KingConn.story
-  5 : 'trades',      // KingConn.trades
-  6 : 'trade',       // KingConn.trade
+  1 : 'list',        // KingCount.list
+  2 : '',
+  3 : '',
+  4 : '',
+  5 : '',
+  6 : '',
   7 : '',
-  8 : 'logout',      // KingConn logout
-  9 : 'close',       // KingConn close
-  0 : 'print',       // KingConn.print
-  a : 'Socket.ping', // KingConn.Socket.ping
+  8 : '',
+  9 : '',
+  0 : '',
+  w : 'Conn.connect',     // KingConn.connect
+  e : 'Conn.ping',        // KingConn.ping
+  r : 'Conn.login',       // KingConn.login
+  t : 'Conn.story',       // KingConn.story
+  y : 'Conn.trades',      // KingConn.trades
+  u : 'Conn.trade',       // KingConn.trade
+  i : 'Conn.logout',      // KingConn logout
+  o : 'Conn.close',       // KingConn close
+  p : 'Conn.print',       // KingConn.print
+  a : 'Conn.Socket.ping', // KingConn.Socket.ping
 }
 
 /**print
@@ -40,6 +49,8 @@ function print (): void {
  *
  * Note: This impure function mogrifies the `props` argument.
  *
+ * Hairflip: The use of `cprop.bind` is confusing to seem cool.
+ *
  * @param c     - The object in question.
  * @param props - The property path to traverse.
  */
@@ -48,7 +59,7 @@ function bind(c: any, props: string[]): Function | undefined {
   const prop = props.shift()
   if (prop) {
     const cprop = c[prop]
-    Logger.info('* bind', props, typeof cprop, cprop)
+    Logger.info(`* BIND ${c.constructor.name}.${prop} = (${typeof cprop})`, cprop)
     if (cprop) {
       if (props.length === 0) {
         return typeof cprop === 'function' ? cprop.bind(c) : cprop
@@ -62,15 +73,15 @@ function bind(c: any, props: string[]): Function | undefined {
  *
  * Return the reference for the given function name.
  *
- * @param connection - Top-level object
- * @param input      - Dot-delimited property path, ex: Socket.ping
+ * @param kingcount - Top-level object
+ * @param input     - Dot-delimited property path, ex: Socket.ping
  */
 // deno-lint-ignore ban-types
-function getBinding(connection: KingConn, input: string): Function | undefined {
+function getBinding(kingcount: KingCount, input: string): Function | undefined {
   const command: string = input in funcMap ? funcMap[input] : input
   Logger.info('* getBinding', typeof input, `(${input}) [${command}]`)
   if (command) {
-    const func = bind(connection, command.split('.'))
+    const func = bind(kingcount, command.split('.'))
     return func ? func : print
   }
 }

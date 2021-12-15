@@ -7,9 +7,13 @@ type ConfigData = {
 }
 
 type ConfigXapi = {
-  Xapi: ConfigData
+  Accounts: ConfigData[]
 }
 
-const config: ConfigData = ((await Config.load({ file: 'local' })) as ConfigXapi).Xapi
+type ConfigContainer = {
+  Xapi: ConfigXapi
+}
+
+const config: ConfigXapi = ((await Config.load({ file: 'local' })) as ConfigContainer).Xapi
 
 export default config

@@ -1,12 +1,12 @@
 import Commands from './commands.ts'
 import getInput from './input.ts'
-import KingConn from './conn.ts'
+import KingCount from './count.ts'
 
-const kingconn = new KingConn()
+const kingcount = new KingCount()
 
 async function start (): Promise<void> {
   for await (const input of getInput()) {
-    const obj = Commands.getBinding(kingconn, input)
+    const obj = Commands.getBinding(kingcount, input)
     if (obj) {
       console.info(obj)
       if (typeof obj === 'function')

@@ -1,9 +1,7 @@
 import { KingCat } from './mod.ts'
 
-import config from './config.ts'
-
 export default function print (this: KingCat) {
-  const id = config.accountId
+  const id = this.account.accountId
   const ses = this.session
   const url = this.socket?.url
   const stat = this.state()

@@ -3,8 +3,13 @@ import KingStream from './xapi/stream/mod.ts'
 
 export default class KingConn {
 
-  Socket = new KingSocket()
-  Stream = new KingStream()
+  Socket: KingSocket
+  Stream: KingStream
+
+  constructor (account: any) {
+    this.Socket = new KingSocket(account)
+    this.Stream = new KingStream(account)
+  }
 
   connect () {
     this.Socket.connect()
