@@ -6,11 +6,16 @@ const kingconn = new KingConn()
 
 async function start (): Promise<void> {
   for await (const input of getInput()) {
-    const func = Commands.getFunction(kingconn, input)
-    console.log('*', func)
-    func()
+    const obj = Commands.getBinding(kingconn, input)
+    if (obj) {
+      console.info(obj)
+      if (typeof obj === 'function')
+        obj()
+    }
+    else {
+      console.info()
+    }
   }
-  console.info()
 }
 
 export default {
