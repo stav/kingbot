@@ -10,9 +10,14 @@ export default function status (this: KingSocket) {
     const returnData = (<XapiDataResponse>response).returnData
     console.log(returnData)
   }
-
-  fetch('getCurrentUserData')
-  fetch('getMarginLevel')
-  fetch('getVersion')
-  fetch('getServerTime')
+  const commands = [
+    'getCurrentUserData',
+    'getMarginLevel',
+    'getVersion',
+    'getServerTime',
+  ]
+  // Throttle commands
+  const interval = 200
+  let timeout = -interval
+  commands.map(c => setTimeout(() => fetch(c), timeout += interval))
 }
