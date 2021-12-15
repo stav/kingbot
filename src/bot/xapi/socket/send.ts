@@ -1,11 +1,11 @@
-import Logger from '../../../../log.ts'
+import Logger from '../../../log.ts'
 
 import { InputData, KingResponse } from './mod.d.ts'
 import KingSocket from './mod.ts'
 
 export function sendx (this: KingSocket, data: InputData) {
   if (this.isOpen) {
-    this.send(JSON.stringify(data))
+    this.socket?.send(JSON.stringify(data))
   }
 }
 
@@ -24,10 +24,10 @@ export async function sync (this: KingSocket, data: InputData): Promise<KingResp
     const mData = JSON.parse(message.data)
     if (mData.customTag === customTag) {
       result = mData
-      this.removeEventListener('message', listener)
+      this.socket?.removeEventListener('message', listener)
     }
   }
-  this.addEventListener('message', listener)
+  this.socket?.addEventListener('message', listener)
   this.sendx(_data)
 
   while (!result) {

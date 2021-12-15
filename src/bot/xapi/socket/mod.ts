@@ -1,72 +1,85 @@
-import KingSocket from './king/mod.ts' // XXX TODO Circular reference
-import Connect from './connect.ts'
+import Logger from '../../../log.ts'
 
-/**
-* @note
-* Certain functions operate on open sockets only. A call to `connect` requests
-* a connection to the server and returns. The connection message arrives to the
-* listener at some point in the future. In order to properly implement these
-* functions (login, ping, etc) which may call `connect`, we need to create a
-* queue.
-*/
+import { KingCat } from '../mod.ts'
+import config from '../config.ts'
+import print from '../print.ts'
+import url from '../url.ts'
 
-let socket: KingSocket
+import { KingResponse, XapiLoginResponse } from './mod.d.ts'
+import { trade, trades } from './trade.ts'
+import { sendx, sync } from './send.ts'
+import story from './story.ts'
 
-function connect () {
-  if (!socket || !socket.isOpen) {
-    socket = Connect.newSocket()
+export default class KingSocket extends KingCat {
+
+  trades = trades
+  trade = trade
+  print = print
+  story = story
+  sendx = sendx
+  sync = sync
+
+  private _gotClose (event: CloseEvent): void {
+    this.session = ''
+    Logger.info('Socket closed with code', event.code)
+    // TODO Reenable reconnect
+    // if (event.code !== 1000) {
+    //   Logger.info('Restarting')
+    //   setTimeout(Socket.connect, 1000)
+    // }
   }
-}
 
-function login () {
-  connect()
-  Connect.login(socket)
-}
-
-function status () {
-  socket && socket.status()
-}
-
-function logout () {
-  if (socket?.session) {
-    Connect.logout(socket)
+  private _gotError (e: Event | ErrorEvent): void {
+    Logger.error((<ErrorEvent>e).message)
+    this.print()
   }
-}
 
-function close () {
-  if (socket) {
-    socket.isOpen && socket.close(1000)
-    socket.print()
+  private _gotMessage (message: MessageEvent): void {
+    Logger.info(message.data)
   }
-}
 
-function ping (): void {
-  connect()
-  socket.sendx({ command: 'ping' })
-}
+  connect (): void {
+    if (!this.socket || !this.isOpen) {
+      this.socket = new WebSocket(url)
+      this.socket.onopen = this.print.bind(this)
+      this.socket.onclose = this._gotClose.bind(this)
+      this.socket.onerror = this._gotError.bind(this)
+      this.socket.onmessage = this._gotMessage
+    }
+  }
 
-function print (): void {
-  socket && socket.print()
-}
+  ping (): void {
+    this.sendx({ command: 'ping' })
+  }
 
-function trade (): void {
-  connect()
-  socket.trade()
-}
+  async login (): Promise<void> {
+    const data = {
+      command: 'login',
+      arguments: {
+        userId: config.accountId,
+        password: config.password,
+        appName: 'KingBot',
+      }
+    }
+    const response: KingResponse = await this.sync(data)
+    if (response.status) {
+      this.session = (<XapiLoginResponse>response).streamSessionId
+    }
+  }
 
-function trades (): void {
-  connect()
-  socket.trades()
-}
+  logout (): void {
+    this.session = ''
+    this.sendx({ command: 'logout' }) // Server will close the connection
+    this.close()
+    this.print()
+  }
 
-export default {
-  ping,
-  close,
-  login,
-  print,
-  trade,
-  trades,
-  logout,
-  status,
-  connect,
+  close (): void {
+    if (this.socket) {
+      // Close 1000 so the bot does not try and restart
+      this.isOpen && this.socket.close(1000)
+      this.print()
+    }
+  }
+
 }
