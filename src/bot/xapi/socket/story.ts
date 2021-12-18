@@ -1,5 +1,5 @@
-import { InputData, KingResponse, XapiDataResponse } from './mod.d.ts'
-import KingSocket from './mod.ts'
+import { InputData, KingResponse, XapiDataResponse } from './socket.d.ts'
+import KingSocket from './socket.ts'
 
 export default function story (this: KingSocket) {
   this.print()

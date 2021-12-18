@@ -11,6 +11,7 @@ export class KingCat {
   session = ''
   account
 
+  // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     this.account = account
   }

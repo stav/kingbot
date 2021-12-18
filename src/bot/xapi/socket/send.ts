@@ -1,7 +1,7 @@
 import Logger from '../../../log.ts'
 
-import { InputData, KingResponse } from './mod.d.ts'
-import KingSocket from './mod.ts'
+import { InputData, KingResponse } from './socket.d.ts'
+import KingSocket from './socket.ts'
 
 export function sendx (this: KingSocket, data: InputData) {
   if (this.isOpen) {

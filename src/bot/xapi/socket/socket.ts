@@ -1,9 +1,9 @@
 import Logger from '../../../log.ts'
 
-import { KingCat } from '../mod.ts'
+import { KingCat } from '../xapi.ts'
 import print from '../print.ts'
 
-import { KingResponse, XapiLoginResponse } from './mod.d.ts'
+import { KingResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { sendx, sync } from './send.ts'
 import story from './story.ts'
@@ -17,6 +17,7 @@ export default class KingSocket extends KingCat {
   sendx = sendx
   sync = sync
 
+  // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     super(account)
   }

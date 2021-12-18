@@ -1,4 +1,4 @@
-import { KingCat } from './mod.ts'
+import { KingCat } from './xapi.ts'
 
 export default function print (this: KingCat) {
   const id = this.account.accountId

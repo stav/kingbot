@@ -1,11 +1,12 @@
-import KingSocket from './xapi/socket/mod.ts'
-import KingStream from './xapi/stream/mod.ts'
+import KingSocket from './xapi/socket/socket.ts'
+import KingStream from './xapi/stream/stream.ts'
 
 export default class KingConn {
 
   Socket: KingSocket
   Stream: KingStream
 
+  // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     this.Socket = new KingSocket(account)
     this.Stream = new KingStream(account)

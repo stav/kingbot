@@ -1,12 +1,13 @@
 import Logger from '../../../log.ts'
 
-import { KingCat } from '../mod.ts'
+import { KingCat } from '../xapi.ts'
 import print from '../print.ts'
 
 export default class KingStream extends KingCat {
 
   print = print
 
+  // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     super(account)
   }

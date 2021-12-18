@@ -1,4 +1,4 @@
-import Commands from './commands.ts'
+import Commands from './cmd.ts'
 import getInput from './input.ts'
 import KingCount from './count.ts'
 
