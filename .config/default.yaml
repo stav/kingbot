@@ -3,4 +3,5 @@
 Xapi:
   accountId: 1234567
   password: secret
+  name: Uncle Joe
   type: demo # real / demo

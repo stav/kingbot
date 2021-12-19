@@ -5,7 +5,7 @@ import KingCount from './count.ts'
 const kingcount = new KingCount()
 
 async function start (): Promise<void> {
-  for await (const input of getInput()) {
+  for await (const input of getInput(kingcount)) {
     const obj = Commands.getBinding(kingcount, input)
     if (obj) {
       console.info(obj)
