@@ -1,12 +1,12 @@
 import KingSocket from '../socket/socket.ts'
-import { KingCat } from '../xapi.ts'
+import { XSocket } from '../xsocket.ts'
 
 type InputData = {
   command: string
   // streamSessionId: string
 }
 
-export default class KingStream extends KingCat {
+export default class KingStream extends XSocket {
 
   Socket: KingSocket
 

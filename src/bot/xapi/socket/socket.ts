@@ -1,11 +1,11 @@
-import { KingCat } from '../xapi.ts'
+import { XSocket } from '../xsocket.ts'
 
 import { KingResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
 import story from './story.ts'
 
-export default class KingSocket extends KingCat {
+export default class KingSocket extends XSocket {
 
   trades = trades
   trade = trade
