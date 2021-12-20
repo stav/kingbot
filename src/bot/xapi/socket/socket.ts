@@ -2,7 +2,7 @@ import { KingCat } from '../xapi.ts'
 
 import { KingResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
-import { sendx, sync } from './send.ts'
+import { send, sync } from './send.ts'
 import story from './story.ts'
 
 export default class KingSocket extends KingCat {
@@ -10,7 +10,7 @@ export default class KingSocket extends KingCat {
   trades = trades
   trade = trade
   story = story
-  sendx = sendx
+  send = send
   sync = sync
 
   // deno-lint-ignore no-explicit-any
@@ -19,7 +19,7 @@ export default class KingSocket extends KingCat {
   }
 
   ping (): void {
-    this.sendx({ command: 'ping' })
+    this.send({ command: 'ping' })
   }
 
   async login (): Promise<void> {
@@ -39,7 +39,7 @@ export default class KingSocket extends KingCat {
 
   logout (): void {
     this.session = ''
-    this.sendx({ command: 'logout' }) // Server will close the connection
+    this.send({ command: 'logout' }) // Server will close the connection
     this.close()
     this.print()
   }

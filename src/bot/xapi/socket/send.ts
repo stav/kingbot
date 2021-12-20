@@ -3,7 +3,7 @@ import Logger from '../../../log.ts'
 import { InputData, KingResponse } from './socket.d.ts'
 import KingSocket from './socket.ts'
 
-export function sendx (this: KingSocket, data: InputData) {
+export function send (this: KingSocket, data: InputData) {
   if (this.isOpen) {
     this.socket?.send(JSON.stringify(data))
   }
@@ -28,7 +28,7 @@ export async function sync (this: KingSocket, data: InputData): Promise<KingResp
     }
   }
   this.socket?.addEventListener('message', listener)
-  this.sendx(_data)
+  this.send(_data)
 
   while (!result) {
     if (++timeout > 10) {

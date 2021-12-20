@@ -1,5 +1,10 @@
 import { KingCat } from '../xapi.ts'
 
+type InputData = {
+  command: string
+  // streamSessionId: string
+}
+
 export default class KingStream extends KingCat {
 
   // deno-lint-ignore no-explicit-any
@@ -8,7 +13,15 @@ export default class KingStream extends KingCat {
   }
 
   ping () {
-    // this.sendx({ command: 'ping' })
+    this.send({ command: 'ping' })
+  }
+
+  send (data: InputData) {
+    if (this.isOpen) {
+      const streamSessionId = this.Socket.session
+      const _data = Object.assign({ streamSessionId }, data)
+      this.socket?.send(JSON.stringify(_data))
+    }
   }
 
   close () {
