@@ -11,11 +11,11 @@ type KeyMap = {
  * Mapping of available command shortcuts to commands
  */
 const funcMap: KeyMap = {
-  '\u001b': 'f.0', // Escape ^[
-  '\x1bOP': 'f.1', // F1 \u001bOP
-  '\x1bOQ': 'f.2', // F2 \u001bOQ
-  '\x1bOR': 'f.3', // F3 \u001bOR
-  '\x1bOS': 'f.4', // F4 \u001bOS
+  '\u001b': 'f.0', // Escape ^[   KingCount.fKey
+  '\x1bOP': 'f.1', // F1 \u001bOP KingCount.fKey
+  '\x1bOQ': 'f.2', // F2 \u001bOQ KingCount.fKey
+  '\x1bOR': 'f.3', // F3 \u001bOR KingCount.fKey
+  '\x1bOS': 'f.4', // F4 \u001bOS KingCount.fKey
 
   1 : 'list',        // KingCount.list
   2 : 'listDetail',  // KingCount.listDetail
@@ -37,9 +37,10 @@ const funcMap: KeyMap = {
   o : 'Conn.close',       // KingConn close
   p : 'Conn.print',       // KingConn.print
   a : 'Conn.Socket.ping', // KingConn.Socket.ping
+  z : 'Conn.Stream.ping', // KingConn.Stream.ping
 }
 
-/**print
+/** print
  *
  * Display all the available command shortcuts
  */

@@ -9,7 +9,7 @@ export default class KingConn {
   // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     this.Socket = new KingSocket(account)
-    this.Stream = new KingStream(account)
+    this.Stream = new KingStream(account, this.Socket)
   }
 
   connect () {

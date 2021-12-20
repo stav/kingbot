@@ -13,6 +13,8 @@ export default class KingSocket extends KingCat {
   send = send
   sync = sync
 
+  session = ''
+
   // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     super(account)

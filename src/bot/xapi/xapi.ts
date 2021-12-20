@@ -1,5 +1,4 @@
 import Logger from '../../log.ts'
-import print from './print.ts'
 
 enum State {
   CONNECTING = 0,
@@ -8,24 +7,28 @@ enum State {
   CLOSED     = 3,
 }
 
-export class KingCat {
+export abstract class KingCat {
+
+  // deno-lint-ignore no-explicit-any
+  [index: string]: any // allow parent property access (session)
 
   socket: WebSocket | null = null
-  session = ''
   account
-  print = print
 
   // deno-lint-ignore no-explicit-any
   constructor (account: any) {
     this.account = account
   }
 
-  private _isOpen (): boolean {
+  private get _isOpen (): boolean {
     return this.socket?.readyState === State.OPEN
   }
 
+  private get _state (): string | undefined {
+    return this.socket ? State[this.socket.readyState] : undefined
+  }
+
   protected gotClose (event: CloseEvent): void {
-    this.session = ''
     Logger.info('Socket closed with code', event.code)
     // TODO Reenable reconnect
     // if (event.code !== 1000) {
@@ -43,13 +46,8 @@ export class KingCat {
     Logger.info(message.data)
   }
 
-  protected state (): string | undefined {
-    if (this.socket)
-      return State[this.socket.readyState]
-  }
-
   get isOpen (): boolean {
-    return this._isOpen()
+    return this._isOpen
   }
 
   get url (): string {
@@ -68,6 +66,15 @@ export class KingCat {
       this.socket.onerror = this.gotError.bind(this)
       this.socket.onmessage = this.gotMessage
     }
+  }
+
+  print () {
+    const id = this.account.accountId
+    const ses = this['session']
+    const url = this.socket?.url
+    const stat = this._state
+    const name = this.constructor.name
+    console.info(`${name}  ${url}  ${id}  ${stat}  ${ses}`)
   }
 
 }

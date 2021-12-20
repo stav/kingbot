@@ -1,3 +1,4 @@
+import KingSocket from '../socket/socket.ts'
 import { KingCat } from '../xapi.ts'
 
 type InputData = {
@@ -7,9 +8,16 @@ type InputData = {
 
 export default class KingStream extends KingCat {
 
+  Socket: KingSocket
+
   // deno-lint-ignore no-explicit-any
-  constructor (account: any) {
+  constructor (account: any, kingsocket: KingSocket) {
     super(account)
+    this.Socket = kingsocket
+  }
+
+  get session (): string {
+    return this.Socket.session
   }
 
   ping () {
