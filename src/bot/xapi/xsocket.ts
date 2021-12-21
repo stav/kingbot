@@ -71,6 +71,12 @@ export abstract class XSocket {
     return 'wss://ws.xtb.com/' + this.account.type
   }
 
+  get info () {
+    const tAcct = this.account
+    const tName = this.constructor.name
+    return `${tName}(${tAcct.id}|${tAcct.name})`
+  }
+
   connect (): void {
     if (!this.socket || !this.isOpen) {
       this.socket = new WebSocket(this.url)

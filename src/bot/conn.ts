@@ -52,4 +52,8 @@ export default class KingConn {
     this.Stream.print()
   }
 
+  list (index: number) {
+    console.log('CNX', index, this.Socket.info, this.Stream.info)
+  }
+
 }

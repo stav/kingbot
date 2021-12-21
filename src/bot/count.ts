@@ -32,17 +32,7 @@ export default class KingCount {
 
   list () {
     for (let i=1; i<this.conns.length; i++) {
-      const conn = this.conns[i]
-
-      const tAcct = conn.Socket.account
-      const tName = conn.Socket.constructor.name
-      const socket = `${tName}(${tAcct.accountId}|${tAcct.name})`
-
-      const mAcct = conn.Stream.account
-      const mName = conn.Stream.constructor.name
-      const stream = `${mName}(${mAcct.accountId}|${mAcct.name})`
-
-      console.log('CNX', i, socket, stream)
+      this.conns[i].list(i)
     }
   }
 
