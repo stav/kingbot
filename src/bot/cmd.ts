@@ -66,7 +66,7 @@ function bind(c: any, props: string[]): Function | undefined {
   const prop = props.shift()
   if (prop) {
     const cprop = c[prop]
-    Logger.info(`* BIND ${c.constructor.name}.${prop} = (${typeof cprop})`, cprop)
+    Logger.info(`  BIND ${c.constructor.name}.${prop} = (${typeof cprop}) ${cprop?.name}`)
     if (cprop) {
       if (props.length === 0) {
         return typeof cprop === 'function' ? cprop.bind(c) : cprop

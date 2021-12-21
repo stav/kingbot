@@ -13,6 +13,7 @@ export abstract class XSocket {
   [index: string]: any // allow parent property access (session)
 
   socket: WebSocket | null = null
+  date: { [index: string]: number } = {}
   account
 
   // deno-lint-ignore no-explicit-any
@@ -28,8 +29,15 @@ export abstract class XSocket {
     return this.socket ? State[this.socket.readyState] : undefined
   }
 
+  protected gotOpen (_event: Event) {
+    this.date.opened = Date.now()
+    this.date.closed = 0
+    this.print()
+  }
+
   protected gotClose (event: CloseEvent): void {
     Logger.info('Socket closed with code', event.code)
+    this.date.closed = Date.now()
     // TODO Reenable reconnect
     // if (event.code !== 1000) {
     //   Logger.info('Restarting')
@@ -61,20 +69,38 @@ export abstract class XSocket {
   connect (): void {
     if (!this.socket || !this.isOpen) {
       this.socket = new WebSocket(this.url)
-      this.socket.onopen = this.print.bind(<XSocket>this)
+      this.socket.onopen = this.gotOpen.bind(this)
       this.socket.onclose = this.gotClose.bind(this)
       this.socket.onerror = this.gotError.bind(this)
       this.socket.onmessage = this.gotMessage
     }
   }
 
+  private get time () {
+    if (!this.date?.opened) {
+      return ''
+    }
+    function human (o: { h: number, m: number, s: number }) {
+      while (o.s > 60) { o.m++; o.s -= 60 }
+      while (o.m > 60) { o.h++; o.m -= 60 }
+      return `${Math.floor(o.h)}h${Math.floor(o.m)}m${Math.floor(o.s)}s`
+    }
+    const open = this.date.opened
+    const close = this.date?.closed || Date.now()
+    const s = (close - open) / 1000
+
+    return human({ h: 0, m: 0, s })
+  }
+
   print () {
     const id = this.account.accountId
     const ses = this['session']
     const url = this.socket?.url
+    const obj = this.constructor.name
+    const name = this.account.name
     const stat = this._state
-    const name = this.constructor.name
-    console.info(`${name}  ${url}  ${id}  ${stat}  ${ses}`)
+    const time = this.time
+    console.info(`${obj}  ${url}  ${id}|${name}  ${stat}|${time}  ${ses}`)
   }
 
 }
