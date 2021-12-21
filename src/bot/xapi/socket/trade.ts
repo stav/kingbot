@@ -1,7 +1,7 @@
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
-import { TRADE_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
-import { InputData, KingResponse, XapiDataResponse } from './socket.d.ts'
-import KingSocket from './socket.ts'
+import type { TRADE_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
+import type { InputData, KingResponse, XapiDataResponse } from './socket.d.ts'
+import type KingSocket from './socket.ts'
 
 export async function trades (this: KingSocket): Promise<void> {
   const data: InputData = {

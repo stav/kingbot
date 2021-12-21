@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import Logger from '../log.ts'
-import KingCount from './count.ts'
+import type KingCount from './count.ts'
 
 type KeyMap = {
   [key: string]: string

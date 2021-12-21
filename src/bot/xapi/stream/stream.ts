@@ -1,4 +1,4 @@
-import KingSocket from '../socket/socket.ts'
+import type KingSocket from '../socket/socket.ts'
 import { XSocket } from '../xsocket.ts'
 
 type InputData = {

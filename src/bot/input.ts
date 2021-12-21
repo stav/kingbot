@@ -1,4 +1,4 @@
-import KingCount from './count.ts'
+import type KingCount from './count.ts'
 
 type InputGenerator = AsyncGenerator<string, void, void>
 

@@ -1,5 +1,5 @@
 // deno-lint-ignore-file
-import { CMD_FIELD, TYPE_FIELD } from './xapi.ts'
+import type { CMD_FIELD, TYPE_FIELD } from './xapi.ts'
 
 declare enum STATE_FIELD {
   MODIFIED = "Modified",

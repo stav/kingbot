@@ -1,6 +1,6 @@
 import { XSocket } from '../xsocket.ts'
 
-import { KingResponse, XapiLoginResponse } from './socket.d.ts'
+import type { KingResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
 import story from './story.ts'

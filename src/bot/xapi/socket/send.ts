@@ -1,7 +1,7 @@
 import Logger from '../../../log.ts'
 
-import { InputData, KingResponse } from './socket.d.ts'
-import KingSocket from './socket.ts'
+import type { InputData, KingResponse } from './socket.d.ts'
+import type KingSocket from './socket.ts'
 
 export function send (this: KingSocket, data: InputData) {
   if (this.isOpen) {
