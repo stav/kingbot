@@ -56,7 +56,7 @@ function print (): void {
  *
  * Note: This impure function mogrifies the `props` argument.
  *
- * Hairflip: The use of `cprop.bind` is confusing to seem cool.
+ * Hairflip: The use of `c[prop].bind` is confusing to seem cool.
  *
  * @param c     - The object in question.
  * @param props - The property path to traverse.
@@ -65,23 +65,24 @@ function print (): void {
 function bind(c: any, props: string[]): Function | undefined {
   const prop = props.shift()
   if (prop) {
-    const cprop = c[prop]
-    Logger.info(`  BIND ${c.constructor.name}.${prop} = (${typeof cprop}) ${cprop?.name}`)
-    if (cprop) {
-      if (props.length === 0) {
-        return typeof cprop === 'function' ? cprop.bind(c) : cprop
-      }
-      return bind(cprop, props)
-    }
+    Logger.info(`  BIND ${c.constructor.name}.${prop} = (${typeof c[prop]}) ${c[prop]?.name}`)
+    if (c[prop])
+      return props.length
+        ? bind(c[prop], props)
+        : typeof c[prop] === 'function'
+          ? c[prop].bind(c)
+          : c[prop]
   }
 }
 
 /** getBinding
  *
- * Return the reference for the given function name.
+ * Based on the input string try to bind a function to the provided connection.
  *
- * @param kingcount - Top-level object
+ * @param kingcount - Top-level connection object
  * @param input     - Dot-delimited property path, ex: Socket.ping
+ *
+ * @returns Reference for the given (function) object name.
  */
 // deno-lint-ignore ban-types
 function getBinding(kingcount: KingCount, input: string): Function | undefined {

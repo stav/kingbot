@@ -12,7 +12,7 @@ export default class KingCount {
 
   constructor () {
     // Hardcode five functions that call fKey based on index accessed
-    for (let i=5; i--; ) {
+    for (let i=5; i--;) {
       this.f[i] = () => this.fKey(i)
     }
     // Create a separate connection for each account
@@ -20,7 +20,7 @@ export default class KingCount {
       this.conns.push(new KingConn(account))
     }
     // Set the first account active
-    if (this.conns.length > 0) {
+    if (this.conns.length > 1) {
       this.currentAccountIndex = 1
     }
   }
