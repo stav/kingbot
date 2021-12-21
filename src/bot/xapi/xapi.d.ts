@@ -6,6 +6,28 @@ declare enum STATE_FIELD {
   DELETED = "Deleted",
 }
 
+export type Account = {
+  id: number
+  pw?: string
+  name: string
+  type: 'real' | 'demo'
+}
+
+export type ConfigAccount = {
+  accountId: number
+  password: string
+  name: string
+  type: 'real' | 'demo'
+}
+
+export type ConfigXapi = {
+  Accounts: ConfigAccount[]
+}
+
+export type ConfigContainer = {
+  Xapi: ConfigXapi
+}
+
 export interface TRADE_RECORD {
   close_price: number;
   close_time: number;

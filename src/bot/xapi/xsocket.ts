@@ -1,4 +1,5 @@
 import Logger from '../../log.ts'
+import type { Account, ConfigAccount } from './xapi.d.ts'
 
 enum State {
   CONNECTING = 0,
@@ -14,11 +15,15 @@ export abstract class XSocket {
 
   socket: WebSocket | null = null
   date: { [index: string]: number } = {}
-  account
+  account: Account
 
-  // deno-lint-ignore no-explicit-any
-  constructor (account: any) {
-    this.account = account
+  constructor (account: ConfigAccount) {
+    this.account = {
+      id:   account.accountId,
+      // pw:account.password,
+      name: account.name,
+      type: account.type,
+    }
   }
 
   private get _isOpen (): boolean {
@@ -93,7 +98,7 @@ export abstract class XSocket {
   }
 
   print () {
-    const id = this.account.accountId
+    const id = this.account.id
     const ses = this['session']
     const url = this.socket?.url
     const obj = this.constructor.name

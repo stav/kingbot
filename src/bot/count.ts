@@ -3,8 +3,7 @@ import config from './xapi/config.ts'
 
 export default class KingCount {
 
-  // deno-lint-ignore no-explicit-any
-  conns: any[] = [new KingConn({ name: 'Dummy' })] // Dummy account so conns is one-indexed
+  conns: KingConn[] = [new KingConn({ name: 'Dummy' })] // Dummy account so conns is one-indexed
 
   f: (() => void)[] = []
 

@@ -1,3 +1,4 @@
+import type { ConfigAccount, Account } from '../xapi.d.ts'
 import { XSocket } from '../xsocket.ts'
 
 import type { KingResponse, XapiLoginResponse } from './socket.d.ts'
@@ -7,17 +8,18 @@ import story from './story.ts'
 
 export default class KingSocket extends XSocket {
 
+  #account: Account
+  session = ''
+
   trades = trades
   trade = trade
   story = story
   send = send
   sync = sync
 
-  session = ''
-
-  // deno-lint-ignore no-explicit-any
-  constructor (account: any) {
+  constructor (account: ConfigAccount) {
     super(account)
+    this.#account = Object.assign({ pw: account.password }, this.account)
   }
 
   ping (): void {
@@ -28,8 +30,8 @@ export default class KingSocket extends XSocket {
     const data = {
       command: 'login',
       arguments: {
-        userId: this.account.accountId,
-        password: this.account.password,
+        userId: this.#account.id,
+        password: this.#account.pw,
         appName: 'KingBot',
       }
     }

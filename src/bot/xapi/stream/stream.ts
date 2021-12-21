@@ -1,3 +1,4 @@
+import type { ConfigAccount } from '../xapi.d.ts'
 import type KingSocket from '../socket/socket.ts'
 import { XSocket } from '../xsocket.ts'
 
@@ -10,8 +11,7 @@ export default class KingStream extends XSocket {
 
   Socket: KingSocket
 
-  // deno-lint-ignore no-explicit-any
-  constructor (account: any, kingsocket: KingSocket) {
+  constructor (account: ConfigAccount, kingsocket: KingSocket) {
     super(account)
     this.Socket = kingsocket
   }
