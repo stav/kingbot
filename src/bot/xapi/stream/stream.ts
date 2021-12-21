@@ -1,4 +1,4 @@
-import type { ConfigAccount } from '../xapi.d.ts'
+import type { ConfigAccount } from '../../config.d.ts'
 import type KingSocket from '../socket/socket.ts'
 import { XSocket } from '../xsocket.ts'
 

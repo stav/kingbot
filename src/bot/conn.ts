@@ -1,3 +1,5 @@
+import type { ConfigAccount } from './config.d.ts'
+
 import KingSocket from './xapi/socket/socket.ts'
 import KingStream from './xapi/stream/stream.ts'
 
@@ -6,8 +8,11 @@ export default class KingConn {
   Socket: KingSocket
   Stream: KingStream
 
-  // deno-lint-ignore no-explicit-any
-  constructor (account: any) {
+  static dummy () {
+    return new KingConn({} as ConfigAccount)
+  }
+
+  constructor (account: ConfigAccount) {
     this.Socket = new KingSocket(account)
     this.Stream = new KingStream(account, this.Socket)
   }

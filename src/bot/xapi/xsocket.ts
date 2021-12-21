@@ -1,5 +1,5 @@
 import Logger from '../../log.ts'
-import type { Account, ConfigAccount } from './xapi.d.ts'
+import type { Account, ConfigAccount } from '../config.d.ts'
 
 enum State {
   CONNECTING = 0,

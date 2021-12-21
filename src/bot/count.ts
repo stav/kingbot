@@ -1,9 +1,9 @@
 import KingConn from './conn.ts'
-import config from './xapi/config.ts'
+import config from './config.ts'
 
 export default class KingCount {
 
-  conns: KingConn[] = [new KingConn({ name: 'Dummy' })] // Dummy account so conns is one-indexed
+  conns: KingConn[] = [KingConn.dummy()] // Dummy account so conns is one-indexed
 
   f: (() => void)[] = []
 
