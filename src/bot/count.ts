@@ -1,34 +1,27 @@
 import type { KingConn } from './conn.d.ts'
-import FactoryConn from './conn.ts'
-import config from './config.ts'
+import ConnectionFactory from './conn.ts'
 
 export default class KingCount {
 
-  conns: KingConn[] = [FactoryConn()] // Dummy account so conns is one-indexed
+  conns: KingConn[] = ConnectionFactory()
 
   f: (() => void)[] = []
 
   currentAccountIndex = 0
 
   constructor () {
-    // Hardcode five functions that call fKey based on index accessed
-    for (let i=5; i--;) {
-      this.f[i] = () => this.fKey(i)
-    }
-    // Create a separate connection for each account
-    for (const account of config.Accounts) {
-      this.conns.push(FactoryConn(account))
-    }
     // Set the first account active
     if (this.conns.length > 1) {
       this.currentAccountIndex = 1
     }
+    // Hardcode five functions that call fKey based on index accessed
+    for (let i=5; i--;) {
+      this.f[i] = () => this.fKey(i)
+    }
   }
 
-  get Conn (): KingConn | null {
-    return this.currentAccountIndex < this.conns.length
-      ? this.conns[ this.currentAccountIndex ]
-      : null
+  get Conn (): KingConn {
+    return this.conns[ this.currentAccountIndex ]
   }
 
   list () {
@@ -42,7 +35,7 @@ export default class KingCount {
   }
 
   fKey (index: number) {
-    if (index > 0 && index < this.conns.length)
+    if (index < this.conns.length)
       this.currentAccountIndex = index
   }
 

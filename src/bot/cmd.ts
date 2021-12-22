@@ -11,7 +11,6 @@ type KeyMap = {
  * Mapping of available command shortcuts to commands
  */
 const funcMap: KeyMap = {
-  '\u001b': 'f.0', // Escape ^[   KingCount.fKey
   '\x1bOP': 'f.1', // F1 \u001bOP KingCount.fKey
   '\x1bOQ': 'f.2', // F2 \u001bOQ KingCount.fKey
   '\x1bOR': 'f.3', // F3 \u001bOR KingCount.fKey
