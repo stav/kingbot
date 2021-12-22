@@ -1,9 +1,10 @@
-import KingConn from './conn.ts'
+import type { KingConn } from './conn.d.ts'
+import FactoryConn from './conn.ts'
 import config from './config.ts'
 
 export default class KingCount {
 
-  conns: KingConn[] = [KingConn.dummy()] // Dummy account so conns is one-indexed
+  conns: KingConn[] = [FactoryConn()] // Dummy account so conns is one-indexed
 
   f: (() => void)[] = []
 
@@ -16,7 +17,7 @@ export default class KingCount {
     }
     // Create a separate connection for each account
     for (const account of config.Accounts) {
-      this.conns.push(new KingConn(account))
+      this.conns.push(FactoryConn(account))
     }
     // Set the first account active
     if (this.conns.length > 1) {
