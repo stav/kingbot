@@ -26,6 +26,7 @@ const funcMap: KeyMap = {
   8 : '',
   9 : '',
   0 : '',
+  q : 'Conn.ticks',     // KingConn.connect
   w : 'Conn.connect',     // KingConn.connect
   e : 'Conn.ping',        // KingConn.ping
   r : 'Conn.login',       // KingConn.login

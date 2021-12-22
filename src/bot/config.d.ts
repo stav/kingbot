@@ -11,6 +11,11 @@ export type ConfigAccount = {
   password: string
   name: string
   type: 'real' | 'demo'
+  api?: {
+    key: string
+    secret: string
+    passphrase: string
+  }
 }
 
 export type ConfigContainer = {
