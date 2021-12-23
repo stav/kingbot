@@ -1,4 +1,4 @@
-import { crypto } from "https://deno.land/std@0.119.0/crypto/mod.ts";
+import { crypto } from 'https://deno.land/std@0.119.0/crypto/mod.ts'
 
 import type { ConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
@@ -49,6 +49,20 @@ export default class KuConn implements KingConn {
     console.log('tknOut', tknOut)
   }
 
+  async sign () {
+    // https://medium.com/deno-the-complete-reference/sign-verify-jwt-hmac-sha256-4aa72b27042a
+    const data = { exp: Date.now(), a: 'b', c: 'd', e: 100 }
+    const key = await genKey("013d3270-b0a0-46f8-9e56-2265ba768e12")
+    const jwt = await getJWT(key, data)
+    const result = await checkJWT(key, jwt)
+    console.log('sign0')
+    console.log('sign1', data)
+    console.log('sign2', result)
+    console.log('sign3', result == data)
+    //jwt: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MzAyNTc4NzY1MTMsImEiOiJiIiwiYyI6ImQiLCJlIjoxMDB9.2EFOA5-sa_taJEEVDaP_xKSA-Nv5IqQYj_-MhmpG1J8const data=await checkJWT(key, jwt);
+    //data: { exp: 1630257876513, a: "b", c: "d", e: 100 }
+  }
+
   async time () {
     const time = await this.resolve('timestamp')
     console.log('time', time, new Date(time))
@@ -60,8 +74,30 @@ export default class KuConn implements KingConn {
 
 }
 
+import {encode as bEnc, decode as bDec} from "https://deno.land/std/encoding/base64url.ts"
 import { encode, decode } from "https://deno.land/std/encoding/base64url.ts"
 import { HmacSha256 } from "https://deno.land/std/hash/sha256.ts"
+
+const tEnc = (d:string) => new TextEncoder().encode(d)
+const tDec = (d:Uint8Array) => new TextDecoder().decode(d)
+
+type HmacImportParams = { name: 'HMAC', hash: 'SHA-256' | 'SHA-384' | 'SHA-512' }
+const params: HmacImportParams = { name:"HMAC", hash:"SHA-256" }
+const genKey = async (k:string) => await crypto.subtle.importKey!("raw", tEnc(k), params, false, ["sign", "verify"]) as CryptoKey
+
+const getJWT = async (key:CryptoKey, data:any) => {
+  const payload = bEnc(tEnc(JSON.stringify({alg:"HS256", typ:"JWT"})))+'.'+bEnc(tEnc(JSON.stringify(data)))
+  const signed = await crypto.subtle.sign!({name:"HMAC"}, key, tEnc(payload)) as ArrayBuffer
+  const signature = bEnc(new Uint8Array(signed))
+  return `${payload}.${signature}`
+}
+const checkJWT = async (key:CryptoKey, jwt:string) => {
+  const jwtParts = jwt.split(".")
+  if (jwtParts.length !== 3) return
+  const data = tEnc(jwtParts[0]+'.'+jwtParts[1])
+  if (await crypto.subtle.verify!({ name:"HMAC" }, key, bDec(jwtParts[2]), data)===true)
+    return JSON.parse(tDec(bDec(jwtParts[1])))
+}
 
 function createJWT(header:any, payload:any, secret:string): string {
   const bHdr = encode(new TextEncoder().encode(JSON.stringify(header)))
@@ -88,21 +124,20 @@ function verifyJWT(token:string, secret:string) {
   return pyld
 }
 
-function sign(text: any, secret: any, outputType = 'base64') {
-  const result = crypto.subtle.digestSync(
-    'SHA-256',
-    new TextEncoder().encode(text)
-  )
-  console.log('sign', text, result)
-  return result
-  // .createHmac('sha256', secret)
-  // .update(text)
-  // .digest(outputType);
-}
-
 function auth(ApiKey: any, method: string, url: string, data: string) {
-  const timestamp = Date.now();
-  const signature = sign(timestamp + method.toUpperCase() + url + data, ApiKey.secret);
+  function sign(text: any, secret: any, outputType = 'base64') {
+    const result = crypto.subtle.digestSync(
+      'SHA-256',
+      new TextEncoder().encode(text)
+    )
+    console.log('sign', text, result)
+    return result
+    // .createHmac('sha256', secret)
+    // .update(text)
+    // .digest(outputType);
+  }
+  const timestamp = Date.now()
+  const signature = sign(timestamp + method.toUpperCase() + url + data, ApiKey.secret)
   const returnData = {
     'KC-API-KEY': ApiKey.key,
     'KC-API-SIGN': signature,
