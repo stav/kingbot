@@ -10,20 +10,20 @@ export default class KuConn implements KingConn {
     this.account = account
   }
 
+  private async resolve (relativePath: string) {
+    const url = this.base + '/api/v1/' + relativePath
+    const response = await fetch(url)
+    return response.ok
+      ? (await response.json()).data
+      : response
+  }
+
   connect () {
   }
 
   async time () {
-    const url = this.base + '/api/v1/timestamp'
-    const response = await fetch(url)
-    if (response.ok) {
-      const result = await response.json()
-      const date = new Date(result.data)
-      console.log('time', result.data, date)
-    }
-    else {
-      console.log('response', response)
-    }
+    const time = await this.resolve('timestamp')
+    console.log('time', time, new Date(time))
   }
 
   list (index: number) {
