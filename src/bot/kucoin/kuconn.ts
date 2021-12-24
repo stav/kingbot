@@ -3,6 +3,13 @@ import { crypto } from 'https://deno.land/std@0.119.0/crypto/mod.ts'
 import type { ConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
 
+type ApiKeyData = {
+  key: string
+  secret: string
+  passphrase: string
+}
+
+
 export default class KuConn implements KingConn {
 
   base = 'https://api.kucoin.com'
@@ -12,28 +19,63 @@ export default class KuConn implements KingConn {
     this.account = account
   }
 
-  private async resolve (relativePath: string) {
+  private async resolvePublic (relativePath: string, options?: RequestInit) {
     const url = this.base + '/api/v1/' + relativePath
-    const response = await fetch(url)
+    const response = await fetch(url, options)
     return response.ok
       ? (await response.json()).data
       : response
   }
 
-  connect () {
-    // C-API-KEY 61c40160d98e2200014f3535
-    // KC-API-SIGN The base64-encoded signature (see Signing a Message).
-    // KC-API-TIMESTAMP Date.now()
-    // KC-API-PASSPHRASE wehavereceivedyourinquiry
-    // KC-API-KEY-VERSION v2
+  async auth(ApiKey: ApiKeyData, method: string, url: string, body = '') {
+    async function sign(data: string, secret: string) {
+      const key = await genKey(secret)
+      console.log('auth.sign', data, `(${secret})`, key)
+      const jwt = await getJWT(key, data)
+      return jwt
+    }
+    const timestamp = Date.now()
+    const document = timestamp + method.toUpperCase() + url + body
+    console.log('auth.document', document)
+    const returnData = {
+      'KC-API-KEY': ApiKey.key,
+      'KC-API-SIGN': await sign(document, ApiKey.secret),
+      'KC-API-TIMESTAMP': timestamp.toString(),
+      // 'KC-API-PASSPHRASE': await sign(ApiKey.passphrase, ApiKey.secret),
+      'KC-API-PASSPHRASE': ApiKey.passphrase,
+      'KC-API-KEY-VERSION': '2',
+    }
+    return returnData
+  }
 
-    const api = {
+  private async resolvePrivate (relativePath: string) {
+    const url = this.base + '/api/v1/' + relativePath
+
+    const akd: ApiKeyData = {
       key: '61c40160d98e2200014f3535',
       secret: '090c76fd-0d75-4ee0-a63d-e6c607bd6819',
       passphrase: 'wehavereceivedyourinquiry',
     }
-    const x = auth(api, 'GET', 'http://localhost', 'asdf')
-    console.log('auth', x)
+    const authHeaders = await this.auth(akd, 'GET', url)
+    const saltHeaders = {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Kingbot/2',
+    }
+    const headers = Object.assign(saltHeaders, authHeaders)
+    console.log('resolve.headers', headers)
+    const response = await fetch(url, { headers })
+    return response.ok
+      ? (await response.json()).data
+      : response
+  }
+
+  async user () {
+    const path = 'sub/user'
+    const user = await this.resolvePrivate(path)
+    console.log('user', user)
+  }
+
+  async connect () {
   }
 
   jwt () {
@@ -64,7 +106,7 @@ export default class KuConn implements KingConn {
   }
 
   async time () {
-    const time = await this.resolve('timestamp')
+    const time = await this.resolvePublic('timestamp')
     console.log('time', time, new Date(time))
   }
 
@@ -122,30 +164,4 @@ function verifyJWT(token:string, secret:string) {
 
   console.log('payday!')
   return pyld
-}
-
-function auth(ApiKey: any, method: string, url: string, data: string) {
-  function sign(text: any, secret: any, outputType = 'base64') {
-    const result = crypto.subtle.digestSync(
-      'SHA-256',
-      new TextEncoder().encode(text)
-    )
-    console.log('sign', text, result)
-    return result
-    // .createHmac('sha256', secret)
-    // .update(text)
-    // .digest(outputType);
-  }
-  const timestamp = Date.now()
-  const signature = sign(timestamp + method.toUpperCase() + url + data, ApiKey.secret)
-  const returnData = {
-    'KC-API-KEY': ApiKey.key,
-    'KC-API-SIGN': signature,
-    'KC-API-TIMESTAMP': timestamp.toString(),
-    'KC-API-PASSPHRASE': sign(ApiKey.passphrase || '', ApiKey.secret),
-    'KC-API-KEY-VERSION': 2,
-    'Content-Type': 'application/json',
-    'User-Agent': `Kingbot/2`,
-  }
-  return returnData
 }
