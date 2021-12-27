@@ -31,16 +31,21 @@ async function sign (data: string, secret: string): Promise<string> {
 
 export default class KuConn extends Socket implements KingConn {
 
+  #tickToggle = false
+
   base = 'https://api.kucoin.com'
   session = ''
   account
-  tickToggle = false
   // tickPrice = ''
   // tickTime = 0
 
   constructor (account: ConfigAccount) {
     super()
     this.account = Object.assign({ api: {} as ApiKeyData }, account)
+  }
+
+  private get scribe () {
+    return this.#tickToggle ? 'unsubscribe' : 'subscribe'
   }
 
   private async resolvePublic (relativePath: string, options?: RequestInit) {
@@ -104,19 +109,19 @@ export default class KuConn extends Socket implements KingConn {
   }
 
   ticks () {
-    this.tickToggle = !this.tickToggle
-    const scribe = this.tickToggle ? 'subscribe' : 'unsubscribe'
-    console.log('ticks', scribe)
+    console.log('ticks', this.scribe)
     const data = {
       id: this.session,                          // The id should be an unique value
-      type: scribe,                              // "subscribe" | "unsubscribe"
+      type: this.scribe,                         // "subscribe" | "unsubscribe"
    // topic: "/market/ticker:BTC-USDT,ETH-USDT", // Topic needs to be subscribed. Some topics support to divisional subscribe the informations of multiple trading pairs through ",".
       topic: "/market/ticker:BTC-USDT",          // Topic needs to be subscribed. Some topics support to divisional subscribe the informations of multiple trading pairs through ",".
       privateChannel: false,                     // Adopted the private channel or not. Set as false by default.
       response: true                             // Whether the server needs to return the receipt information of this subscription or not. Set as false by default.
     }
-    if (this.isOpen)
+    if (this.isOpen) {
       this.socket?.send(JSON.stringify(data))
+      this.#tickToggle = !this.#tickToggle
+    }
   }
 
   async status () {
