@@ -1,5 +1,5 @@
 import type { ConfigAccount } from '../../config.d.ts'
-import type KingSocket from '../socket/socket.ts'
+import type XapiSocket from '../socket/socket.ts'
 import { XSocket } from '../xsocket.ts'
 
 type InputData = {
@@ -7,13 +7,13 @@ type InputData = {
   // streamSessionId: string
 }
 
-export default class KingStream extends XSocket {
+export default class XapiStream extends XSocket {
 
-  Socket: KingSocket
+  Socket: XapiSocket
 
-  constructor (account: ConfigAccount, kingsocket: KingSocket) {
+  constructor (account: ConfigAccount, socket: XapiSocket) {
     super(account)
-    this.Socket = kingsocket
+    this.Socket = socket
   }
 
   get session (): string {

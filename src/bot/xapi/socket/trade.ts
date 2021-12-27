@@ -1,16 +1,16 @@
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 import type { TRADE_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
-import type { InputData, KingResponse, XapiDataResponse } from './socket.d.ts'
-import type KingSocket from './socket.ts'
+import type { InputData, XapiResponse, XapiDataResponse } from './socket.d.ts'
+import type XapiSocket from './socket.ts'
 
-export async function trades (this: KingSocket): Promise<void> {
+export async function trades (this: XapiSocket): Promise<void> {
   const data: InputData = {
     command: 'getTrades',
     arguments: {
       openedOnly: false,
     }
   }
-  const response: KingResponse = await this.sync(data)
+  const response: XapiResponse = await this.sync(data)
   if (response.status) {
     const trades: TRADE_RECORD[] = (<XapiDataResponse>response).returnData
     trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
@@ -21,7 +21,7 @@ export async function trades (this: KingSocket): Promise<void> {
   }
 }
 
-export async function trade(this: KingSocket): Promise<void> {
+export async function trade(this: XapiSocket): Promise<void> {
   // First make the trade
   const trade: TRADE_TRANS_INFO = {
     order: 0,
@@ -42,7 +42,7 @@ export async function trade(this: KingSocket): Promise<void> {
       tradeTransInfo: trade,
     }
   }
-  let response: KingResponse = await this.sync(data)
+  let response: XapiResponse = await this.sync(data)
   let returnData = (<XapiDataResponse>response).returnData
   console.log(returnData)
 

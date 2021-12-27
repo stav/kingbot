@@ -1,11 +1,11 @@
 import type { ConfigAccount, Account } from '../../config.d.ts'
 import { XSocket } from '../xsocket.ts'
-import type { KingResponse, XapiLoginResponse } from './socket.d.ts'
+import type { XapiResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
 import story from './story.ts'
 
-export default class KingSocket extends XSocket {
+export default class XapiSocket extends XSocket {
 
   #account: Account
   session = ''
@@ -34,7 +34,7 @@ export default class KingSocket extends XSocket {
         appName: 'KingBot',
       }
     }
-    const response: KingResponse = await this.sync(data)
+    const response: XapiResponse = await this.sync(data)
     if (response.status) {
       this.session = (<XapiLoginResponse>response).streamSessionId
     }

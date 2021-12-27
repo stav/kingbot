@@ -40,4 +40,4 @@ type ErrorResponse = XapiErrorResponse | KingErrorResponse
 
 type SuccessResponse = XapiLoginResponse | XapiLogoutResponse | XapiDataResponse
 
-export type KingResponse = SuccessResponse | ErrorResponse
+export type XapiResponse = SuccessResponse | ErrorResponse

@@ -1,15 +1,15 @@
 import Logger from '../../../log.ts'
 
-import type { InputData, KingResponse } from './socket.d.ts'
-import type KingSocket from './socket.ts'
+import type { InputData, XapiResponse } from './socket.d.ts'
+import type XapiSocket from './socket.ts'
 
-export function send (this: KingSocket, data: InputData) {
+export function send (this: XapiSocket, data: InputData) {
   if (this.isOpen) {
     this.socket?.send(JSON.stringify(data))
   }
 }
 
-export async function sync (this: KingSocket, data: InputData): Promise<KingResponse> {
+export async function sync (this: XapiSocket, data: InputData): Promise<XapiResponse> {
   // TODO Also check for logged in
   if (!this.isOpen) { return { status: false, errorCode: 'K1NG', errorDescr: 'Closed' }}
   const customTag = Math.random().toString()

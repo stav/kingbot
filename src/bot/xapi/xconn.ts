@@ -1,17 +1,17 @@
 import type { ConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
 
-import KingSocket from './socket/socket.ts'
-import KingStream from './stream/stream.ts'
+import XapiSocket from './socket/socket.ts'
+import XapiStream from './stream/stream.ts'
 
 export default class XConn implements KingConn {
 
-  Socket: KingSocket
-  Stream: KingStream
+  Socket: XapiSocket
+  Stream: XapiStream
 
   constructor (account: ConfigAccount) {
-    this.Socket = new KingSocket(account)
-    this.Stream = new KingStream(account, this.Socket)
+    this.Socket = new XapiSocket(account)
+    this.Stream = new XapiStream(account, this.Socket)
   }
 
   connect () {
