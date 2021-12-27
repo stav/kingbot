@@ -1,5 +1,7 @@
 import type { ConfigAccount, Account } from '../../config.d.ts'
+
 import { XSocket } from '../xsocket.ts'
+
 import type { XapiResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'

@@ -2,6 +2,7 @@ import { encode as b64encode } from 'https://deno.land/std/encoding/base64.ts'
 
 import type { ConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
+import Socket from '../socket.ts'
 
 type ApiKeyData = {
   key: string
@@ -28,10 +29,9 @@ async function sign (data: string, secret: string): Promise<string> {
   return signature
 }
 
-export default class KuConn implements KingConn {
+export default class KuConn extends Socket implements KingConn {
 
   base = 'https://api.kucoin.com'
-  socket: WebSocket | null = null
   session = ''
   account
   tickToggle = false
@@ -39,6 +39,7 @@ export default class KuConn implements KingConn {
   // tickTime = 0
 
   constructor (account: ConfigAccount) {
+    super()
     this.account = Object.assign({ api: {} as ApiKeyData }, account)
   }
 
@@ -114,7 +115,8 @@ export default class KuConn implements KingConn {
       privateChannel: false,                     // Adopted the private channel or not. Set as false by default.
       response: true                             // Whether the server needs to return the receipt information of this subscription or not. Set as false by default.
     }
-    this.socket?.send(JSON.stringify(data))
+    if (this.isOpen)
+      this.socket?.send(JSON.stringify(data))
   }
 
   async status () {
@@ -180,7 +182,8 @@ export default class KuConn implements KingConn {
   }
 
   close () {
-    this.socket?.close()
+    if (this.isOpen)
+      this.socket?.close()
   }
 
 }
