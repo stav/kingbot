@@ -1,4 +1,4 @@
-import type { ConfigAccount } from '../config.d.ts'
+import type { KucoinConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
 import Socket from '../socket.ts'
 import sign from './sign.ts'
@@ -14,14 +14,15 @@ export default class KuConn extends Socket implements KingConn {
   #tickToggle = false
 
   base = 'https://api.kucoin.com'
+  // base = 'https://openapi-sandbox.kucoin.com'
   session = ''
-  account
+  account: KucoinConfigAccount
   // tickPrice = ''
   // tickTime = 0
 
-  constructor (account: ConfigAccount) {
+  constructor (account: KucoinConfigAccount) {
     super()
-    this.account = Object.assign({ api: {} as ApiKeyData }, account)
+    this.account = account
   }
 
   private get scribe () {

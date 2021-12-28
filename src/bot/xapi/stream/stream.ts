@@ -1,4 +1,4 @@
-import type { ConfigAccount } from '../../config.d.ts'
+import type { XapiConfigAccount } from '../../config.d.ts'
 import type XapiSocket from '../socket/socket.ts'
 import { XSocket } from '../xsocket.ts'
 
@@ -11,7 +11,7 @@ export default class XapiStream extends XSocket {
 
   Socket: XapiSocket
 
-  constructor (account: ConfigAccount, socket: XapiSocket) {
+  constructor (account: XapiConfigAccount, socket: XapiSocket) {
     super(account)
     this.Socket = socket
   }

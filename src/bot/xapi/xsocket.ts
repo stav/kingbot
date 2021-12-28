@@ -1,6 +1,6 @@
 import Logger from '../../log.ts'
 
-import type { Account, ConfigAccount } from '../config.d.ts'
+import type { XapiConfigAccount, XapiAccount } from '../config.d.ts'
 import Socket from '../socket.ts'
 
 export abstract class XSocket extends Socket {
@@ -9,9 +9,9 @@ export abstract class XSocket extends Socket {
   [index: string]: any // allow parent property access (session)
 
   date: { [index: string]: number } = {}
-  account: Account
+  account: XapiAccount
 
-  constructor (account: ConfigAccount) {
+  constructor (account: XapiConfigAccount) {
     super()
     this.account = {
       id:   account.accountId,
