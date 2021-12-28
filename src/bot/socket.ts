@@ -10,8 +10,9 @@ export default abstract class Socket {
 
   socket: WebSocket | null = null
 
-  protected get state (): string | undefined {
-    return this.socket ? State[this.socket.readyState] : undefined
+  protected get state (): string {
+    const readyState = this.socket?.readyState || State.CLOSED
+    return State[readyState]
   }
 
   protected get isOpen (): boolean {
