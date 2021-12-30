@@ -76,6 +76,16 @@ export default class KuConn extends Socket implements KingConn {
     console.log('sub/user', await this.resolvePrivate('sub/user'))
   }
 
+  async orders () {
+    console.log('orders (done)', await this.resolvePrivate('orders?status=done'))
+    console.log('orders (active)', await this.resolvePrivate('orders?status=active'))
+  }
+
+  async fees () {
+    console.log('fee (base)', await this.resolvePrivate('base-fee'))
+    console.log('fee (trade)', await this.resolvePrivate('trade-fees?symbols=BTC-USDT,KCS-USDT'))
+  }
+
   async symbols () {
     console.log('symbols', await this.resolvePublic('symbols'))
   }
