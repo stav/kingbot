@@ -1,5 +1,6 @@
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
+import { inspect } from './lib/inspect.ts'
 
 export default class KingCount {
 
@@ -8,6 +9,8 @@ export default class KingCount {
   f: (() => void)[] = []
 
   currentAccountIndex = 0
+
+  inspect: () => void = inspect
 
   constructor () {
     // Set the first account active

@@ -1,5 +1,6 @@
 import type { XapiConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
+import { inspect } from '../lib/inspect.ts'
 
 import XapiSocket from './socket/socket.ts'
 import XapiStream from './stream/stream.ts'
@@ -8,6 +9,8 @@ export default class XConn implements KingConn {
 
   Socket: XapiSocket
   Stream: XapiStream
+
+  inspect: () => void = inspect
 
   constructor (account: XapiConfigAccount) {
     this.Socket = new XapiSocket(account)
