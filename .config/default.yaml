@@ -6,3 +6,14 @@ Accounts:
     password: secret
     name: Uncle Joe
     type: demo # real / demo
+
+  - broker: KUCOIN
+    name: Honey moon bags
+    accountId: honey@moon.bags
+    password: sshhhhh
+    type: live # live | sandbox
+    api: {
+      key: 123abc,
+      secret: 0a1s2d1-...-4safas87sfd5,
+      passphrase: superspecialpassword,
+    }
