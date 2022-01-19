@@ -1,37 +1,24 @@
 import Logger from '../../log.ts'
-import type { Account, ConfigAccount } from '../config.d.ts'
 
-enum State {
-  CONNECTING = 0,
-  OPEN       = 1,
-  CLOSING    = 2,
-  CLOSED     = 3,
-}
+import type { XapiConfigAccount, XapiAccount } from '../config.d.ts'
+import Socket from '../socket.ts'
 
-export abstract class XSocket {
+export abstract class XSocket extends Socket {
 
   // deno-lint-ignore no-explicit-any
   [index: string]: any // allow parent property access (session)
 
-  socket: WebSocket | null = null
   date: { [index: string]: number } = {}
-  account: Account
+  account: XapiAccount
 
-  constructor (account: ConfigAccount) {
+  constructor (account: XapiConfigAccount) {
+    super()
     this.account = {
       id:   account.accountId,
       // pw:account.password,
       name: account.name,
       type: account.type,
     }
-  }
-
-  private get _isOpen (): boolean {
-    return this.socket?.readyState === State.OPEN
-  }
-
-  private get _state (): string | undefined {
-    return this.socket ? State[this.socket.readyState] : undefined
   }
 
   protected gotOpen (_event: Event) {
@@ -57,10 +44,6 @@ export abstract class XSocket {
 
   protected gotMessage (message: MessageEvent): void {
     Logger.info(message.data)
-  }
-
-  get isOpen (): boolean {
-    return this._isOpen
   }
 
   get url (): string {
@@ -105,11 +88,11 @@ export abstract class XSocket {
 
   print () {
     const id = this.account.id
-    const ses = this['session']
+    const ses = this.session
     const url = this.socket?.url
     const obj = this.constructor.name
     const name = this.account.name
-    const stat = this._state
+    const stat = this.state
     const time = this.time
     console.info(`${obj}  ${url}  ${id}|${name}  ${stat}|${time}  ${ses}`)
   }

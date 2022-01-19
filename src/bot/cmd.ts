@@ -26,6 +26,7 @@ const funcMap: KeyMap = {
   8 : '',
   9 : '',
   0 : '',
+  q : 'Conn.ticks',     // KingConn.connect
   w : 'Conn.connect',     // KingConn.connect
   e : 'Conn.ping',        // KingConn.ping
   r : 'Conn.login',       // KingConn.login
@@ -64,8 +65,8 @@ function print (): void {
 function bind(c: any, props: string[]): Function | undefined {
   const prop = props.shift()
   if (prop) {
-    Logger.info(`  BIND ${c.constructor.name}.${prop} = (${typeof c[prop]}) ${c[prop]?.name}`)
-    if (c[prop])
+    Logger.info(`  BIND ${c.constructor.name}.${prop} = (${typeof c[prop]}) ${c[prop]?.name||''}`, prop in c, props.length)
+    if (prop in c)
       return props.length
         ? bind(c[prop], props)
         : typeof c[prop] === 'function'
@@ -88,8 +89,10 @@ function getBinding(kingcount: KingCount, input: string): Function | undefined {
   const command: string = input in funcMap ? funcMap[input] : input
   Logger.info('* getBinding', typeof input, `(${input}) [${command}]`)
   if (command) {
-    const func = bind(kingcount, command.split('.'))
-    return func ? func : print
+    const fObj = bind(kingcount, command.split('.'))
+    return fObj === undefined
+      ? print
+      : fObj
   }
 }
 

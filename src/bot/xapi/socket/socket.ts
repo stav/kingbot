@@ -1,5 +1,7 @@
-import type { ConfigAccount, Account } from '../../config.d.ts'
+import type { XapiConfigAccount, XapiAccount } from '../../config.d.ts'
+
 import { XSocket } from '../xsocket.ts'
+
 import type { XapiResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
@@ -7,7 +9,7 @@ import story from './story.ts'
 
 export default class XapiSocket extends XSocket {
 
-  #account: Account
+  #account: XapiAccount
   session = ''
 
   trades = trades
@@ -16,7 +18,7 @@ export default class XapiSocket extends XSocket {
   send = send
   sync = sync
 
-  constructor (account: ConfigAccount) {
+  constructor (account: XapiConfigAccount) {
     super(account)
     this.#account = Object.assign({ pw: account.password }, this.account)
   }
