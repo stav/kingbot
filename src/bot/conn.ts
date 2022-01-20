@@ -21,7 +21,7 @@ export default function () {
         break
 
       default:
-        break
+        console.warn(`Can't add account, broker "${account.broker}" not supported.`)
     }
 
   }

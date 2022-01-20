@@ -27,7 +27,7 @@ export default class KuConn extends Socket implements KingConn {
   }
 
   list (index: number) {
-    console.log('CNX', index, this.constructor.name, this.account.name)
+    return `CNX ${index || ''} ${this.constructor.name} ${this.account.name}`
   }
 
   async user () {

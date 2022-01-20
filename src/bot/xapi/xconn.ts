@@ -52,13 +52,15 @@ export default class XConn implements KingConn {
     this.Socket.close()
   }
 
-  print () {
-    this.Socket.print()
-    this.Stream.print()
+  status () {
+    return [
+      this.Socket.status,
+      this.Stream.status,
+    ]
   }
 
   list (index: number) {
-    console.log('CNX', index, this.Socket.info, this.Stream.info)
+    return `CNX ${index || ''} ${this.constructor.name} ${this.Socket.info} ${this.Stream.info}`
   }
 
 }
