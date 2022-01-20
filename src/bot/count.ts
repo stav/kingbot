@@ -1,5 +1,9 @@
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
+
+import { bind } from '../lib/bind.ts'
+import { reflect } from '../lib/reflect.ts'
+
 import { inspect } from './lib/inspect.ts'
 
 export default class KingCount {
@@ -25,6 +29,23 @@ export default class KingCount {
 
   get Conn (): KingConn {
     return this.conns[ this.currentAccountIndex ]
+  }
+
+  get availableCommands (): string[] {
+    return [
+      ...reflect(this).props,
+      ...reflect(this.Conn).props.map(p => `Conn.${p}`),
+    ]
+  }
+
+  bind (command: string) {
+    if (command) {
+      const fObj = bind(this, command.split('.'))
+                || bind(this.Conn, command.split('.'))
+      return fObj === undefined
+        ? this.availableCommands
+        : fObj
+    }
   }
 
   list () {
