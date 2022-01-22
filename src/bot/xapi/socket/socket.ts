@@ -23,6 +23,10 @@ export default class XapiSocket extends XSocket {
     this.#account = Object.assign({ pw: account.password }, this.account)
   }
 
+  get url (): string {
+    return 'wss://ws.xtb.com/' + this.account.type
+  }
+
   ping (): void {
     this.send({ command: 'ping' })
   }

@@ -65,14 +65,6 @@ export abstract class XSocket extends Socket {
     Logger.info(message.data)
   }
 
-  get url (): string {
-    // wss://ws.xtb.com/demo
-    // wss://ws.xtb.com/demoStream
-    // wss://ws.xtb.com/real
-    // wss://ws.xtb.com/realStream
-    return 'wss://ws.xtb.com/' + this.account.type
-  }
-
   get info () {
     const tAcct = this.account
     const tName = this.constructor.name

@@ -49,6 +49,14 @@ export default class XConn implements KingConn {
     this.Stream.ping()
   }
 
+  listen () {
+    this.Stream.listen()
+  }
+
+  unlisten () {
+    this.Stream.unlisten()
+  }
+
   story () {
     this.Socket.story()
   }

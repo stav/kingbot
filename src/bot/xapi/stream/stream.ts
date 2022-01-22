@@ -4,7 +4,7 @@ import { XSocket } from '../xsocket.ts'
 
 type InputData = {
   command: string
-  // streamSessionId: string
+  arguments?: { openedOnly: boolean }
 }
 
 export default class XapiStream extends XSocket {
@@ -16,13 +16,34 @@ export default class XapiStream extends XSocket {
     this.Socket = socket
   }
 
+  get url (): string {
+    return 'wss://ws.xtb.com/' + this.account.type + 'Stream'
+  }
+
   get session (): string {
     return this.Socket.session
+  }
+
+  #listener = (message: MessageEvent) => {
+    const m = JSON.parse(message.data)
+    if (m.command === 'trade') {
+      console.log('got MESSAGE3!', m.data)
+    }
   }
 
   ping () {
     if (this.isOpen)
       this.send({ command: 'ping' })
+  }
+
+  listen () {
+    this.socket?.addEventListener('message', this.#listener)
+    this.send({ command: 'getTrades', arguments: { openedOnly: true }})
+  }
+
+  unlisten () {
+    this.socket?.removeEventListener('message', this.#listener)
+    this.send({ command: 'stopTrades' })
   }
 
   // Note: sending before login will close the connection
