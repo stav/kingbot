@@ -5,6 +5,7 @@ import { XSocket } from '../xsocket.ts'
 import type { XapiResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
+import { check } from './profits.ts'
 import hedge from './hedge.ts'
 import story from './story.ts'
 
@@ -14,6 +15,7 @@ export default class XapiSocket extends XSocket {
   session = ''
 
   trades = trades
+  check = check
   hedge = hedge
   story = story
   trade = trade

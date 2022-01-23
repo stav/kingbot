@@ -24,10 +24,13 @@ export default class XapiStream extends XSocket {
     return this.Socket.session
   }
 
-  #listener = (message: MessageEvent) => {
+  async #listener (message: MessageEvent) {
     const m = JSON.parse(message.data)
     if (m.command === 'trade') {
       console.log('got MESSAGE3!', m.data)
+      // print familys, trades
+      await this.Socket.check(m.data)
+      // print all trades
     }
   }
 
@@ -37,7 +40,7 @@ export default class XapiStream extends XSocket {
   }
 
   listen () {
-    this.socket?.addEventListener('message', this.#listener)
+    this.socket?.addEventListener('message', this.#listener.bind(this))
     this.send({ command: 'getTrades', arguments: { openedOnly: true }})
   }
 

@@ -61,8 +61,9 @@ export default class XConn implements KingConn {
     this.Socket.story()
   }
 
-  trades () {
-    this.Socket.trades()
+  async trades () {
+    const trades = await this.Socket.trades()
+    return [ trades, trades.length ]
   }
 
   trade () {
