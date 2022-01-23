@@ -10,7 +10,7 @@ export default class KingCount {
 
   conns: KingConn[] = ConnectionFactory()
 
-  f: (() => void)[] = []
+  f: (() => number | void)[] = []
 
   currentAccountIndex = 0
 
@@ -33,34 +33,34 @@ export default class KingCount {
 
   get availableCommands (): string[] {
     return [
-      ...reflect(this).props,
-      ...reflect(this.Conn).props.map(p => `Conn.${p}`),
+      ...reflect(this).props, // KingCount properties
+      ...reflect(this.Conn).props.map(p => `Conn.${p}`), // KingCount.Conn properties
     ]
   }
 
   bind (command: string) {
     if (command) {
-      const fObj = bind(this, command.split('.'))
-                || bind(this.Conn, command.split('.'))
-      return fObj === undefined
+      // First try to bind to KingCount
+      let fObj = bind(this, command.split('.'))
+      // Secondly try to bind to the Connection
+      if (fObj === undefined)
+        fObj = bind(this.Conn, command.split('.'))
+      // Return bound object (or command list)
+      return (fObj === undefined)
         ? this.availableCommands
         : fObj
     }
   }
 
   list () {
-    for (let i=1; i<this.conns.length; i++) {
-      this.conns[i].list(i)
-    }
-  }
-
-  listDetail () {
-    console.log('CNX', this.conns)
+    return this.conns
+      .map((c, i) => c.list(i)) // Run list for all connections
+      // .filter((_c, i) => i > 0) // Ignore the first result (Telegram)
   }
 
   fKey (index: number) {
     if (index < this.conns.length)
-      this.currentAccountIndex = index
+      return this.currentAccountIndex = index
   }
 
 }

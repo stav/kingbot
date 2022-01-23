@@ -37,9 +37,10 @@ export default class XapiSocket extends XSocket {
       }
     }
     const response: XapiResponse = await this.sync(data)
-    if (response.status) {
+    if (response.status)
       this.session = (<XapiLoginResponse>response).streamSessionId
-    }
+    else
+      console.error('Login error', response)
   }
 
   logout (): void {

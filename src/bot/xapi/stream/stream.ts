@@ -21,12 +21,14 @@ export default class XapiStream extends XSocket {
   }
 
   ping () {
-    this.send({ command: 'ping' })
+    if (this.isOpen)
+      this.send({ command: 'ping' })
   }
 
+  // Note: sending before login will close the connection
   send (data: InputData) {
     if (this.isOpen) {
-      const streamSessionId = this.Socket.session
+      const streamSessionId = this.session
       const _data = Object.assign({ streamSessionId }, data)
       this.socket?.send(JSON.stringify(_data))
     }

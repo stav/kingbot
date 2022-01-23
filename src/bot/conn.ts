@@ -6,7 +6,8 @@ import config from './config.ts'
 
 export default function () {
 
-  const conns: Array<KingConn | any> = [{}] // Dummy account so conns is one-indexed
+  // deno-lint-ignore no-explicit-any
+  const conns: Array<KingConn | any> = [{ list: () => {}}] // Dummy account so conns is one-indexed
 
   for (const account of config.Accounts) {
 
