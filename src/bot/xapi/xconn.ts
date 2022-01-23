@@ -1,3 +1,5 @@
+import { delay } from 'https://deno.land/std/async/mod.ts'
+
 import type { XapiConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
 import { inspect } from '../lib/inspect.ts'
@@ -12,9 +14,25 @@ export default class XConn implements KingConn {
 
   inspect: () => void = inspect
 
+  private async alive () {
+    this.Stream.send({ command: 'getKeepAlive' })
+    while (this.Stream.isOpen) {
+      this.ping()
+      await delay(9000)
+    }
+  }
+
   constructor (account: XapiConfigAccount) {
     this.Socket = new XapiSocket(account)
     this.Stream = new XapiStream(account, this.Socket)
+  }
+
+  async start () {
+    await this.Stream.open()
+    await this.Socket.open()
+    await this.Socket.login()
+    this.alive()
+    return this.status()
   }
 
   connect () {
@@ -22,13 +40,13 @@ export default class XConn implements KingConn {
     this.Stream.connect()
   }
 
+  login () {
+    this.Socket.login()
+  }
+
   ping () {
     this.Socket.ping()
     this.Stream.ping()
-  }
-
-  login () {
-    this.Socket.login()
   }
 
   story () {
