@@ -69,6 +69,10 @@ export default class XConn implements KingConn {
     this.Socket.trade()
   }
 
+  async hedge () {
+    return await this.Socket.hedge()
+  }
+
   logout () {
     this.Socket.logout()
   }

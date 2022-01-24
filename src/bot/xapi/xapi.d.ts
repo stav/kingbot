@@ -6,6 +6,20 @@ declare enum STATE_FIELD {
   DELETED = "Deleted",
 }
 
+export interface TICK_RECORD {
+  ask: number;
+  askVolume: number;
+  bid: number;
+  bidVolume: number;
+  high: number;
+  level: number;
+  low: number;
+  spreadRaw: number;
+  spreadTable: number;
+  symbol: string;
+  timestamp: number;
+}
+
 export interface TRADE_RECORD {
   close_price: number;
   close_time: number;

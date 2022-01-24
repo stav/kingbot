@@ -1,0 +1,13 @@
+# Edit this file and save as input.yaml
+
+Hedge:
+  Assets:
+    - symbol: DE30
+      volume: 0.01
+      digits: 1
+    - symbol: BITCOIN
+      volume: 0.1
+      digits: 2
+    - symbol: ETHEREUM
+      volume: 1
+      digits: 3
