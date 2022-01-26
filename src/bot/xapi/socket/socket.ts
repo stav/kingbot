@@ -35,6 +35,10 @@ export default class XapiSocket extends XSocket {
     this.send({ command: 'ping' })
   }
 
+  prompt () {
+    return this.xprompt(!!this.session)
+  }
+
   async login (): Promise<void> {
     const data = {
       command: 'login',

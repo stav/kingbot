@@ -27,7 +27,7 @@ export default class KuConn extends Socket implements KingConn {
   }
 
   list (index: number) {
-    return `CNX ${index || ''} ${this.constructor.name} ${this.account.name}`
+    return `CNX ${index || ''} [${this.prompt()}] ${this.constructor.name} ${this.account.name}`
   }
 
   async user () {
@@ -76,6 +76,10 @@ export default class KuConn extends Socket implements KingConn {
 
   async status () {
     console.log('status', await this.resolvePublic('status'))
+  }
+
+  prompt () {
+    return this.isOpen ? 'o' : '-'
   }
 
   protected gotOpen (_event: Event) {

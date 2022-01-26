@@ -31,6 +31,11 @@ export default class XConn implements KingConn {
     }
   }
 
+  prompt () {
+    return (this.Socket.prompt()) +
+           (this.Stream.prompt())
+  }
+
   async start () {
     await this.Stream.open()
     await this.Socket.open()
@@ -95,7 +100,7 @@ export default class XConn implements KingConn {
   }
 
   list (index: number) {
-    return `CNX ${index || ''} ${this.constructor.name} ${this.Socket.info} ${this.Stream.info}`
+    return `CNX ${index || ''} [${this.prompt()}] ${this.constructor.name} ${this.Socket.info} ${this.Stream.info}`
   }
 
 }

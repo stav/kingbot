@@ -86,6 +86,14 @@ export abstract class XSocket extends Socket {
     console.log(this.status)
   }
 
+  xprompt (active: boolean) {
+    return this.isOpen && active
+      ? 'l'
+      : this.isOpen
+        ? 'o'
+        : '-'
+  }
+
   connect (): void {
     if (!this.socket || !this.isOpen) {
       this.socket = new WebSocket(this.url)

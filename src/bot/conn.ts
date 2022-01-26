@@ -4,10 +4,15 @@ import KuConn from './kucoin/kuconn.ts'
 import XConn from './xapi/xconn.ts'
 import config from './config.ts'
 
+const index0 = {
+  list: () => {},
+  prompt: () => '',
+  connect: () => {},
+} as KingConn
+
 export default function () {
 
-  // deno-lint-ignore no-explicit-any
-  const conns: Array<KingConn | any> = [{ list: () => {}}] // Dummy account so conns is one-indexed
+  const conns: Array<KingConn> = [index0] // Dummy account so conns is one-indexed
 
   for (const account of config.Accounts) {
 

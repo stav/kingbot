@@ -12,14 +12,14 @@ export default class KingCount {
 
   f: (() => number | void)[] = []
 
-  currentAccountIndex = 0
+  #currentAccountIndex = 0
 
   inspect: () => void = inspect
 
   constructor () {
     // Set the first account active
     if (this.conns.length > 1) {
-      this.currentAccountIndex = 1
+      this.#currentAccountIndex = 1
     }
     // Hardcode five functions that call fKey based on index accessed
     for (let i=5; i--;) {
@@ -28,7 +28,7 @@ export default class KingCount {
   }
 
   get Conn (): KingConn {
-    return this.conns[ this.currentAccountIndex ]
+    return this.conns[ this.#currentAccountIndex ]
   }
 
   get availableCommands (): string[] {
@@ -36,6 +36,12 @@ export default class KingCount {
       ...reflect(this).props, // KingCount properties
       ...reflect(this.Conn).props.map(p => `Conn.${p}`), // KingCount.Conn properties
     ]
+  }
+
+  get prompt () {
+    const i = this.#currentAccountIndex
+    const p = this.Conn.prompt()
+    return `\n${i}[${p}]> `
   }
 
   bind (command: string) {
@@ -60,7 +66,7 @@ export default class KingCount {
 
   fKey (index: number) {
     if (index < this.conns.length)
-      return this.currentAccountIndex = index
+      return this.#currentAccountIndex = index
   }
 
 }
