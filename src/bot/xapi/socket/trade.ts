@@ -42,6 +42,9 @@ export async function trade(this: XapiSocket): Promise<void> {
     }
   }
   let response: XapiResponse = await this.sync(data)
+  if (!response.status)
+    return console.error(response)
+
   let returnData = (<XapiDataResponse>response).returnData
   console.log(returnData)
 

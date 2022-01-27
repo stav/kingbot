@@ -1,6 +1,8 @@
 import type { XapiConfigAccount } from '../../config.d.ts'
-import type XapiSocket from '../socket/socket.ts'
+
 import { XSocket } from '../xsocket.ts'
+
+import type XapiSocket from '../socket/socket.ts'
 
 type InputData = {
   command: string
@@ -11,9 +13,9 @@ export default class XapiStream extends XSocket {
 
   Socket: XapiSocket
 
-  constructor (account: XapiConfigAccount, socket: XapiSocket) {
+  constructor (account: XapiConfigAccount, xsocket: XapiSocket) {
     super(account)
-    this.Socket = socket
+    this.Socket = xsocket
   }
 
   get url (): string {
@@ -27,7 +29,7 @@ export default class XapiStream extends XSocket {
   async #listener (message: MessageEvent) {
     const m = JSON.parse(message.data)
     if (m.command === 'trade') {
-      console.log('got MESSAGE3!', m.data)
+      console.log('got MESSAGE', m.data)
       // print familys, trades
       await this.Socket.check(m.data)
       // print all trades

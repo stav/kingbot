@@ -82,10 +82,13 @@ async function getHedgeOrders (sync: SyncFunction): Promise<TRADE_TRANS_INFO[]> 
 export default async function hedge (this: XapiSocket) {
   const orders = await getHedgeOrders(this.sync.bind(this))
   console.log('Creating', orders.length, 'orders', orders)
-  for (const order of orders) {
+  // for (const order of orders) {
+  for (let i=0; i<orders.length; i++) {
+    const order = orders[i]
     this.send({
       command: 'tradeTransaction',
-      arguments: { tradeTransInfo: order }
+      arguments: { tradeTransInfo: order },
+      customTag: `Order#${i+1}`
     })
   }
   return `Requested ${orders.length} orders`

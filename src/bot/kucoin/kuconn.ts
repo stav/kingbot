@@ -31,8 +31,8 @@ export default class KuConn extends Socket implements KingConn {
   }
 
   async user () {
-    console.log('accounts', await this.resolvePrivate('accounts'))
-    console.log('sub/user', await this.resolvePrivate('sub/user'))
+    console.log('user accounts', await this.resolvePrivate('accounts'))
+    console.log('user sub/user', await this.resolvePrivate('sub/user'))
   }
 
   async orders () {
@@ -50,7 +50,7 @@ export default class KuConn extends Socket implements KingConn {
   }
 
   async book () {
-    console.log('symbols', await this.resolvePublic('market/orderbook/level2_20?symbol=BTC-USDT'))
+    console.log('book', await this.resolvePublic('market/orderbook/level2_20?symbol=BTC-USDT'))
   }
 
   async time () {
@@ -75,11 +75,11 @@ export default class KuConn extends Socket implements KingConn {
   }
 
   async status () {
-    console.log('time', await this.resolvePublic('status'))
+    console.log('status', await this.resolvePublic('status'))
   }
 
   protected gotOpen (_event: Event) {
-    console.log('open')
+    console.log('Opened')
   }
 
   protected gotClose (event: CloseEvent): void {

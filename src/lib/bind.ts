@@ -15,18 +15,18 @@ export function bind(c: any, props: string[]): any {
   Logger.info(`c="${c?.constructor?.name}", props=${JSON.stringify(props)}, length=${props.length}`)
   const prop = props.shift()
   Logger.info(`prop="${prop}"`)
-  if (prop) {
+  if (c && prop) {
     Logger.info(' BIND '
-                + `${c.constructor.name}.${prop}`
+                + `${c.constructor?.name || typeof c}.${prop}`
                 + ' = '
                 + `(${typeof c[prop]}) `
                 + `${c[prop]?.name||''}`,
-      JSON.stringify(c[prop]),
+      Deno.inspect(c[prop], { depth: 1, iterableLimit: 3 }),
       prop in c,
       props.length
     )
     if (prop in c)
-      return props.length
+      return (props.length)
         ? bind(c[prop], props)
         : typeof c[prop] === 'function'
           ? c[prop].bind(c)

@@ -22,13 +22,13 @@ export default class XapiSocket extends XSocket {
   send = send
   sync = sync
 
+  get url (): string {
+    return 'wss://ws.xtb.com/' + this.account.type
+  }
+
   constructor (account: XapiConfigAccount) {
     super(account)
     this.#account = Object.assign({ pw: account.password }, this.account)
-  }
-
-  get url (): string {
-    return 'wss://ws.xtb.com/' + this.account.type
   }
 
   ping (): void {

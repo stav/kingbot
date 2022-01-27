@@ -7,6 +7,10 @@ import { inspect } from '../lib/inspect.ts'
 import XapiSocket from './socket/socket.ts'
 import XapiStream from './stream/stream.ts'
 
+/**
+ * "At most 50 simultaneous connections from the same client address are allowed"
+ * @see http://developers.xstore.pro/documentation/#connection-validation
+ */
 export default class XConn implements KingConn {
 
   Socket: XapiSocket
@@ -14,17 +18,17 @@ export default class XConn implements KingConn {
 
   inspect: () => void = inspect
 
+  constructor (account: XapiConfigAccount) {
+    this.Socket = new XapiSocket(account)
+    this.Stream = new XapiStream(account, this.Socket)
+  }
+
   private async alive () {
     this.Stream.send({ command: 'getKeepAlive' })
     while (this.Stream.isOpen) {
       this.ping()
       await delay(9000)
     }
-  }
-
-  constructor (account: XapiConfigAccount) {
-    this.Socket = new XapiSocket(account)
-    this.Stream = new XapiStream(account, this.Socket)
   }
 
   async start () {

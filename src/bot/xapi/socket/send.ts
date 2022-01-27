@@ -14,6 +14,12 @@ import type XapiSocket from './socket.ts'
  *
  * This function becomes a method of the XapiSocket class.
  *
+ * "Each command invocation should not contain more than 1kB of data."
+ * "User should send requests in 200 ms intervals. This rule can be broken,
+ *  but if it happens 6 times in a row the connection is dropped."
+ * @see http://developers.xstore.pro/documentation/#connection-validation
+ * @todo Throttle requests
+ *
  * @param data The payload to send
  * @returns Nothing
  */
