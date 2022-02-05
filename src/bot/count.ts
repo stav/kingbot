@@ -4,6 +4,7 @@ import ConnectionFactory from './conn.ts'
 import { bind } from '../lib/bind.ts'
 import { reflect } from '../lib/reflect.ts'
 
+import type TConn from './telegram/telegram.ts'
 import { inspect } from './lib/inspect.ts'
 
 export default class KingCount {
@@ -26,7 +27,9 @@ export default class KingCount {
       this.f[i] = () => this.fKey(i)
     }
   }
-
+  private get TConn (): TConn {
+    return this.conns[0] as TConn
+  }
   get Conn (): KingConn {
     return this.conns[ this.#currentAccountIndex ]
   }

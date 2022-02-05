@@ -17,3 +17,8 @@ Accounts:
       secret: 0a1s2d1-...-4safas87sfd5,
       passphrase: superspecialpassword,
     }
+
+Telegram:
+  apiId: 12345678
+  apiHash: f024...b1b1
+  session: "1AQA...HW5bafY="
