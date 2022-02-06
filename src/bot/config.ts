@@ -1,5 +1,7 @@
-import { Config } from "https://raw.githubusercontent.com/stav/config/readjson/mod.ts"
+import { parse } from 'https://deno.land/std/encoding/yaml.ts'
 
 import type { ConfigContainer } from './config.d.ts'
 
-export default await Config.load({ file: 'local' }) as ConfigContainer
+const content = await Deno.readTextFile('.config/local.yaml')
+
+export default parse(content) as ConfigContainer

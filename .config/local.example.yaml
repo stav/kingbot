@@ -1,4 +1,4 @@
-# https://deno.land/x/config
+# Edit this file and save as local.yaml
 
 Accounts:
   - broker: XAPI
