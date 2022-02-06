@@ -1,3 +1,5 @@
+import { delay } from 'https://deno.land/std/async/mod.ts'
+
 import Logger from '../../log.ts'
 
 import type { XapiConfigAccount, XapiAccount } from '../config.d.ts'
@@ -63,14 +65,6 @@ export abstract class XSocket extends Socket {
     Logger.info(message.data)
   }
 
-  get url (): string {
-    // wss://ws.xtb.com/demo
-    // wss://ws.xtb.com/demoStream
-    // wss://ws.xtb.com/real
-    // wss://ws.xtb.com/realStream
-    return 'wss://ws.xtb.com/' + this.account.type
-  }
-
   get info () {
     const tAcct = this.account
     const tName = this.constructor.name
@@ -99,6 +93,36 @@ export abstract class XSocket extends Socket {
       this.socket.onclose = this.gotClose.bind(this)
       this.socket.onerror = this.gotError.bind(this)
       this.socket.onmessage = this.gotMessage
+    }
+  }
+
+  async open (): Promise<void> {
+    if (this.isOpen) return;
+
+    let timeout = 0
+    let result = false
+
+    const gotOpen = (_event: Event) => {
+      this.date.opened = Date.now()
+      this.date.closed = 0
+      this.print()
+      result = true
+    }
+
+    this.socket = new WebSocket(this.url)
+    this.socket.onopen = gotOpen.bind(this)
+    this.socket.onclose = this.gotClose.bind(this)
+    this.socket.onerror = this.gotError.bind(this)
+    this.socket.onmessage = this.gotMessage
+
+    while (!result) {
+      if (++timeout > 10) {
+        console.error({ status: false, errorCode: 'K1NG', errorDescr: 'Timeout' })
+      }
+      else {
+        console.log('wait')
+        await delay(200)
+      }
     }
   }
 

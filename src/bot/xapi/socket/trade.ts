@@ -3,22 +3,21 @@ import type { TRADE_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
 import type { InputData, XapiResponse, XapiDataResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
 
-export async function trades (this: XapiSocket): Promise<void> {
+export async function trades (this: XapiSocket, openedOnly = false): Promise<TRADE_RECORD[]> {
+  let trades: TRADE_RECORD[] = []
   const data: InputData = {
     command: 'getTrades',
-    arguments: {
-      openedOnly: false,
-    }
+    arguments: { openedOnly }
   }
   const response: XapiResponse = await this.sync(data)
   if (response.status) {
-    const trades: TRADE_RECORD[] = (<XapiDataResponse>response).returnData
+    trades = (<XapiDataResponse>response).returnData
     trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
-    console.info('trades', trades)
   }
   else {
     console.error('Trades', response)
   }
+  return trades
 }
 
 export async function trade(this: XapiSocket): Promise<void> {

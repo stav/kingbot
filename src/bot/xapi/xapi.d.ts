@@ -6,6 +6,47 @@ declare enum STATE_FIELD {
   DELETED = "Deleted",
 }
 
+export interface TICK_RECORD {
+  ask: number;
+  askVolume: number;
+  bid: number;
+  bidVolume: number;
+  high: number;
+  level: number;
+  low: number;
+  spreadRaw: number;
+  spreadTable: number;
+  symbol: string;
+  timestamp: number;
+}
+
+export interface STREAMING_TRADE_RECORD {
+  close_price: number;
+  close_time: number;
+  closed: boolean;
+  cmd: CMD_FIELD;
+  comment: string;
+  commission: number;
+  customComment: string;
+  digits: number;
+  expiration: number;
+  margin_rate: number;
+  offset: number;
+  open_price: number;
+  open_time: number;
+  order: number;
+  order2: number;
+  position: number;
+  profit: number;
+  sl: number;
+  storage: number;
+  symbol: string;
+  tp: number;
+  volume: number;
+  type: TYPE_FIELD;
+  state: STATE_FIELD;
+}
+
 export interface TRADE_RECORD {
   close_price: number;
   close_time: number;

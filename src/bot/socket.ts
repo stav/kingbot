@@ -17,7 +17,7 @@ export default abstract class Socket {
     return State[readyState]
   }
 
-  protected get isOpen (): boolean {
+  get isOpen (): boolean {
     return this.socket?.readyState === State.OPEN
   }
 

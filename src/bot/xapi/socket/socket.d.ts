@@ -1,5 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 
+/* Input */
+
 export type InputData = {
   command: string
   arguments?: any
@@ -7,7 +9,13 @@ export type InputData = {
   prettyPrint?: boolean
 }
 
-/** Responses */
+/* Functions */
+
+export interface SyncFunction {
+  (data: InputData): Promise<XapiResponse>
+}
+
+/* Responses */
 
 export interface XapiLoginResponse {
   status: true;

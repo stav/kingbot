@@ -31,3 +31,14 @@ type ConfigAccount = XapiConfigAccount | KucoinConfigAccount
 export type ConfigContainer = {
   Accounts: ConfigAccount[]
 }
+
+interface Asset {
+  symbol: string
+  volume: number
+  digits: number
+  modify: number
+}
+
+export type InputContainer = {
+  Hedge: { Assets: Asset[] }
+}

@@ -5,6 +5,8 @@ import { XSocket } from '../xsocket.ts'
 import type { XapiResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
+import { check } from './profits.ts'
+import hedge from './hedge.ts'
 import story from './story.ts'
 
 export default class XapiSocket extends XSocket {
@@ -13,14 +15,20 @@ export default class XapiSocket extends XSocket {
   session = ''
 
   trades = trades
-  trade = trade
+  check = check
+  hedge = hedge
   story = story
+  trade = trade
   send = send
   sync = sync
 
   constructor (account: XapiConfigAccount) {
     super(account)
     this.#account = Object.assign({ pw: account.password }, this.account)
+  }
+
+  get url (): string {
+    return 'wss://ws.xtb.com/' + this.account.type
   }
 
   ping (): void {
