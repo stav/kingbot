@@ -18,10 +18,10 @@ export default class KingCount {
   inspect: () => void = inspect
 
   constructor () {
-    // Set the first account active
-    if (this.conns.length > 1) {
-      this.#currentAccountIndex = 1
-    }
+    // // Set the first account active
+    // if (this.conns.length > 1) {
+    //   this.#currentAccountIndex = 1
+    // }
     // Hardcode five functions that call fKey based on index accessed
     for (let i=5; i--;) {
       this.f[i] = () => this.fKey(i)

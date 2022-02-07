@@ -1,5 +1,7 @@
+import type KingCount from './count.ts'
+
 export interface KingConn {
-  connect (): void;
+  connect (kingcount?: KingCount): void;
   list (i: number): void;
   prompt (): string;
 }
