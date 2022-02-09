@@ -1,18 +1,14 @@
 import type { KucoinConfigAccount, XapiConfigAccount } from './config.d.ts'
 import type { KingConn } from './conn.d.ts'
+import TConn from './telegram/telethon.ts'
 import KuConn from './kucoin/kuconn.ts'
 import XConn from './xapi/xconn.ts'
 import config from './config.ts'
 
-const index0 = {
-  list: () => {},
-  prompt: () => '',
-  connect: () => {},
-} as KingConn
 
 export default function () {
 
-  const conns: Array<KingConn> = [index0] // Dummy account so conns is one-indexed
+  const conns: KingConn[] = [new TConn()]
 
   for (const account of config.Accounts) {
 
