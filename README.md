@@ -147,8 +147,6 @@ deno run --allow-net --allow-read --allow-write ./src/app.ts
 
     1[--]> start
     input "start" (function) [AsyncFunction: bound start]
-    XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  OPEN|0h0m0s
-    XapiSocket  wss://ws.xtb.com/demo  123456|Demo  OPEN|0h0m0s
     [
       "XapiSocket  wss://ws.xtb.com/demo  123456|Demo  OPEN|0h0m0s  0010afe3-...",
       "XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  OPEN|0h0m0s  001..."
@@ -198,7 +196,7 @@ deno run --allow-net --allow-read --allow-write ./src/app.ts
     XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  CLOSING|0h9m12s
     XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  CLOSED|0h9m12s
 
-    1[ll]> list
+    1[--]> list
     input "list" (function) [Function: bound list]
     [
       "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
@@ -207,6 +205,7 @@ deno run --allow-net --allow-read --allow-write ./src/app.ts
     ]
 
 Send EOF (Ctrl-D End-of-file) to exit.
+
 
 [1]: https://github.com/stav/xapi
 [2]: https://deno.land

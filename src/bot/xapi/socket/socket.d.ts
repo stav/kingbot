@@ -18,30 +18,30 @@ export interface SyncFunction {
 /* Responses */
 
 export interface XapiLoginResponse {
-  status: true;
-  streamSessionId: string;
+  status: true
+  streamSessionId: string
 }
 
 interface XapiLogoutResponse {
-  status: true;
+  status: true
 }
 
 export interface XapiDataResponse {
-  status: true;
-  returnData: any;
-  customTag: string;
+  status: true
+  returnData: any
+  customTag: string
 }
 
 interface XapiErrorResponse {
-  status: false;
-  errorCode: string;
-  errorDescr: string;
+  status: false
+  errorCode: string
+  errorDescr: string
 }
 
 interface KingErrorResponse {
-  status: false;
-  errorCode: "K1NG";
-  errorDescr: string;
+  status: false
+  errorCode: "K1NG"
+  errorDescr: string
 }
 
 type ErrorResponse = XapiErrorResponse | KingErrorResponse
