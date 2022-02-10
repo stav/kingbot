@@ -1,5 +1,8 @@
-import { format } from 'std/datetime/mod.ts'
+import type { BaseHandler } from 'std/log/handlers.ts'
 import * as logging from 'std/log/mod.ts'
+import { format } from 'std/datetime/mod.ts'
+
+let handlers = [] as BaseHandler[]
 
 const formatter = (logRecord: logging.LogRecord) => {
   const level = logRecord.levelName
@@ -11,7 +14,6 @@ const formatter = (logRecord: logging.LogRecord) => {
 }
 
 async function setup () {
-  // custom configuration with 2 loggers (the default and `tasks` loggers).
   await logging.setup({
 
     handlers: {
@@ -27,6 +29,11 @@ async function setup () {
         formatter,
       }),
 
+      tfile: new logging.handlers.FileHandler("NOTSET", {
+        filename: "./logs/kingram.log",
+        formatter,
+      }),
+
     },
 
     loggers: {
@@ -38,17 +45,22 @@ async function setup () {
         level: "NOTSET",
         handlers: ["mfile"],
       },
+      telegram: {
+        level: "NOTSET",
+        handlers: ["tfile"],
+      },
     },
 
   })
-  return logging.getLogger()
+  handlers = [
+    ...Array.from(logging.getLogger('default').handlers),
+    ...Array.from(logging.getLogger('message').handlers),
+    ...Array.from(logging.getLogger('telegram').handlers),
+  ]
+  return logging.getLogger('default')
 }
 
 function flush () {
-  const handlers = [
-    ...Array.from(logging.getLogger().handlers),
-    ...Array.from(logging.getLogger('message').handlers),
-  ]
   handlers.forEach(handler => {
     if (handler instanceof logging.handlers.FileHandler)
       handler.flush()

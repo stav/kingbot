@@ -1,13 +1,33 @@
 # K1NGBOT
 
-_The [K1NGbot][1] rewritten using [Deno][2]._ 🦕
-
 This is a Deno command line application that monitors trade events on XTB's
 XStation 5 appliance via websocket connections.
 
-Currently the bot only does one thing:
+## 1.0
 
-* **move the stop loss for the position**.
+The **kingbot** [Proof-of-concept][1] started early October 2021 and within a
+month it was moving the _Break-even_ on the exchange by:
+
+1. grouping multi-order positions into "families",
+2. listening for _Take-profit_ events,
+3. moving the _Stop-loss_ for all orders in the family to slightly better than
+the entry.
+
+We began trading with real money in December, the worst month.
+
+## 2.0
+
+Kingbot 2.0 is a rewrite of the code switching the execution engine from
+[Node.js][2] to 🦕[Deno][3]. It started in December 2021. The plan is to have it
+in production come the spring with the following features:
+
+* monitor [Telegram][4] for _signals_,
+* create orders on the exchange,
+* move the Break-even.
+
+With these features the bot can theoretically run fully-automatically.
+
+## Family
 
 An asset position may be comprised of multiple orders. _A family is a group of
 orders all with the **exact same stop loss**._ Each order in the position would
@@ -36,8 +56,8 @@ Take the following received trade event that XTB sends:
     volume: 0.1
 
 That's all the bot knows.  It doesn't know about the other orders (in the "family")
-and their TP levels.  Instead the bot reasons about what to do solely from the single
-trade event information that the server sends.
+and their TP levels.  Instead the bot reasons about what to do solely from the
+single trade event information that the server sends.
 
 ## Stop Loss
 
@@ -55,7 +75,8 @@ open price.
 When TP2 is reached the bot moves to halfway between the open-price and the
 close-price for this order.
 
-For example: Say we have three orders in a "family" all with a stop loss of `70239.44`:
+For example: Say we have three orders in a "family" all with a stop loss of
+`70239.44`:
 
     SL 70239.44 SELL BITCOIN TPs=[ 67133.03, 66998.09, 66863.15 ]
 
@@ -89,19 +110,73 @@ Then we hit TP2:
 The bot moves stop loss from
 `67437.79` to `67206.15 = (67458.03 + 66994.74 / 2) - 20.24` for one (1) order.
 
-Then TP3 (the last order) does not move any stop loss since there is noone left
+Then TP3 (the last order) does not move any stop loss since there are none left
 in the family, perhaps sadly; but, don't get emotional.
+
+## Telegram
+
+The job of the component is to:
+
+1. listen to messages on certain Telegram chats,
+2. parse the messages for signal data (e.g. entry price),
+3. create an exchange position.
+
+### Listen to messages on certain Telegram chats
+
+Telethon is a Python library which was chosen because it allows for logging into
+Telegram as a user (i.e. not a bot) and listening to any chat that the user is a
+member of.
+
+Since Telethon is not a JavaScript library it is started as a separate process.
+
+### Parse the messages for signal data
+
+### Create an exchange position
 
 ## Documentation
 
-XTB <https://xstation5.xtb.com/>
-xAPI <http://developers.xstore.pro/documentation/>
-Deno <https://deno.land/>
+- XTB          <https://xstation5.xtb.com/>
+- xAPI         <http://developers.xstore.pro/documentation/>
+- Deno         <https://deno.land/>
+- Rhum         <https://drash.land/rhum/>
+- Velociraptor <https://velociraptor.run/docs/>
 
 ## Installation
 
-Deno doesn't use package management, per se. Modules are cached when they are
-first encountered in the code.
+The Kingbot uses these components:
+
+* Git - version control (Not needed in future)
+* Deno - execution engine runtime
+* Velociraptor - script runner
+
+### Install Deno
+
+Deno works on macOS, Linux, and Windows. Deno is a single binary executable. It
+has no external dependencies.
+
+On Linux use cURL to download the installation script and run it in a shell:
+
+    curl -fsSL https://deno.land/x/install/install.sh | sh
+
+For other platforms see the [installation page][6].
+
+### Script Runner
+
+Velociraptor makes it easy to run scripts.
+
+Install [Velociraptor][5]:
+
+    deno install -qAn vr https://deno.land/x/velociraptor@1.4.0/cli.ts
+
+Add Bash completion:
+
+    source <(vr completions bash)
+
+### Install the Kingbot
+
+Deno doesn't use any package management files in the project. Modules are cached
+when they are first encountered in the code; therefore, the bot doesn't need to
+be installed. Just clone the repository:
 
     git clone git@github.com:stav/kingbot.git
     cd kingbot
@@ -113,10 +188,57 @@ it as `.config/local.yaml`.
 
 ## Usage
 
+The Telegram client and server are currently decoupled. The _server_ is able to
+be started from the main **deno** application but the _client_ must be started
+manually.
+
+### Start the Application
+
+Open a new command-line terminal.
+
 Make sure you are in the `kingbot` directory.
 
+Start the **deno** runtime with [Velociraptor][5].
+
+    vr start
+
+#### Prime the Connections
+
+    0[]> prime
+
+#### Start the Telegram Server
+
+The Telegram server listens to HTTP traffic on `localhost` port 8000.
+
+Enter the `connect` command to start the server:
+
+    0[-]> connect
+    input "connect" (function) [Function: bound connect]
+    Listening to localhost:8000 for { id:123456, name:"Demo", type:"demo" }
+
+### Start the Telegram Client
+
+Open a second command-line terminal.
+
+Make sure you are in the `kingbot` directory.
+
+Start the **Python** script to listen to configured **Telegram** chats.
+
+    python ./src/bot/telegram/telethonx.py
+
+    Connection to 149.154.175.52:443/TcpFull complete!
+
+    Please enter your phone (or bot token): +12345678901
+
+    Disconnection from 149.154.167.51:443/TcpFull complete!
+    Connection to 149.154.175.52:443/TcpFull complete!
+    Please enter the code you received: 12345
+    Signed in successfully
+
+## CLI Feature Showcase
+
 ```bash
-deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPaths.json ./src/app.ts
+vr start
 ```
 
     0[]> ?
@@ -136,10 +258,17 @@ deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPath
     0[]> prime
     input "prime" (function) [Function: bound prime]
     [
+      "CNX 0 [-] TConn",
       "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
       "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
       "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
     ]
+
+Enter the command: `f.1` to switch to the first connection:
+
+    0[-]> f.1
+    input "f.1" (function) [Function: bound ]
+    1
 
     1[--]> ?
     input "?" (object) [
@@ -159,9 +288,6 @@ deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPath
       "Conn.status",       "Conn.list"
     ]
 
-    0[]> f.1
-    input "f.1" (function) [Function: bound ]
-
     1[--]> start
     input "start" (function) [AsyncFunction: bound start]
     [
@@ -172,6 +298,7 @@ deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPath
     1[lo]> list
     input "list" (function) [Function: bound list]
     [
+      "CNX 0 [-] TConn",
       "CNX 1 [lo] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
       "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
       "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
@@ -183,6 +310,7 @@ deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPath
     1[ll]> list
     input "list" (function) [Function: bound list]
     [
+      "CNX 0 [-] TConn",
       "CNX 1 [ll] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
       "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
       "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
@@ -216,6 +344,7 @@ deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPath
     1[--]> list
     input "list" (function) [Function: bound list]
     [
+      "CNX 0 [-] TConn",
       "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
       "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
       "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
@@ -241,19 +370,10 @@ Send EOF (Ctrl-D End-of-file) to exit.
     # query the location of the dependency file in question
     DENO_DIR=$PWD/deno deno info --unstable https://deno.land/x/rhum@v1.1.12/src/mock_builder.ts
 
-### Script Runner
-
-Install [Velociraptor][5]:
-
-    $ deno install -qAn vr https://deno.land/x/velociraptor@1.4.0/cli.ts
-
-Add Bash completion:
-
-    $ source <(vr completions bash)
-
 
 [1]: https://github.com/stav/xapi
 [2]: https://nodejs.org/
 [3]: https://deno.land/
 [4]: https://telegram.org/
 [5]: https://velociraptor.run/
+[6]: https://deno.land/manual/getting_started/installation#installation

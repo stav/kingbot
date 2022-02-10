@@ -9,11 +9,14 @@ scripts:
     importMap: denoPaths.json
     unstable: false
     allow:
-      net: ws.xtb.com
+      net:
+        - ws.xtb.com
+        - 0.0.0.0:8000
       read: .config/local.yaml
       write:
         - logs/kingbot.log
         - logs/kingmsg.log
+        - logs/kingram.log
 
   test:
     cmd: deno test
