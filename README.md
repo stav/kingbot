@@ -94,9 +94,9 @@ in the family, perhaps sadly; but, don't get emotional.
 
 ## Documentation
 
-XTB <https://xstation5.xtb.com/>
-xAPI <http://developers.xstore.pro/documentation/>
-Deno <https://deno.land/>
+- XTB <https://xstation5.xtb.com/>
+- xAPI <http://developers.xstore.pro/documentation/>
+- Deno <https://deno.land/>
 
 ## Installation
 
@@ -113,7 +113,51 @@ it as `.config/local.yaml`.
 
 ## Usage
 
+The Telegram client and server are currently decoupled. The _server_ is able to
+be started from the main **deno** applicaiton but the _client_ must started
+manually.
+
+### Start the Application
+
+Open a new command-line terminal.
+
 Make sure you are in the `kingbot` directory.
+
+Start the **deno** runtime with our application granting read/write/net permissions.
+
+    deno run --allow-read --allow-write --allow-net ./src/app.ts
+
+#### Start the Server
+
+Enter the command: `f.0` to switch to Connection #0:
+
+    1[--]> f.0
+    input "f.0" (function) [Function: bound ]
+    0
+
+Enter the `connect` command to start the `Oak` server:
+
+    0[-]> connect
+    input "connect" (function) [Function: bound connect]
+    Server {
+      app: Application { "#middleware": [ [Function] ], proxy: false, state: {} },
+      connected: true
+    }
+
+### Start the Client
+
+Open a second command-line terminal.
+
+Make sure you are in the `kingbot` directory.
+
+Start the **Python** script to listen to **Telegram**.
+
+    python ./src/bot/telegram/telethonx.py
+
+    Connecting to 149.154.175.52:443/TcpFull...
+    Connection to 149.154.175.52:443/TcpFull complete!
+
+## CLI Feature Showcase
 
 ```bash
 deno run --allow-net --allow-read --allow-write ./src/app.ts
