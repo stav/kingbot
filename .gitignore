@@ -1,3 +1,4 @@
 .config/input.yaml
 .config/local.yaml
+__pycache__/
 logs/
