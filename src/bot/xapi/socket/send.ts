@@ -1,4 +1,4 @@
-import { deadline, delay, DeadlineError } from 'https://deno.land/std/async/mod.ts'
+import { deadline, delay, DeadlineError } from 'https://deno.land/std@0.125.0/async/mod.ts'
 
 import Logger from '../../../log.ts'
 

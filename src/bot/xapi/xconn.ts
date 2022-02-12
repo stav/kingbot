@@ -1,4 +1,4 @@
-import { delay } from 'https://deno.land/std/async/mod.ts'
+import { delay } from 'https://deno.land/std@0.125.0/async/mod.ts'
 
 import type { XapiConfigAccount } from '../config.d.ts'
 import type { KingConn } from '../conn.d.ts'
