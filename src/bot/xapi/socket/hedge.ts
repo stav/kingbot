@@ -1,7 +1,7 @@
+import type { Asset } from '../../../lib/config.d.ts'
+import { input } from '../../../lib/config.ts'
 import Logger from '../../../log.ts'
 
-import type { Asset } from '../../config.d.ts'
-import { input } from '../../config.ts'
 
 import type { TICK_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
@@ -73,7 +73,7 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
 
 async function getHedgeOrders (sync: SyncFunction): Promise<TRADE_TRANS_INFO[]> {
   const assets = input().Hedge.Assets
-  const symbols = assets.map(a => a.symbol)
+  const symbols = assets.map((a: any) => a.symbol)
   const prices = await fetchHedgePrices(sync, symbols)
   const orders = genHedgeOrders(assets, prices)
   return orders

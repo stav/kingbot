@@ -1,6 +1,8 @@
-import type { KucoinConfigAccount } from '../config.d.ts'
+import type { KucoinConfigAccount } from '../../lib/config.d.ts'
+
 import type { KingConn } from '../conn.d.ts'
 import Socket from '../socket.ts'
+
 import { resolvePrivate, resolvePublic } from './resolve.ts'
 
 export default class KuConn extends Socket implements KingConn {

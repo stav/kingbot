@@ -1,8 +1,9 @@
-import type { KucoinConfigAccount, XapiConfigAccount } from './config.d.ts'
+import type { KucoinConfigAccount, XapiConfigAccount } from '../lib/config.d.ts'
+import config from '../lib/config.ts'
+
 import type { KingConn } from './conn.d.ts'
 import KuConn from './kucoin/kuconn.ts'
 import XConn from './xapi/xconn.ts'
-import config from './config.ts'
 
 const index0 = {
   list: () => {},

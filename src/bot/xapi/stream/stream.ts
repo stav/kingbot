@@ -1,4 +1,4 @@
-import type { XapiConfigAccount } from '../../config.d.ts'
+import type { XapiConfigAccount } from '../../../lib/config.d.ts'
 
 import { XSocket } from '../xsocket.ts'
 
