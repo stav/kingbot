@@ -1,8 +1,8 @@
 import type { XapiConfigAccount } from 'lib/config.d.ts'
 
-import { XSocket } from '../xsocket.ts'
-
 import type XapiSocket from '../socket/socket.ts'
+
+import { XSocket } from '../xsocket.ts'
 
 // deno-lint-ignore no-explicit-any
 type Symbolic = { [index: symbol]: any }
