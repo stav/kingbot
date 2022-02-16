@@ -1,5 +1,4 @@
-import { deadline, debounce, delay, DeadlineError } from 'std@0.125.0/async/mod.ts'
-import { bgBlack, white, magenta, yellow, red } from 'std@0.125.0/fmt/colors.ts'
+import { deadline, debounce, delay, DeadlineError } from 'std/async/mod.ts'
 
 import type { InputData, XapiResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
@@ -25,26 +24,26 @@ const throttleDebounced = debounce(xsocket => {
 }, TIMEOUT)
 
 function throttle(xsocket: WebSocket) {
-  console.log(bgBlack(yellow('THROTTLE')), xsocket?.constructor?.name,
+  Logger.file('throttle', 'THROTTLE', xsocket?.constructor?.name,
     'queue', queue.length,
     'burst', burst,
     'throttled', throttled,
   )
   if (queue.length) {
     if (throttled) {
-      console.log(bgBlack(red('Throttled, waiting')))
+      Logger.file('throttle', 'Throttled, waiting')
       throttleDebounced(xsocket)
     }
     else {
       if (burst > 0) {
         burst--
         const x = queue.shift() as string
-        console.log(bgBlack(white('Not throttled, sending')), x)
+        Logger.file('throttle', 'Not throttled, sending', x)
         xsocket?.send(x)
         throttle(xsocket)
       }
       else {
-        console.log(bgBlack(magenta('Not throttled, but bursted, so throttling')))
+        Logger.file('throttle', 'Not throttled, but bursted, so throttling')
         throttled = true
         throttle(xsocket)
       }
@@ -79,7 +78,7 @@ export function send (this: XapiSocket, data: InputData) {
     const tag = JSON.stringify(data.customTag)
     const json = JSON.stringify(data)
     const command = JSON.stringify(data.command)
-    Logger.info('--->SEND<---', json.length, command, tag)
+    Logger.info(`send(): queue.push(${json.length}/${command}) "${json}"`, tag)
     queue.push(json)
     throttle(this.socket)
   }
