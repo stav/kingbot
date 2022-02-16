@@ -97,8 +97,7 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
     return trade.symbol === data.symbol
       && trade.sl === data.sl
   }
-  // if (data.closed && data.comment === '[T/P]') {
-  if (true) {
+  if (data.closed && data.comment === '[T/P]') {
     console.log('TAKE PROFIT', data)
 
     const openedOnly = true
