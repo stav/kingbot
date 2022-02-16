@@ -1,3 +1,3 @@
 import KingBot from './bot/mod.ts'
 
-KingBot.start()
+await KingBot.start()

@@ -17,7 +17,7 @@ export default async function* getInput (kingcount: KingCount): InputGenerator {
 
   while (n !== EOL) {
     const buffer = new Uint8Array(1024)
-    Deno.stdout.write(encoder.encode(kingcount.prompt))
+    await Deno.stdout.write(encoder.encode(kingcount.prompt))
     n = <number>await Deno.stdin.read(buffer)
     const input = decoder.decode(buffer.subarray(0, n))
     yield input.trim() // Remove the newline

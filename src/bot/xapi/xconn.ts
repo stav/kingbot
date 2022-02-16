@@ -1,9 +1,9 @@
-import { delay } from 'https://deno.land/std@0.125.0/async/mod.ts'
+import { delay } from 'std/async/mod.ts'
 
-import type { XapiConfigAccount } from '../../lib/config.d.ts'
+import type { XapiConfigAccount } from 'lib/config.d.ts'
+import { inspect } from 'lib/inspect.ts'
 
 import type { KingConn } from '../conn.d.ts'
-import { inspect } from '../lib/inspect.ts'
 
 import XapiSocket from './socket/socket.ts'
 import XapiStream from './stream/stream.ts'

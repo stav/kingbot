@@ -1,18 +1,17 @@
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
 
-import { bind } from '../lib/bind.ts'
-import { reflect } from '../lib/reflect.ts'
-
-import { inspect } from './lib/inspect.ts'
+import { bind } from 'lib/bind.ts'
+import { reflect } from 'lib/reflect.ts'
+import { inspect } from 'lib/inspect.ts'
 
 export default class KingCount {
 
-  conns: KingConn[] = ConnectionFactory()
-
-  f: (() => number | void)[] = []
+  conns: KingConn[] = []
 
   #currentAccountIndex = 0
+
+  f = [0, 1, 2, 3, 4].map(i => () => this.fKey(i)) // Switch between connections
 
   inspect: () => void = inspect
 
@@ -20,10 +19,6 @@ export default class KingCount {
     // Set the first account active
     if (this.conns.length > 1) {
       this.#currentAccountIndex = 1
-    }
-    // Hardcode five functions that call fKey based on index accessed
-    for (let i=5; i--;) {
-      this.f[i] = () => this.fKey(i)
     }
   }
 
@@ -34,14 +29,19 @@ export default class KingCount {
   get availableCommands (): string[] {
     return [
       ...reflect(this).props, // KingCount properties
-      ...reflect(this.Conn).props.map(p => `Conn.${p}`), // KingCount.Conn properties
+      ...reflect(this.Conn)?.props.map(p => `Conn.${p}`), // KingCount.Conn properties
     ]
   }
 
   get prompt () {
     const i = this.#currentAccountIndex
-    const p = this.Conn.prompt()
+    const p = this.Conn?.prompt() || ''
     return `\n${i}[${p}]> `
+  }
+
+  prime () {
+    this.conns = ConnectionFactory()
+    return this.list()
   }
 
   bind (command: string) {
@@ -61,7 +61,6 @@ export default class KingCount {
   list () {
     return this.conns
       .map((c, i) => c.list(i)) // Run list for all connections
-      // .filter((_c, i) => i > 0) // Ignore the first result (Telegram)
   }
 
   fKey (index: number) {

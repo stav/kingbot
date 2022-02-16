@@ -1,4 +1,4 @@
-import { encode as b64encode } from 'https://deno.land/std@0.125.0/encoding/base64.ts'
+import { encode as b64encode } from 'std/encoding/base64.ts'
 
 async function importKey (secret: string): Promise<CryptoKey> {
   return await crypto.subtle.importKey(

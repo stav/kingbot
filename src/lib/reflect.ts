@@ -4,6 +4,12 @@ type Reflection = {
   methods: string[]
 }
 
+const emptyReflection = {
+  props: [],
+  fields: [],
+  methods: [],
+} as Reflection
+
 const ObjectProps = [
   "constructor",
   "hasOwnProperty",
@@ -16,6 +22,8 @@ const ObjectProps = [
 
 // deno-lint-ignore no-explicit-any
 export function reflect(obj: any): Reflection {
+  if (!obj) return emptyReflection;
+
   // deno-lint-ignore no-explicit-any
   let _obj: any = Object.assign(obj)
 

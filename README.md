@@ -116,8 +116,30 @@ it as `.config/local.yaml`.
 Make sure you are in the `kingbot` directory.
 
 ```bash
-deno run --allow-net --allow-read --allow-write ./src/app.ts
+deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPaths.json ./src/app.ts
 ```
+
+    0[]> ?
+    input "?" (object) [
+      "conns",
+      "f",
+      "inspect",
+      "Conn",
+      "availableCommands",
+      "prompt",
+      "prime",
+      "bind",
+      "list",
+      "fKey"
+    ]
+
+    0[]> prime
+    input "prime" (function) [Function: bound prime]
+    [
+      "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
+      "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
+      "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
+    ]
 
     1[--]> ?
     input "?" (object) [
@@ -137,13 +159,8 @@ deno run --allow-net --allow-read --allow-write ./src/app.ts
       "Conn.status",       "Conn.list"
     ]
 
-    1[--]> list
-    input "list" (function) [Function: bound list]
-    [
-      "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
-      "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
-      "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
-    ]
+    0[]> f.1
+    input "f.1" (function) [Function: bound ]
 
     1[--]> start
     input "start" (function) [AsyncFunction: bound start]
