@@ -37,8 +37,8 @@ function isBuyOrder(cmd: number): boolean {
   function stoplossWorseThanEntry(): boolean {
     return _isBuyOrder ? data.sl < data.open_price : data.sl > data.open_price
   }
-  if (stoplossWorseThanEntry()) {
-    return data.open_price
+  if (stoplossWorseThanEntry()) { // This would normally mean that the
+    return data.open_price        // break-even has not been moved yet
   }
   const level = (data.open_price + data.close_price) / 2
   getLogger().info('LEVEL', level, '=', data.open_price, '+', data.close_price, '/', 2)
@@ -110,4 +110,8 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
   else {
     console.log('did not check out:', data.state)
   }
+}
+
+export const testing = {
+  getLevel,
 }
