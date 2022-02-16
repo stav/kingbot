@@ -1,5 +1,4 @@
 import { deadline, debounce, delay, DeadlineError } from 'std/async/mod.ts'
-import { bgBlack, white, magenta, yellow, red } from 'std/fmt/colors.ts'
 import { getLogger } from 'std/log/mod.ts'
 
 import type { InputData, XapiResponse } from './socket.d.ts'
@@ -24,26 +23,26 @@ const throttleDebounced = debounce(xsocket => {
 }, TIMEOUT)
 
 function throttle(xsocket: WebSocket) {
-  console.log(bgBlack(yellow('THROTTLE')), xsocket?.constructor?.name,
+  getLogger().info('throttle', 'THROTTLE', xsocket?.constructor?.name,
     'queue', queue.length,
     'burst', burst,
     'throttled', throttled,
   )
   if (queue.length) {
     if (throttled) {
-      console.log(bgBlack(red('Throttled, waiting')))
+      getLogger().info('throttle', 'Throttled, waiting')
       throttleDebounced(xsocket)
     }
     else {
       if (burst > 0) {
         burst--
         const x = queue.shift() as string
-        console.log(bgBlack(white('Not throttled, sending')), x)
+        getLogger().info('throttle', 'Not throttled, sending', x)
         xsocket?.send(x)
         throttle(xsocket)
       }
       else {
-        console.log(bgBlack(magenta('Not throttled, but bursted, so throttling')))
+        getLogger().info('throttle', 'Not throttled, but bursted, so throttling')
         throttled = true
         throttle(xsocket)
       }
