@@ -10,24 +10,36 @@ import Logger from '../log.ts'
  * @param props - The property path to traverse.
  */
 // deno-lint-ignore no-explicit-any
-export function bind(c: any, props: string[]): any {
-  Logger.info()
-  Logger.info(`c="${c?.constructor?.name}", props=${JSON.stringify(props)}, length=${props.length}`)
+export function bind (c: any, props: string[], recursing = false): any {
+
+  const cname = c?.constructor?.name || typeof c
+
+  if (!recursing) Logger.info(); // Log blank line for top of recursion
+
+  function log () {
+    if (prop) // Duplicate check for prop to make linter happy
+      Logger.info(
+        ` ${cname}.${prop}`
+          + ' = '
+          + `(${typeof c[prop]}) `
+          + `${c[prop]?.name||''}`,
+        Deno.inspect(c[prop], { depth: 1, iterableLimit: 3 }),
+        prop in c,
+        props.length
+      )
+  }
+
+  Logger.info(`BIND c="${cname}" props(${props.length})=${JSON.stringify(props)}`)
+
   const prop = props.shift()
-  Logger.info(`prop="${prop}"`)
+
+  Logger.info(` prop="${prop}"`)
+
   if (c && prop) {
-    Logger.info(' BIND '
-                + `${c.constructor?.name || typeof c}.${prop}`
-                + ' = '
-                + `(${typeof c[prop]}) `
-                + `${c[prop]?.name||''}`,
-      Deno.inspect(c[prop], { depth: 1, iterableLimit: 3 }),
-      prop in c,
-      props.length
-    )
+    log()
     if (prop in c)
       return (props.length)
-        ? bind(c[prop], props)
+        ? bind(c[prop], props, true)
         : typeof c[prop] === 'function'
           ? c[prop].bind(c)
           : c[prop]
