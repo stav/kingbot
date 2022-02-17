@@ -1,13 +1,13 @@
-import type { Asset } from '../../../lib/config.d.ts'
-import { input } from '../../../lib/config.ts'
-import Logger from '../../../log.ts'
-
+import type { Asset } from 'lib/config.d.ts'
+import { input } from 'lib/config.ts'
 
 import type { TICK_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 
 import type { XapiResponse, XapiDataResponse, SyncFunction } from './socket.d.ts'
 import XapiSocket from './socket.ts'
+
+import Logger from 'log'
 
 async function fetchHedgePrices(sync: SyncFunction, symbols: string[]): Promise<TICK_RECORD[]> {
   const data = {

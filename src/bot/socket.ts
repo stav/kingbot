@@ -1,4 +1,4 @@
-import { inspect } from './lib/inspect.ts'
+import { inspect } from 'lib/inspect.ts'
 
 enum State {
   CONNECTING = 0,

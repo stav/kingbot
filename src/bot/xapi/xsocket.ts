@@ -1,9 +1,10 @@
-import { delay } from 'https://deno.land/std@0.125.0/async/mod.ts'
+import { delay } from 'std/async/mod.ts'
 
-import type { XapiConfigAccount, XapiAccount } from '../../lib/config.d.ts'
-import Logger from '../../log.ts'
+import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
 
 import Socket from '../socket.ts'
+
+import Logger from 'log'
 
 function human (o: { h: number, m: number, s: number }) {
   let { h, m, s } = o

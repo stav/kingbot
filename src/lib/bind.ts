@@ -1,4 +1,4 @@
-import Logger from '../log.ts'
+import Logger from 'log'
 
 /** bind
  *

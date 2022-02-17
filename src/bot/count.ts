@@ -1,10 +1,9 @@
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
 
-import { bind } from '../lib/bind.ts'
-import { reflect } from '../lib/reflect.ts'
-
-import { inspect } from './lib/inspect.ts'
+import { bind } from 'lib/bind.ts'
+import { reflect } from 'lib/reflect.ts'
+import { inspect } from 'lib/inspect.ts'
 
 export default class KingCount {
 

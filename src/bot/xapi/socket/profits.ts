@@ -1,5 +1,3 @@
-import Logger from '../../../log.ts'
-
 import type {
   TRADE_RECORD,
   TRADE_TRANS_INFO,
@@ -9,6 +7,8 @@ import type {
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 
 import type XapiSocket from './socket.ts'
+
+import Logger from 'log'
 
 type UpdateOrderEvent = Partial<TRADE_TRANS_INFO>
 

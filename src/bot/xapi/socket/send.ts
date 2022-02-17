@@ -1,9 +1,9 @@
-import { deadline, delay, DeadlineError } from 'https://deno.land/std@0.125.0/async/mod.ts'
-
-import Logger from '../../../log.ts'
+import { deadline, delay, DeadlineError } from 'std/async/mod.ts'
 
 import type { InputData, XapiResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
+
+import Logger from 'log'
 
 /**
  * send

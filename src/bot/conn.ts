@@ -1,5 +1,5 @@
-import type { KucoinConfigAccount, XapiConfigAccount } from '../lib/config.d.ts'
-import config from '../lib/config.ts'
+import type { KucoinConfigAccount, XapiConfigAccount } from 'lib/config.d.ts'
+import config from 'lib/config.ts'
 
 import type { KingConn } from './conn.d.ts'
 import KuConn from './kucoin/kuconn.ts'

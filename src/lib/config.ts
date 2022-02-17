@@ -1,4 +1,4 @@
-import { parse } from 'https://deno.land/std@0.125.0/encoding/yaml.ts'
+import { parse } from 'std/encoding/yaml.ts'
 
 import type { ConfigContainer, InputContainer } from './config.d.ts'
 
