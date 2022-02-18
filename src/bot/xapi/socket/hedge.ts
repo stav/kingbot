@@ -7,7 +7,7 @@ import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 import type { XapiResponse, XapiDataResponse, SyncFunction } from './socket.d.ts'
 import XapiSocket from './socket.ts'
 
-import Logger from 'log'
+import Logging from 'lib/logging.ts'
 
 async function fetchHedgePrices(sync: SyncFunction, symbols: string[]): Promise<TICK_RECORD[]> {
   const data = {
@@ -28,6 +28,7 @@ async function fetchHedgePrices(sync: SyncFunction, symbols: string[]): Promise<
 }
 
 function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_INFO[] {
+  const logger = Logging.logger()
   const tpRates = [ 0.005, 0.007, 0.009 ]
   const timestamp = Date.now()
   const orders: TRADE_TRANS_INFO[] = []
@@ -45,7 +46,7 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
     const bid = record.bid
     const buyPrice = parseFloat((bid + bid * 0.002 * mod).toFixed(asset?.digits))
     const sellPrice = parseFloat((bid - bid * 0.001 * mod).toFixed(asset?.digits))
-    Logger.info('Spread', record.symbol, buyPrice - sellPrice)
+    logger.info('Spread', record.symbol, buyPrice - sellPrice)
     let tpLevel = 0
 
     for (const rate of tpRates) {

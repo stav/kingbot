@@ -4,7 +4,7 @@ import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
 
 import Socket from '../socket.ts'
 
-import Logger from 'log'
+import Logging from 'lib/logging.ts'
 
 function human (o: { h: number, m: number, s: number }) {
   let { h, m, s } = o
@@ -48,22 +48,22 @@ export abstract class XSocket extends Socket {
   }
 
   protected gotClose (event: CloseEvent): void {
-    Logger.info('Socket closed with code', event.code)
+    Logging.logger().info('Socket closed with code', event.code)
     this.date.closed = Date.now()
     // TODO Reenable reconnect
     // if (event.code !== 1000) {
-    //   Logger.info('Restarting')
+    //   Logging.logger().info('Restarting')
     //   setTimeout(Socket.connect, 1000)
     // }
   }
 
   protected gotError (e: Event | ErrorEvent): void {
-    Logger.error((<ErrorEvent>e).message)
+    Logging.logger().error((<ErrorEvent>e).message)
     this.print()
   }
 
   protected gotMessage (message: MessageEvent): void {
-    Logger.info(message.data)
+    Logging.logger().info(message.data)
   }
 
   get info () {

@@ -1,8 +1,7 @@
 {
   "imports": {
     "std/": "https://deno.land/std@0.125.0/",
-    "src/": "./src/",
     "lib/": "./src/lib/",
-    "log" : "./src/log.ts"
+    "src/": "./src/"
   }
 }
