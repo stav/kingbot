@@ -114,4 +114,5 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
 
 export const testing = {
   getLevel,
+  getStopLoss,
 }
