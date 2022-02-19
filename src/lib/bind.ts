@@ -1,4 +1,4 @@
-import * as logging from 'std/log/mod.ts'
+import { getLogger } from 'std/log/mod.ts'
 
 /** bind
  *
@@ -13,7 +13,7 @@ import * as logging from 'std/log/mod.ts'
 // deno-lint-ignore no-explicit-any
 export function bind (c: any, props: string[], recursing = false): any {
 
-  const log = (...msg: unknown[]) => logging.getLogger().info(msg)
+  const log = (...msg: unknown[]) => getLogger().info(msg)
 
   const cname = c?.constructor?.name || typeof c
 

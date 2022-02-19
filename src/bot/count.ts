@@ -1,4 +1,4 @@
-import * as logging from 'std/log/mod.ts'
+import { getLogger } from 'std/log/mod.ts'
 
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
@@ -40,7 +40,7 @@ export default class KingCount {
   }
 
   log () {
-    const logger = logging.getLogger()
+    const logger = getLogger()
     logger.debug("Hello world");
     logger.info(123456);
     logger.warning(true);
