@@ -1,13 +1,13 @@
-import * as log from 'std/log/mod.ts'
+import * as logging from 'std/log/mod.ts'
 
 async function setup () {
   // custom configuration with 2 loggers (the default and `tasks` loggers).
-  await log.setup({
+  await logging.setup({
 
     handlers: {
-      console: new log.handlers.ConsoleHandler("WARNING"),
+      console: new logging.handlers.ConsoleHandler("WARNING"),
 
-      file: new log.handlers.FileHandler("DEBUG", {
+      file: new logging.handlers.FileHandler("DEBUG", {
         filename: "./logs/kingbot.log",
         formatter: "{datetime} {levelName} {msg}",
       }),
@@ -25,7 +25,7 @@ async function setup () {
     },
 
   })
-  return log.getLogger()
+  return logging.getLogger()
 }
 
 export default {
