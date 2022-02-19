@@ -41,15 +41,16 @@ export default class KingCount {
 
   log () {
     const logger = getLogger()
-    logger.debug("Hello world");
-    logger.info(123456);
-    logger.warning(true);
-    logger.error({ foo: "bar", fizz: "bazz" });
-    logger.critical("500 Internal server error");
+    logger.debug("Hello world")
+    logger.info(123456)
+    logger.warning(true)
+    logger.error({ foo: "bar", fizz: "bazz" })
+    logger.critical("500 Internal server error")
   }
 
-  prime () {
+  async prime () {
     this.conns = ConnectionFactory()
+    await Logging.setup()
     return this.list()
   }
 

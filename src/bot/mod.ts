@@ -1,3 +1,5 @@
+import Logging from 'lib/logging.ts'
+
 import getInput from './input.ts'
 import KingCount from './count.ts'
 
@@ -10,15 +12,15 @@ async function start (): Promise<void> {
     const obj = kingcount.bind(input)
 
     // Print it
-    console.info(`input "${input}" (${typeof obj})`, obj)
+    console.info(`input "${input}" (${typeof obj}) '${obj?.constructor.name}'`, obj)
 
     // Call it
     if (typeof obj === 'function')
-      console.info(
-        obj.constructor.name === 'AsyncFunction'
-          ? await obj()
-          : obj()
-      )
+      console.info(await obj()) // Is it ok to await if it's not a promise?
+
+    // Flush it
+    Logging.flush()
+
   }
 }
 
