@@ -28,6 +28,14 @@ async function setup () {
   return logging.getLogger()
 }
 
+function flush () {
+  logging.getLogger().handlers.forEach(handler => {
+    if (handler instanceof logging.handlers.FileHandler)
+      handler.flush()
+  })
+}
+
 export default {
+  flush,
   setup,
 }
