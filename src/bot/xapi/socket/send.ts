@@ -1,5 +1,5 @@
 import { deadline, delay, DeadlineError } from 'std/async/mod.ts'
-import * as logging from 'std/log/mod.ts'
+import { getLogger } from 'std/log/mod.ts'
 
 import type { InputData, XapiResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
@@ -25,7 +25,7 @@ import type XapiSocket from './socket.ts'
  export function send (this: XapiSocket, data: InputData) {
   if (this.isOpen) {
     const json = JSON.stringify(data)
-    logging.getLogger().info('Sending', json)
+    getLogger().info('Sending', json)
     this.socket?.send(json)
   }
 }
