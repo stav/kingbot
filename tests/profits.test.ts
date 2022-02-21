@@ -2,11 +2,13 @@ import * as logging from 'std/log/mod.ts'
 
 import { Rhum } from 'rhum/mod.ts'
 
-import type { STREAMING_TRADE_RECORD } from 'src/bot/xapi/xapi.d.ts'
-import { testing } from 'src/bot/xapi/socket/profits.ts'
+import type { STREAMING_TRADE_RECORD, TRADE_RECORD } from 'src/bot/xapi/xapi.d.ts'
 import { CMD_FIELD } from 'src/bot/xapi/xapi.ts'
 
-const { getLevel, getStopLoss } = testing
+import type XapiSocket from 'src/bot/xapi/socket/socket.ts'
+import { testing } from 'src/bot/xapi/socket/profits.ts'
+
+const { getLevel, getStopLoss, setFamilyStoploss } = testing
 
 await logging.setup({ loggers: { default: { level: "WARNING" } } })
 
@@ -84,6 +86,61 @@ Rhum.testPlan("profits", () => {
         sl: 1,
       } as STREAMING_TRADE_RECORD
       Rhum.asserts.assertEquals( getStopLoss(data), 2 )
+    })
+
+  })
+
+  Rhum.testSuite("setFamilyStoploss", () => {
+
+    const data = {
+      close_price: 16294.86,
+      close_time: 1638907147065,
+      closed: true,
+      cmd: CMD_FIELD.SELL,
+      comment: '[T/P]',
+      digits: 2,
+      open_price: 16295.77,
+      open_time: 1638906046869,
+      order2: 497200723,
+      order: 144310429,
+      position: 497200573,
+      profit: 0.16,
+      sl: 16322.57,
+      state: 'Modified',
+      symbol: 'US100',
+      tp: 16295.21,
+      type: 2,
+      volume: 0.01,
+    } as STREAMING_TRADE_RECORD
+
+    class XapiSocketMock {
+      async sync (_data: unknown) {}
+    }
+
+    // deno-lint-ignore no-explicit-any
+    let xsocketMock: any
+    Rhum.beforeEach(() => {
+      xsocketMock = Rhum.mock(XapiSocketMock).create()
+    })
+
+    Rhum.testCase("should attempt to modify no orders in the family", async () => {
+      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+      await setFamilyStoploss(data, [], xsocketMock as unknown as XapiSocket)
+      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+    })
+
+    Rhum.testCase("should attempt to modify one order in the family", async () => {
+      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+      const trades = [ {} as TRADE_RECORD ]
+      await setFamilyStoploss(data, trades, xsocketMock as unknown as XapiSocket)
+      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 1 )
+    })
+
+    Rhum.testCase("should attempt to modify nine orders in the family", async () => {
+      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+      const trades = new Array(9).fill( {} as TRADE_RECORD )
+      await setFamilyStoploss(data, trades, xsocketMock as unknown as XapiSocket)
+      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 9 )
     })
 
   })
