@@ -1,7 +1,8 @@
 import { assertEquals, assertArrayIncludes, assertExists } from 'std/testing/asserts.ts'
 import * as logging from 'std/log/mod.ts'
 
-import config from 'lib/config.ts'
+import config, { input } from 'lib/config.ts'
+
 import { bind } from 'lib/bind.ts'
 import { reflect } from 'lib/reflect.ts'
 
@@ -23,6 +24,7 @@ Deno.test('lib.bind', () => {
 
 Deno.test('lib.config', () => {
   assertExists(config().Accounts)
+  assertExists(input().Hedge.Assets)
 })
 
 Deno.test('lib.reflect', () => {
