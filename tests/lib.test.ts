@@ -8,10 +8,17 @@ import { reflect } from 'lib/reflect.ts'
 await logging.setup({ loggers: { default: { level: "WARNING" } } })
 
 Deno.test('lib.bind', () => {
+  const object = {a: {b: 2}, c: () => {}}
+
   const command = 'a.b'
   const props = command.split('.') // ['a', 'b']
-  const result = bind({a: {b: 2}}, props)
+  let result = bind(object, props)
   assertEquals(result, 2)
+
+  result = bind(object, ['c'])
+  assertEquals(typeof result, 'function')
+
+  assertEquals(bind(null, []), undefined)
 })
 
 Deno.test('lib.config', () => {
