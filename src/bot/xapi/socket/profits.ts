@@ -112,11 +112,12 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
     }
   }
   else {
-    getLogger().warning('did not check out:', data.state)
+    getLogger().debug('Order not a take-profit:', data.state)
   }
 }
 
 export const testing = {
+  check,
   getLevel,
   getStopLoss,
   setFamilyStoploss,
