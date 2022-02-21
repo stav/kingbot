@@ -10,6 +10,8 @@ type UpdateOrderEvent = Partial<TRADE_TRANS_INFO>
 /** @name isBuyOrder */
 /**
  * Determine if the given command is for _buying_ (as opposed to _selling_)
+ * @todo What if it's a balance or credit order, i.e. not buy or sell
+ * @see xapi.ts:CMD_FIELD
  */
 function isBuyOrder(cmd: number): boolean {
   return ['BUY', 'BUY_LIMIT', 'BUY_STOP'].includes(CMD_FIELD[cmd])
@@ -60,26 +62,28 @@ function isBuyOrder(cmd: number): boolean {
 /** @name setFamilyStoploss */
 /**
  * Issue order stop-loss modification transactions for all orders in _family_
+ * @param tpData The take-profit order data sent by the exchange
+ * @param trades The order family of trades belonging to the `tpData`
+ * @param xsocket The object that has a `sync` method to do the update
  */
-async function setFamilyStoploss( data: STREAMING_TRADE_RECORD,
-                                 trades: TRADE_RECORD[],
-                                xsocket: XapiSocket,
+async function setFamilyStoploss( tpData: STREAMING_TRADE_RECORD,
+                                  trades: TRADE_RECORD[],
+                                 xsocket: XapiSocket,
 ) {
   getLogger().info('Updating stop loss for', trades.length, 'orders')
   const transaction: UpdateOrderEvent = {
     type: TYPE_FIELD.MODIFY,
-    sl: getStopLoss(data),
+    sl: getStopLoss(tpData),
   }
   for (const trade of trades) {
-    const tradeTransInfo = Object.assign({}, trade, transaction)
     const data = {
       command: 'tradeTransaction',
-      arguments: { tradeTransInfo }
+      arguments: { tradeTransInfo: Object.assign({}, trade, transaction) }
     }
-    console.log('setFamilyStoploss: transaction', data)
+    getLogger().error('setFamilyStoploss: transaction')
     // The transaction will fail if the take-profit is "worse" than the entry price
     const response = await xsocket.sync(data)
-    console.log('setFamilyStoploss: response', response)
+    getLogger().debug('setFamilyStoploss: response', response)
   }
 }
 
@@ -93,26 +97,27 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
       && trade.sl === data.sl
   }
   if (data.closed && data.comment === '[T/P]') {
-    console.log('TAKE PROFIT', data)
+    getLogger().debug('TAKE PROFIT', data)
 
     const openedOnly = true
 
     const trades: TRADE_RECORD[] = await this.trades(openedOnly)
-    console.log('check', trades.length, 'trades in total')
+    getLogger().info('check', trades.length, 'trades in total')
 
     const family = trades.filter(symbolStoploss)
-    console.log('check', family.length, 'family of', data.symbol)
+    getLogger().info('check', family.length, 'family of', data.symbol)
 
     if (family.length > 0) {
       await setFamilyStoploss(data, family, this)
     }
   }
   else {
-    console.log('did not check out:', data.state)
+    getLogger().warning('did not check out:', data.state)
   }
 }
 
 export const testing = {
   getLevel,
   getStopLoss,
+  setFamilyStoploss,
 }
