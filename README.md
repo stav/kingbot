@@ -241,6 +241,19 @@ Send EOF (Ctrl-D End-of-file) to exit.
     # query the location of the dependency file in question
     DENO_DIR=$PWD/deno deno info --unstable https://deno.land/x/rhum@v1.1.12/src/mock_builder.ts
 
+### Script Runner
+
+Install [Velociraptor][5]:
+
+    $ deno install -qAn vr https://deno.land/x/velociraptor@1.4.0/cli.ts
+
+Add Bash completion:
+
+    $ source <(vr completions bash)
+
 
 [1]: https://github.com/stav/xapi
-[2]: https://deno.land
+[2]: https://nodejs.org/
+[3]: https://deno.land/
+[4]: https://telegram.org/
+[5]: https://velociraptor.run/
