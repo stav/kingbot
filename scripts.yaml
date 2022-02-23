@@ -1,0 +1,29 @@
+# https://velociraptor.run/docs/cli
+# vr start
+# vr test
+
+scripts:
+
+  start:
+    cmd: src/app.ts
+    importMap: denoPaths.json
+    unstable: false
+    allow:
+      net: ws.xtb.com
+      read: .config/local.yaml
+      write: logs/kingbot.log
+
+  test:
+    cmd: deno test
+    importMap: denoPaths.json
+    allow:
+      env: CI # Rhum: if (Deno.env.get("CI") === "true")
+      read:
+        - .config/local.yaml
+        - .config/input.yaml
+    env:
+      CI: false # Rhum
+
+  cov:
+    - vr test --coverage=coverage
+    - deno coverage coverage
