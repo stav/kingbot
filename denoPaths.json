@@ -1,6 +1,6 @@
 {
   "imports": {
-    "std/": "https://deno.land/std@0.125.0/",
+    "std/": "https://deno.land/std@0.127.0/",
     "lib/": "./src/lib/",
     "src/": "./src/"
   }
