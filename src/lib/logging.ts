@@ -1,4 +1,14 @@
+import { format } from 'std/datetime/mod.ts'
 import * as logging from 'std/log/mod.ts'
+
+const formatter = (logRecord: logging.LogRecord) => {
+  const level = logRecord.levelName
+  const date = format(logRecord.datetime, 'yyyy-MM-dd HH:mm:ss')
+  const msg = logRecord.msg
+
+  return `${date} ${level} ${msg} `
+    + logRecord.args.map(arg => Deno.inspect(arg)).join(' ')
+}
 
 async function setup () {
   // custom configuration with 2 loggers (the default and `tasks` loggers).
@@ -9,8 +19,14 @@ async function setup () {
 
       file: new logging.handlers.FileHandler("DEBUG", {
         filename: "./logs/kingbot.log",
-        formatter: "{datetime} {levelName} {msg}",
+        formatter,
       }),
+
+      mfile: new logging.handlers.FileHandler("NOTSET", {
+        filename: "./logs/kingmsg.log",
+        formatter,
+      }),
+
     },
 
     loggers: {
@@ -18,10 +34,10 @@ async function setup () {
         level: "NOTSET",
         handlers: ["file", "console"],
       },
-      // tasks: {
-      //   level: "ERROR",
-      //   handlers: ["console", "file"],
-      // },
+      message: {
+        level: "NOTSET",
+        handlers: ["mfile"],
+      },
     },
 
   })
@@ -29,7 +45,11 @@ async function setup () {
 }
 
 function flush () {
-  logging.getLogger().handlers.forEach(handler => {
+  const handlers = [
+    ...Array.from(logging.getLogger().handlers),
+    ...Array.from(logging.getLogger('message').handlers),
+  ]
+  handlers.forEach(handler => {
     if (handler instanceof logging.handlers.FileHandler)
       handler.flush()
   })
