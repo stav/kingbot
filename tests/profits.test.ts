@@ -146,34 +146,25 @@ Rhum.testPlan("profits", () => {
 
   Rhum.testSuite("check", () => {
 
-    // deno-lint-ignore no-explicit-any
-    let calls: any
-    let xsocketMock: XapiSocket
+    let xSocketMock: XapiSocket
 
     class XapiSocketMock {
       check = check
-      trades = (arg: boolean) => {
-        calls.trade.push(arg)
-        return []
-      }
+      trades = (_arg: boolean) => []
     }
 
     Rhum.beforeEach(() => {
-      calls = {
-        trade: [] as boolean[],
-      }
-      xsocketMock = new XapiSocketMock() as unknown as XapiSocket
+      xSocketMock = Rhum.mock(XapiSocketMock).create() as unknown as XapiSocket
     })
 
     Rhum.testCase("should do nothing", async () => {
-      await xsocketMock.check({ closed: false } as STREAMING_TRADE_RECORD)
-      Rhum.asserts.assertEquals( calls.trade.length, 0 )
+      await xSocketMock.check({ closed: false } as STREAMING_TRADE_RECORD)
+      Rhum.asserts.assertEquals( xSocketMock.calls.trades, 0 )
     })
 
     Rhum.testCase("should call trades once", async () => {
-      await xsocketMock.check(tpData)
-      Rhum.asserts.assertEquals( calls.trade.length, 1 )
-      Rhum.asserts.assertEquals( calls.trade, [true] )
+      await xSocketMock.check(tpData)
+      Rhum.asserts.assertEquals( xSocketMock.calls.trades, 1 )
     })
 
   })
