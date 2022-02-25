@@ -20,12 +20,16 @@ scripts:
     importMap: denoPaths.json
     allow:
       env: CI # Rhum: if (Deno.env.get("CI") === "true")
+      net: ws.xtb.com
       read:
         - .config/local.yaml
         - .config/input.yaml
     env:
       CI: false # Rhum
 
+  tu: vr test tests/unit
+  ti: vr test tests/integration
   cov:
+    - rm coverage/*
     - vr test --coverage=coverage
     - deno coverage coverage

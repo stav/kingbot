@@ -16,3 +16,10 @@ export enum TYPE_FIELD {
   MODIFY = 3,
   DELETE = 4,
 }
+
+export enum REQUEST_STATUS_FIELD {
+  ERROR = 0,
+  PENDING = 1,
+  ACCEPTED = 3,
+  REJECTED = 4,
+}
