@@ -52,7 +52,7 @@ export default class XapiSocket extends XSocket {
     if (response.status)
       this.session = (<XapiLoginResponse>response).streamSessionId
     else
-      console.error('Login error', response)
+      console.error('Login error', response, data) // TODO: Will expose password
   }
 
   logout (): void {

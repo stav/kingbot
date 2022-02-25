@@ -50,8 +50,12 @@ export default class XConn implements KingConn {
     this.Stream.connect()
   }
 
+  /**
+   * @see https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/docs/rules/no-floating-promises.md
+   * @see https://palantir.github.io/tslint/rules/no-floating-promises
+   */
   login () {
-    this.Socket.login()
+    this.Socket.login() // Floating promise
   }
 
   ping () {
