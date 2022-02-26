@@ -1,4 +1,7 @@
+import { getLogger } from 'std/log/mod.ts'
+
 import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
+import Logging from 'lib/logging.ts'
 
 import { XSocket } from '../xsocket.ts'
 
@@ -59,14 +62,16 @@ export default class XapiSocket extends XSocket {
     this.session = ''
     this.send({ command: 'logout' }) // Server will close the connection
     this.close()
-    this.print()
+    getLogger().info(this.status)
+    Logging.flush()
   }
 
   close (): void {
     if (this.socket) {
       // Close 1000 so the bot does not try and restart
       this.isOpen && this.socket.close(1000)
-      this.print()
+      getLogger().info(this.status)
+      Logging.flush()
     }
   }
 

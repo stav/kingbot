@@ -34,15 +34,14 @@ export abstract class XSocket extends Socket {
 
   protected gotOpen (event: Event) {
     const target = event.target as EventTarget & { url: string}
-    getLogger('message').info('Socket opened', target?.url)
+    getLogger('message').info('Socket opened', target?.url, this.status)
     Logging.flush()
     this.date.opened = event.timeStamp
     this.date.closed = 0
-    this.print()
   }
 
   protected gotClose (event: CloseEvent): void {
-    getLogger('message').info('Socket closed with code', event.code)
+    getLogger('message').info('Socket closed with code', event.code, this.status)
     Logging.flush()
     this.date.closed = Date.now()
     // TODO Reenable reconnect
@@ -55,9 +54,7 @@ export abstract class XSocket extends Socket {
   protected gotError (e: Event | ErrorEvent): void {
     const message = (<ErrorEvent>e).message
     getLogger('message').error(message)
-    console.error(message)
     Logging.flush()
-    this.print()
   }
 
   protected gotMessage (message: MessageEvent): void {
@@ -80,10 +77,6 @@ export abstract class XSocket extends Socket {
     const stat = this.state
     const time = this.time
     return `${obj}  ${url}  ${id}|${name}  ${stat}|${time}  ${ses}`.trim()
-  }
-
-  print () {
-    console.info(this.status)
   }
 
   xprompt (active: boolean) {
