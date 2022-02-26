@@ -97,7 +97,6 @@ export default class XapiStream extends XSocket {
     if (this.socket) {
       this.unlisten()
       this.isOpen && this.socket.close(1000)
-      this.print()
     }
   }
 
