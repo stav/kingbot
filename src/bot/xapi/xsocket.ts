@@ -1,4 +1,4 @@
-import { delay } from 'std/async/mod.ts'
+import { delay, deadline, DeadlineError } from 'std/async/mod.ts'
 import { getLogger } from 'std/log/mod.ts'
 
 import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
@@ -87,10 +87,10 @@ export abstract class XSocket extends Socket {
         : '-'
   }
 
-  connect (): void {
+  connect (gotOpen = this.gotOpen): void {
     if (!this.socket || !this.isOpen) {
       this.socket = new WebSocket(this.url)
-      this.socket.onopen = this.gotOpen.bind(this)
+      this.socket.onopen = gotOpen.bind(this)
       this.socket.onclose = this.gotClose.bind(this)
       this.socket.onerror = this.gotError.bind(this)
       this.socket.onmessage = this.gotMessage
@@ -98,32 +98,22 @@ export abstract class XSocket extends Socket {
   }
 
   async open (): Promise<void> {
-    if (this.isOpen) return;
+    if (this.isOpen) { return }
 
-    let timeout = 0
-    let result = false
-
-    const gotOpen = (_event: Event) => {
-      this.date.opened = Date.now()
-      this.date.closed = 0
-      this.print()
-      result = true
+    const gotOpen = (event: Event) => {
+      this.gotOpen(event)
+      done = true
     }
-
-    this.socket = new WebSocket(this.url)
-    this.socket.onopen = gotOpen.bind(this)
-    this.socket.onclose = this.gotClose.bind(this)
-    this.socket.onerror = this.gotError.bind(this)
-    this.socket.onmessage = this.gotMessage
-
-    while (!result) {
-      if (++timeout > 10) {
-        console.error({ status: false, errorCode: 'K1NG', errorDescr: 'Timeout' })
-      }
-      else {
-        console.log('wait')
-        await delay(200)
-      }
+    let done = false
+    this.connect(gotOpen)
+    async function wait () { while (!done) await delay(200) }
+    try {
+      await deadline(wait(), 2000)
+    }
+    catch (e) {
+      if (e instanceof DeadlineError)
+        getLogger().error({ status: false, errorCode: 'K1NG', errorDescr: 'XSocket Open Timeout' })
+      else throw e
     }
   }
 
