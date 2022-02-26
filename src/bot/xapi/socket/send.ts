@@ -1,9 +1,8 @@
 import { deadline, delay, DeadlineError } from 'std/async/mod.ts'
+import { getLogger } from 'std/log/mod.ts'
 
 import type { InputData, XapiResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
-
-import Logger from 'log'
 
 /**
  * send
@@ -25,7 +24,9 @@ import Logger from 'log'
  */
  export function send (this: XapiSocket, data: InputData) {
   if (this.isOpen) {
-    this.socket?.send(JSON.stringify(data))
+    const json = JSON.stringify(data)
+    getLogger().info('Sending', json)
+    this.socket?.send(json)
   }
 }
 
@@ -73,7 +74,6 @@ export async function sync (this: XapiSocket, data: InputData): Promise<XapiResp
   // 1. Send data
   const customTag = Math.random().toString()
   const _data = Object.assign({ customTag }, data)
-  Logger.info('Syncing', JSON.stringify(_data))
   this.send(_data)
 
   // 2. Wait for Result 2 seconds max

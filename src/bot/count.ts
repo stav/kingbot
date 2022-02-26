@@ -1,6 +1,9 @@
+import { getLogger } from 'std/log/mod.ts'
+
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
 
+import Logging from 'lib/logging.ts'
 import { bind } from 'lib/bind.ts'
 import { reflect } from 'lib/reflect.ts'
 import { inspect } from 'lib/inspect.ts'
@@ -14,13 +17,6 @@ export default class KingCount {
   f = [0, 1, 2, 3, 4].map(i => () => this.fKey(i)) // Switch between connections
 
   inspect: () => void = inspect
-
-  constructor () {
-    // Set the first account active
-    if (this.conns.length > 1) {
-      this.#currentAccountIndex = 1
-    }
-  }
 
   get Conn (): KingConn {
     return this.conns[ this.#currentAccountIndex ]
@@ -39,8 +35,22 @@ export default class KingCount {
     return `\n${i}[${p}]> `
   }
 
-  prime () {
+  async logging () {
+    return await Logging.setup()
+  }
+
+  log () {
+    const logger = getLogger()
+    logger.debug("Hello world")
+    logger.info(123456)
+    logger.warning(true)
+    logger.error({ foo: "bar", fizz: "bazz" })
+    logger.critical("500 Internal server error")
+  }
+
+  async prime () {
     this.conns = ConnectionFactory()
+    await Logging.setup()
     return this.list()
   }
 

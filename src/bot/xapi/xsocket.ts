@@ -1,10 +1,10 @@
 import { delay } from 'std/async/mod.ts'
+import { getLogger } from 'std/log/mod.ts'
 
 import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
+import Logging from 'lib/logging.ts'
 
 import Socket from '../socket.ts'
-
-import Logger from 'log'
 
 function human (o: { h: number, m: number, s: number }) {
   let { h, m, s } = o
@@ -41,29 +41,37 @@ export abstract class XSocket extends Socket {
     return human({ h: 0, m: 0, s })
   }
 
-  protected gotOpen (_event: Event) {
-    this.date.opened = Date.now()
+  protected gotOpen (event: Event) {
+    const target = event.target as EventTarget & { url: string}
+    getLogger('message').info('Socket opened', target?.url)
+    Logging.flush()
+    this.date.opened = event.timeStamp
     this.date.closed = 0
     this.print()
   }
 
   protected gotClose (event: CloseEvent): void {
-    Logger.info('Socket closed with code', event.code)
+    getLogger('message').info('Socket closed with code', event.code)
+    Logging.flush()
     this.date.closed = Date.now()
     // TODO Reenable reconnect
     // if (event.code !== 1000) {
-    //   Logger.info('Restarting')
+    //   console.info('Restarting')
     //   setTimeout(Socket.connect, 1000)
     // }
   }
 
   protected gotError (e: Event | ErrorEvent): void {
-    Logger.error((<ErrorEvent>e).message)
+    const message = (<ErrorEvent>e).message
+    getLogger('message').error(message)
+    console.error(message)
+    Logging.flush()
     this.print()
   }
 
   protected gotMessage (message: MessageEvent): void {
-    Logger.info(message.data)
+    getLogger('message').info(message.data)
+    Logging.flush()
   }
 
   get info () {
@@ -84,7 +92,7 @@ export abstract class XSocket extends Socket {
   }
 
   print () {
-    console.log(this.status)
+    console.info(this.status)
   }
 
   xprompt (active: boolean) {

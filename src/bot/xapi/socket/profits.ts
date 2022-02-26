@@ -1,14 +1,9 @@
-import type {
-  TRADE_RECORD,
-  TRADE_TRANS_INFO,
-  STREAMING_TRADE_RECORD,
-} from '../xapi.d.ts'
+import { getLogger } from 'std/log/mod.ts'
 
+import type { TRADE_RECORD, TRADE_TRANS_INFO, STREAMING_TRADE_RECORD } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 
 import type XapiSocket from './socket.ts'
-
-import Logger from 'log'
 
 type UpdateOrderEvent = Partial<TRADE_TRANS_INFO>
 
@@ -46,7 +41,7 @@ function isBuyOrder(cmd: number): boolean {
     return data.open_price
   }
   const level = (data.open_price + data.close_price) / 2
-  Logger.info('LEVEL', level, '=', data.open_price, '+', data.close_price, '/', 2)
+  getLogger().info('LEVEL', level, '=', data.open_price, '+', data.close_price, '/', 2)
   return level
 }
 
@@ -58,7 +53,7 @@ function isBuyOrder(cmd: number): boolean {
   const margin = level * 0.0003
   const betterment = isBuyOrder(data.cmd) ? +margin : -margin
   const stopLoss = +(level + betterment).toFixed(data.digits)
-  Logger.info('STOP LOSS:', stopLoss, '=', level, '+', betterment)
+  getLogger().info('STOP LOSS:', stopLoss, '=', level, '+', betterment)
   return stopLoss
 }
 
@@ -70,7 +65,7 @@ async function setFamilyStoploss( data: STREAMING_TRADE_RECORD,
                                  trades: TRADE_RECORD[],
                                 xsocket: XapiSocket,
 ) {
-  Logger.info('Updating stop loss for', trades.length, 'orders')
+  getLogger().info('Updating stop loss for', trades.length, 'orders')
   const transaction: UpdateOrderEvent = {
     type: TYPE_FIELD.MODIFY,
     sl: getStopLoss(data),

@@ -1,4 +1,4 @@
-import Logger from 'log'
+import { getLogger } from 'std/log/mod.ts'
 
 /** bind
  *
@@ -13,13 +13,15 @@ import Logger from 'log'
 // deno-lint-ignore no-explicit-any
 export function bind (c: any, props: string[], recursing = false): any {
 
+  const logger = getLogger()
+
   const cname = c?.constructor?.name || typeof c
 
-  if (!recursing) Logger.info(); // Log blank line for top of recursion
+  if (!recursing) logger.info(''); // Log blank line for top of recursion
 
   function log () {
     if (prop) // Duplicate check for prop to make linter happy
-      Logger.info(
+      logger.info(
         ` ${cname}.${prop}`
           + ' = '
           + `(${typeof c[prop]}) `
@@ -30,11 +32,11 @@ export function bind (c: any, props: string[], recursing = false): any {
       )
   }
 
-  Logger.info(`BIND c="${cname}" props(${props.length})=${JSON.stringify(props)}`)
+  logger.info(`BIND c="${cname}" props(${props.length})=${JSON.stringify(props)}`)
 
   const prop = props.shift()
 
-  Logger.info(` prop="${prop}"`)
+  logger.info(` prop="${prop}"`)
 
   if (c && prop) {
     log()
