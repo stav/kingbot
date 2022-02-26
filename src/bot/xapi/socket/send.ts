@@ -48,7 +48,7 @@ import type XapiSocket from './socket.ts'
  * @returns The response payload
  */
 export async function sync (this: XapiSocket, data: InputData): Promise<XapiResponse> {
-  if (!this.isOpen) { return { status: false, errorCode: 'K1NG', errorDescr: 'Closed' }}
+  if (!this.isOpen) { return { status: false, errorCode: 'K1NG', errorDescr: 'Sync Connection Closed' }}
 
   // Function to Listen for messages with custom tag
   const listener = (message: MessageEvent) => {
@@ -61,15 +61,7 @@ export async function sync (this: XapiSocket, data: InputData): Promise<XapiResp
   this.socket?.addEventListener('message', listener)
 
   // Function to Wait for result
-  // deno-lint-ignore no-explicit-any
-  let result: any
-  async function wait (resolve: (value: void) => void) {
-    while (!result) {
-      console.log('wait')
-      await delay(200)
-    }
-    resolve()
-  }
+  async function wait () { while (!result) await delay(200) }
 
   // 1. Send data
   const customTag = Math.random().toString()
@@ -77,14 +69,16 @@ export async function sync (this: XapiSocket, data: InputData): Promise<XapiResp
   this.send(_data)
 
   // 2. Wait for Result 2 seconds max
+  // deno-lint-ignore no-explicit-any
+  let result: any
   try {
-    await deadline(new Promise(wait), 2000)
+    await deadline(wait(), 2000)
   }
 
   // 3. Check for Timeout
   catch (e) {
     if (e instanceof DeadlineError)
-      result = { status: false, errorCode: 'K1NG', errorDescr: 'Timeout' }
+      result = { status: false, errorCode: 'K1NG', errorDescr: 'Sync Timeout' }
     else throw e
   }
 
