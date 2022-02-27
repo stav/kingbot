@@ -54,7 +54,8 @@ export default class XConn implements KingConn {
    * @see https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/docs/rules/no-floating-promises.md
    * @see https://palantir.github.io/tslint/rules/no-floating-promises
    */
-  login () {
+  async login () {
+    await this.Socket.open()
     this.Socket.login() // Floating promise
   }
 
@@ -71,13 +72,19 @@ export default class XConn implements KingConn {
     this.Stream.unlisten()
   }
 
-  story () {
-    this.Socket.story()
+  async balance () {
+    await this.Socket.open()
+    await this.Socket.login()
+    const story = await this.story()
+    return story.getMarginLevel.balance
+  }
+
+  async story () {
+    return await this.Socket.story()
   }
 
   async trades () {
-    const trades = await this.Socket.trades()
-    return [ trades, trades.length ]
+    return await this.Socket.trades()
   }
 
   async hedge () {

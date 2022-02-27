@@ -5,12 +5,11 @@ import Logging from 'lib/logging.ts'
 
 import { XSocket } from '../xsocket.ts'
 
-import type { XapiResponse, XapiLoginResponse } from './socket.d.ts'
+import type { InputData, XapiResponse, XapiDataResponse, XapiLoginResponse } from './socket.d.ts'
 import { trade, trades } from './trade.ts'
 import { send, sync } from './send.ts'
 import { check } from './profits.ts'
 import hedge from './hedge.ts'
-import story from './story.ts'
 
 export default class XapiSocket extends XSocket {
 
@@ -20,7 +19,6 @@ export default class XapiSocket extends XSocket {
   trades = trades
   check = check
   hedge = hedge
-  story = story
   trade = trade
   send = send
   sync = sync
@@ -32,6 +30,12 @@ export default class XapiSocket extends XSocket {
   constructor (account: XapiConfigAccount) {
     super(account)
     this.#account = Object.assign({ pw: account.password }, this.account)
+  }
+
+  protected async fetchCommand (command: string) {
+    const data: InputData = { command }
+    const response: XapiResponse = await this.sync(data)
+    return (<XapiDataResponse>response).returnData
   }
 
   ping (): void {
@@ -54,8 +58,19 @@ export default class XapiSocket extends XSocket {
     const response: XapiResponse = await this.sync(data)
     if (response.status)
       this.session = (<XapiLoginResponse>response).streamSessionId
+    else if (response.errorCode === 'BE118') // Already logged in
+      getLogger().info('Login:', response.errorDescr)
     else
       console.error('Login error', response, data) // TODO: Will expose password
+  }
+
+  async story () {
+    return {
+      getCurrentUserData: await this.fetchCommand('getCurrentUserData'),
+      getMarginLevel:     await this.fetchCommand('getMarginLevel'),
+      getVersion:         await this.fetchCommand('getVersion'),
+      getServerTime:      await this.fetchCommand('getServerTime'),
+    }
   }
 
   logout (): void {
