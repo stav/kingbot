@@ -16,6 +16,7 @@ scripts:
       write:
         - logs/kingbot.log
         - logs/kingmsg.log
+        - logs/kingram.log
 
   test:
     cmd: deno test

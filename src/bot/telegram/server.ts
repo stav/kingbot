@@ -1,13 +1,13 @@
 import { serve } from 'std/http/server.ts'
-import { getLogger } from 'std/log/mod.ts'
-
 import { parse } from './parsers/mod.ts'
 
 async function handler (request: Request) {
-  const body = await request.json()
-  getLogger().info(`Server got ${Deno.inspect(body)}`)
   try {
-    return new Response(Deno.inspect(await parse(body)))
+    return new Response(
+      Deno.inspect(
+        await parse(
+          await request.json(
+            ))))
   }
   catch (error) {
     return new Response(error)
@@ -22,7 +22,7 @@ export default class Server {
 
   connect () {
     serve( handler, { signal: this.#ctl.signal } )
-    console.log('Serving')
+    console.info('Serving')
     this.connected = true
     return this
   }

@@ -1,5 +1,9 @@
+import { getLogger } from 'std/log/mod.ts'
+
 import * as yup from 'https://cdn.skypack.dev/yup'
 // import typesYup from 'https://cdn.skypack.dev/@types/yup'
+
+import Logging from 'lib/logging.ts'
 
 import type { TelegramSignal } from './parsers.d.ts'
 import DowjonesParser, { DOWJONES } from './dowjones.ts'
@@ -30,7 +34,7 @@ function parsers (id: number) {
 
     case SELV:
     default:
-      console.warn('No parser found for id:', id)
+      getLogger('telegram').warning('No parser found for id:', id)
   }
   // As a last resort let's try all know parsers.
   // This is the case where maybe the user typed in a signal manually.
@@ -38,20 +42,26 @@ function parsers (id: number) {
 }
 
 export async function parse (data: any): Promise<TelegramSignal> {
-  console.log('parse()', data)
+  const logger = getLogger('telegram')
+  let parsed, signal
+
+  logger.info('Parsing', data)
+
   for (const parse of parsers(data.cid)) {
-    console.log()
-    console.log('parse', parse)
     try {
-      const parsedMessage = parse(message(data))
-      console.log('parsed', parsedMessage)
-      const signal = await schema.validate(parsedMessage) as TelegramSignal
-      console.log('validated', signal)
+      parsed = parse(message(data))
+      signal = await schema.validate(parsed) as TelegramSignal
       return signal
     }
     catch (error) {
-      console.debug(error)
+      if (!(error instanceof yup.ValidationError))
+        logger.error(error)
+    }
+    finally {
+      logger.info('Parser', parse, 'Parsed', parsed, 'Signal', signal)
+      Logging.flush()
     }
   }
+  // This following error gets sent back to the client
   throw new Error(`No parsers available for data ${data.cid} ${JSON.stringify(data)}`)
 }
