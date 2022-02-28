@@ -2,7 +2,7 @@ import type { TelegramSignal } from './parsers.d.ts'
 
 export const MONEYBAGS = 1151289381
 
-const re = /(?<symbol>\w+)\s+(?<type>BUY|SELL)\s+ENTRADA: (?<entry>[\d.]+)\s+SL = \s*(?<sl>[\d.]+)\s+\([\d]+ PIPS\)\s+(?<tps>.+)/s
+const re = /(?<symbol>[^\s]+)\s+(?<type>BUY|SELL)\s+ENTRADA: (?<entry>[\d.]+)\s+SL = \s*(?<sl>[\d.]+)\s+\([\d]+ PIPS\)\s+(?<tps>.+)/s
 
 type MoneybagsTelegramSignal = {
   sl: string,           // "35576"
