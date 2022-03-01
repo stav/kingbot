@@ -143,8 +143,40 @@ Since Telethon is not a JavaScript library it is started as a separate process.
 
 ## Installation
 
-Deno doesn't use package management, per se. Modules are cached when they are
-first encountered in the code.
+The Kingbot uses these components:
+
+* Git - version control (Not needed in future)
+* Deno - execution engine runtime
+* Velociraptor - script runner
+
+### Install Deno
+
+Deno works on macOS, Linux, and Windows. Deno is a single binary executable. It
+has no external dependencies.
+
+On Linux use cURL to download the installation script and run it in a shell:
+
+    curl -fsSL https://deno.land/x/install/install.sh | sh
+
+For other platforms see the [installation page][6].
+
+### Script Runner
+
+Velociraptor makes it easy to run scripts.
+
+Install [Velociraptor][5]:
+
+    deno install -qAn vr https://deno.land/x/velociraptor@1.4.0/cli.ts
+
+Add Bash completion:
+
+    source <(vr completions bash)
+
+### Install the Kingbot
+
+Deno doesn't use any package management files in the project. Modules are cached
+when they are first encountered in the code; therefore, the bot doesn't need to
+be installed. Just clone the repository:
 
     git clone git@github.com:stav/kingbot.git
     cd kingbot
@@ -182,8 +214,7 @@ Enter the `connect` command to start the server:
 
     0[-]> connect
     input "connect" (function) [Function: bound connect]
-    Serving
-    Server { connected: true }
+    Listening to localhost:8000 for { id:123456, name:"Demo", type:"demo" }
 
 ### Start the Telegram Client
 
@@ -339,19 +370,10 @@ Send EOF (Ctrl-D End-of-file) to exit.
     # query the location of the dependency file in question
     DENO_DIR=$PWD/deno deno info --unstable https://deno.land/x/rhum@v1.1.12/src/mock_builder.ts
 
-### Script Runner
-
-Install [Velociraptor][5]:
-
-    $ deno install -qAn vr https://deno.land/x/velociraptor@1.4.0/cli.ts
-
-Add Bash completion:
-
-    $ source <(vr completions bash)
-
 
 [1]: https://github.com/stav/xapi
 [2]: https://nodejs.org/
 [3]: https://deno.land/
 [4]: https://telegram.org/
 [5]: https://velociraptor.run/
+[6]: https://deno.land/manual/getting_started/installation#installation
