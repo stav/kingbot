@@ -41,6 +41,7 @@ function parsers (id: number) {
   return [GoldParser, DowjonesParser, MoneybagsParser]
 }
 
+// deno-lint-ignore no-explicit-any
 export async function parse (data: any): Promise<TelegramSignal> {
   const logger = getLogger('telegram')
   let parsed, signal
@@ -50,8 +51,8 @@ export async function parse (data: any): Promise<TelegramSignal> {
   for (const parse of parsers(data.cid)) {
     try {
       parsed = parse(message(data))
-      signal = await schema.validate(parsed) as TelegramSignal
-      return signal
+      signal = await schema.validate(parsed)
+      return signal as TelegramSignal
     }
     catch (error) {
       if (!(error instanceof yup.ValidationError))
