@@ -6,6 +6,13 @@ from urllib.request import Request, urlopen
 
 from telethon import TelegramClient, events
 
+CHATS = [
+    -1001699473616, # King Signals
+    -1001151289381, # US30 DOW JONES
+    -1001251224123, # ORO/DÓLAR
+    -1001386141255, # MONEY BAGS
+]
+
 # logging.basicConfig(
 #     format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
 #     level=logging.INFO,
@@ -66,7 +73,7 @@ api_hash = config['Telegram']['api_hash']
 client = TelegramClient('logs/telethonx', api_id, api_hash)
 
 # @client.on(events.NewMessage())
-@client.on(events.NewMessage(chats=[-1001253919762, -1001410749168, -1001386141255, -1001151289381, -1001699473616]))
+@client.on(events.NewMessage(chats=CHATS))
 async def my_event_handler(event):
     logger.debug('Got event message %s', event.message.stringify())
     msg = sanitize(event.message.message)
