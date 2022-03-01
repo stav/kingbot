@@ -21,4 +21,8 @@ export default abstract class Socket {
     return this.socket?.readyState === State.OPEN
   }
 
+  get isClosed (): boolean {
+    return this.socket?.readyState === State.CLOSED
+  }
+
 }

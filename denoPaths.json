@@ -1,6 +1,10 @@
 {
   "imports": {
+
     "std/": "https://deno.land/std@0.127.0/",
+
+    "rhum/": "https://deno.land/x/rhum@v1.1.13/",
+
     "lib/": "./src/lib/",
     "src/": "./src/"
   }

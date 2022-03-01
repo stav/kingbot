@@ -2,16 +2,10 @@ import { delay } from 'std/async/mod.ts'
 import { getLogger } from 'std/log/mod.ts'
 
 import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
+import { human } from 'lib/time.ts'
 import Logging from 'lib/logging.ts'
 
 import Socket from '../socket.ts'
-
-function human (o: { h: number, m: number, s: number }) {
-  let { h, m, s } = o
-  while (s > 60) { m++; s -= 60 }
-  while (m > 60) { h++; m -= 60 }
-  return `${Math.floor(h)}h${Math.floor(m)}m${Math.floor(s)}s`
-}
 
 export abstract class XSocket extends Socket {
 
@@ -32,13 +26,10 @@ export abstract class XSocket extends Socket {
   }
 
   private get time () {
-    if (!this.date?.opened) {
-      return ''
-    }
+    if (!this.date?.opened) { return '' }
     const open = this.date.opened
     const close = this.date?.closed || Date.now()
-    const s = (close - open) / 1000
-    return human({ h: 0, m: 0, s })
+    return human({ s: (close - open) / 1000 })
   }
 
   protected gotOpen (event: Event) {

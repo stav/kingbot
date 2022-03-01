@@ -1,5 +1,4 @@
-// deno-lint-ignore-file
-import type { CMD_FIELD, TYPE_FIELD } from './xapi.ts'
+import type { CMD_FIELD, TYPE_FIELD, REQUEST_STATUS_FIELD } from './xapi.ts'
 
 declare enum STATE_FIELD {
   MODIFIED = "Modified",
@@ -90,4 +89,12 @@ export interface TRADE_TRANS_INFO {
   tp: number
   type: TYPE_FIELD
   volume: number
+}
+
+export interface STREAMING_TRADE_STATUS_RECORD {
+  customComment: string | null
+  message: string | null
+  order: number
+  price: number | null
+  requestStatus: REQUEST_STATUS_FIELD | null
 }

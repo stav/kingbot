@@ -223,6 +223,37 @@ deno run --allow-net --allow-read --allow-write --unstable --import-map=denoPath
 
 Send EOF (Ctrl-D End-of-file) to exit.
 
+## Development
+
+### Coverage
+
+    deno test -A --import-map=denoPaths.json --coverage=coverage
+
+    deno coverage coverage
+    deno coverage coverage |grep '100.000%'
+    deno coverage coverage |grep 'cover file'
+
+### Dependency Debugging
+
+    # cache dependencies locally
+    DENO_DIR=$PWD/deno deno test tests/profits.test.ts -A --import-map=denoPaths.json
+
+    # query the location of the dependency file in question
+    DENO_DIR=$PWD/deno deno info --unstable https://deno.land/x/rhum@v1.1.12/src/mock_builder.ts
+
+### Script Runner
+
+Install [Velociraptor][5]:
+
+    $ deno install -qAn vr https://deno.land/x/velociraptor@1.4.0/cli.ts
+
+Add Bash completion:
+
+    $ source <(vr completions bash)
+
 
 [1]: https://github.com/stav/xapi
-[2]: https://deno.land
+[2]: https://nodejs.org/
+[3]: https://deno.land/
+[4]: https://telegram.org/
+[5]: https://velociraptor.run/

@@ -80,10 +80,6 @@ export default class XConn implements KingConn {
     return [ trades, trades.length ]
   }
 
-  trade () {
-    this.Socket.trade()
-  }
-
   async hedge () {
     return await this.Socket.hedge()
   }
