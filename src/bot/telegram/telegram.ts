@@ -4,6 +4,7 @@ import Server from './server.ts'
 export default class TConn implements KingConn {
 
   private readonly server = new Server()
+  private target: KingConn | null = null
 
   private get state () {
     return (this.server.connected)
@@ -20,8 +21,13 @@ export default class TConn implements KingConn {
     return `CNX ${_index} [${this.prompt()}] ${this.constructor.name}`
   }
 
+  setup (targetConnection: KingConn) {
+    this.target = targetConnection
+  }
+
+  /** Requires that `setup` is run a priori */
   connect () {
-    return Deno.inspect(this.server.connect())
+    return this.server.connect(this.target)
   }
 
   close () {
