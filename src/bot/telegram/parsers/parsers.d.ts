@@ -6,3 +6,10 @@ export interface TelegramSignal {
   tps: number[],
   sl: number,
 }
+
+export interface TelethonMessage {
+  cid: number,
+  fid: string,
+  msg: string,
+  date: string,
+}

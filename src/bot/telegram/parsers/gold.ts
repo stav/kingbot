@@ -19,7 +19,7 @@ const re = /XAUUSD (?<type>BUY|SELL)\s+[ENTRADA|entrada]+:\s*(?<entry>[\d.]+)\s+
  *
  * @returns { type:'BUY', entry:'1806', sl:'1796', tps:[ 1808, 1812, 1821 ] }
  */
-export default function GoldParser (text: string): any {
+export default function GoldParser (text: string): Record<string, unknown> {
   const message = text || ''
   const symbol = 'GOLD'
   const volume = 0.01
@@ -29,7 +29,7 @@ export default function GoldParser (text: string): any {
     return +tpMatch[0]
   }
 
-  const m: any = message.match(re)?.groups || { tps: '' }
+  const m = (message.match(re)?.groups || { tps: '' })
   const tps = m.tps.split('\n').map(tpLabelMap).filter(Boolean)
   const signal = Object.assign( { symbol, volume }, m, { tps } )
   return signal

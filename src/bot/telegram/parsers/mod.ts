@@ -5,13 +5,20 @@ import * as yup from 'https://cdn.skypack.dev/yup'
 
 import Logging from 'lib/logging.ts'
 
-import type { TelegramSignal } from './parsers.d.ts'
-import DowjonesParser, { DOWJONES } from './dowjones.ts'
+import type { TelethonMessage, TelegramSignal } from './parsers.d.ts'
 import MoneybagsParser, { MONEYBAGS } from './moneybags.ts'
+import DowjonesParser, { DOWJONES } from './dowjones.ts'
 import GoldParser, { GOLD } from './gold.ts'
-import { message, SELV } from './mock.ts'
 
-const schema = yup.object().shape({
+function SignalObjectParser (text: string): TelegramSignal {
+  const regex = /(['"])?([a-z0-9A-Z_]+)(['"])?:/g
+  const json = text.replace(regex, '"$2": ');
+  return JSON.parse(json)
+}
+
+const TelethonMessageSchema = yup.object().shape({
+  symbol: yup.string().required(),
+  volume: yup.number().required(),
   entry: yup.number().required(),
   type: yup.string().trim().required().matches(/(BUY|SELL)/),
   tps: yup.array(yup.number()).required(),
@@ -31,18 +38,13 @@ function parsers (id: number) {
 
     case MONEYBAGS:
       return [MoneybagsParser]
-
-    case SELV:
-    default:
-      getLogger('telegram').warning('No parser found for id:', id)
   }
-  // As a last resort let's try all know parsers.
+  // As a last resort let's try all known parsers.
   // This is the case where maybe the user typed in a signal manually.
-  return [GoldParser, DowjonesParser, MoneybagsParser]
+  return [JSON.parse, SignalObjectParser, GoldParser, DowjonesParser, MoneybagsParser]
 }
 
-// deno-lint-ignore no-explicit-any
-export async function parse (data: any): Promise<TelegramSignal> {
+export async function parse (data: TelethonMessage): Promise<TelegramSignal> {
   const logger = getLogger('telegram')
   let parsed, signal
 
@@ -50,12 +52,12 @@ export async function parse (data: any): Promise<TelegramSignal> {
 
   for (const parse of parsers(data.cid)) {
     try {
-      parsed = parse(message(data))
-      signal = await schema.validate(parsed)
+      parsed = parse(data.msg)
+      signal = await TelethonMessageSchema.validate(parsed)
       return signal as TelegramSignal
     }
     catch (error) {
-      if (!(error instanceof yup.ValidationError))
+      if ( !(error instanceof yup.ValidationError) && !(error instanceof SyntaxError) )
         logger.error(error)
     }
     finally {
