@@ -1,6 +1,6 @@
 import { delay } from 'std/async/mod.ts'
 
-import type { XapiConfigAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import { inspect } from 'lib/inspect.ts'
 
 import type { KingConn } from '../conn.d.ts'
@@ -19,7 +19,7 @@ export default class XConn implements KingConn {
 
   inspect: () => void = inspect
 
-  constructor (account: XapiConfigAccount) {
+  constructor (account: XapiExchangeAccount) {
     this.Socket = new XapiSocket(account)
     this.Stream = new XapiStream(account, this.Socket)
   }

@@ -3,18 +3,18 @@ import * as logging from 'std/log/mod.ts'
 
 import { Rhum } from 'rhum/mod.ts'
 
-import type { XapiConfigAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import config from 'lib/config.ts'
 
 import XConn from 'src/bot/xapi/xconn.ts'
 
 await logging.setup({ loggers: { default: { level: "WARNING" } } })
 
-const TEST_INDEX = 0
+const TEST_INDEX = 0 // TODO config
 
 Rhum.testSuite('balance', () => {
 
-  const account = config().Accounts[TEST_INDEX] as XapiConfigAccount
+  const account = config().Exchanges[TEST_INDEX] as XapiExchangeAccount
 
   Rhum.testCase('should be a number', async () => {
     const conn = new XConn(account)

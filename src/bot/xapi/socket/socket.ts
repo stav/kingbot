@@ -1,6 +1,6 @@
 import { getLogger } from 'std/log/mod.ts'
 
-import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount, XapiAccount } from 'lib/config.d.ts'
 import Logging from 'lib/logging.ts'
 
 import { XSocket } from '../xsocket.ts'
@@ -27,7 +27,7 @@ export default class XapiSocket extends XSocket {
     return 'wss://ws.xtb.com/' + this.account.type
   }
 
-  constructor (account: XapiConfigAccount) {
+  constructor (account: XapiExchangeAccount) {
     super(account)
     this.#account = Object.assign({ pw: account.password }, this.account)
   }

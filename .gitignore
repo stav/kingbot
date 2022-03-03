@@ -1,6 +1,5 @@
 .config/input.yaml
 .config/local.yaml
-.config/telegram.ini
 __pycache__/
 coverage/
 logs/*

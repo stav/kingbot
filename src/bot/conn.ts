@@ -1,4 +1,4 @@
-import type { KucoinConfigAccount, XapiConfigAccount } from 'lib/config.d.ts'
+import type { KucoinExchangeAccount, XapiExchangeAccount } from 'lib/config.d.ts'
 import config from 'lib/config.ts'
 
 import type { KingConn } from './conn.d.ts'
@@ -12,16 +12,16 @@ export default function () {
   // Exchange connections start at index one (1)
   const conns: KingConn[] = [new TConn()]
 
-  for (const account of config().Accounts) {
+  for (const account of config().Exchanges) {
 
     switch (account.broker) {
 
       case 'XAPI':
-        conns.push(new XConn(account as XapiConfigAccount))
+        conns.push(new XConn(account as XapiExchangeAccount))
         break
 
       case 'KUCOIN':
-        conns.push(new KuConn(account as KucoinConfigAccount))
+        conns.push(new KuConn(account as KucoinExchangeAccount))
         break
 
       default:

@@ -1,6 +1,7 @@
 # Edit this file and save as local.yaml
 
-Accounts:
+Exchanges:
+
   - broker: XAPI
     accountId: 1234567
     password: secret
@@ -17,3 +18,24 @@ Accounts:
       secret: 0a1s2d1-...-4safas87sfd5,
       passphrase: superspecialpassword,
     }
+
+Telegram:
+
+  index: 0
+
+  Accounts:
+
+    - name: John
+      api_id: 23456789
+      api_hash: qwerasdfzxcv321654987rtuyfghbnm0
+      exchange_index: 1
+      chats:
+        - -1001234567890  # Homesteading channel
+        - 123456789  # Work group
+        - 987654321
+
+    - name: Joe
+      api_id: 12345678
+      api_hash: q1w2e3r4t5y67i8o9p0a1s2d3f4g5h6j
+      exchange_index: 0
+      chats: []

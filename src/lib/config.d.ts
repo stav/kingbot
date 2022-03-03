@@ -5,7 +5,7 @@ export type XapiAccount = {
   type: 'real' | 'demo'
 }
 
-export type XapiConfigAccount = {
+export type XapiExchangeAccount = {
   broker: string
   accountId: number
   password: string
@@ -13,7 +13,7 @@ export type XapiConfigAccount = {
   type: 'real' | 'demo'
 }
 
-export type KucoinConfigAccount = {
+export type KucoinExchangeAccount = {
   broker: string
   accountId: string
   password: string
@@ -26,10 +26,22 @@ export type KucoinConfigAccount = {
   }
 }
 
-type ConfigAccount = XapiConfigAccount | KucoinConfigAccount
+type TelegramAccount = {
+  name: string
+  api_id: number
+  api_hash: string
+  exchange_index: number
+  chats: number[]
+}
+
+type ExchangeAccount = XapiExchangeAccount | KucoinExchangeAccount
 
 export type ConfigContainer = {
-  Accounts: ConfigAccount[]
+  Exchanges: ExchangeAccount[]
+  Telegram: {
+    index: number
+    Accounts: TelegramAccount[]
+  }
 }
 
 interface Asset {

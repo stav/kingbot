@@ -1,4 +1,9 @@
-import { assertStrictEquals, assertArrayIncludes, assertExists } from 'std/testing/asserts.ts'
+import {
+  assertNotStrictEquals,
+  assertArrayIncludes,
+  assertStrictEquals,
+  assertExists,
+} from 'std/testing/asserts.ts'
 import * as logging from 'std/log/mod.ts'
 
 import config, { input } from 'lib/config.ts'
@@ -24,8 +29,13 @@ Deno.test('lib.bind', () => {
 })
 
 Deno.test('lib.config', () => {
-  assertExists(config().Accounts)
   assertExists(input().Hedge.Assets)
+  assertExists(config().Exchanges)
+  assertExists(config().Telegram)
+  const accounts = config().Telegram.Accounts
+  assertExists(accounts)
+  assertStrictEquals(accounts.constructor.name, 'Array')
+  assertNotStrictEquals(accounts.length, 0)
 })
 
 Deno.test('lib.reflect', () => {

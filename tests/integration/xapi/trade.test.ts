@@ -3,7 +3,7 @@ import * as logging from 'std/log/mod.ts'
 
 import { Rhum } from 'rhum/mod.ts'
 
-import type { XapiConfigAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import config from 'lib/config.ts'
 
 import XConn from 'src/bot/xapi/xconn.ts'
@@ -13,11 +13,11 @@ import { CMD_FIELD, TYPE_FIELD, REQUEST_STATUS_FIELD } from 'src/bot/xapi/xapi.t
 
 await logging.setup({ loggers: { default: { level: "WARNING" } } })
 
-const TEST_INDEX = 0
+const TEST_INDEX = 0 // TODO config
 
 Rhum.testSuite('connection', () => {
 
-  const account = config().Accounts[TEST_INDEX] as XapiConfigAccount
+  const account = config().Exchanges[TEST_INDEX] as XapiExchangeAccount
 
   const sellTrade = {
     order: 0,

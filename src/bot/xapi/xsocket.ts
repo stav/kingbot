@@ -1,7 +1,7 @@
 import { delay, deadline, DeadlineError } from 'std/async/mod.ts'
 import { getLogger } from 'std/log/mod.ts'
 
-import type { XapiConfigAccount, XapiAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount, XapiAccount } from 'lib/config.d.ts'
 import { human } from 'lib/time.ts'
 import Logging from 'lib/logging.ts'
 
@@ -15,7 +15,7 @@ export abstract class XSocket extends Socket {
   date: { [index: string]: number } = {}
   account: XapiAccount
 
-  constructor (account: XapiConfigAccount) {
+  constructor (account: XapiExchangeAccount) {
     super()
     this.account = {
       id:   account.accountId,

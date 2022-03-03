@@ -2,7 +2,7 @@ import * as logging from 'std/log/mod.ts'
 
 import { Rhum } from 'rhum/mod.ts'
 
-import type { XapiConfigAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount } from 'lib/config.d.ts'
 
 import XConn from 'src/bot/xapi/xconn.ts'
 
@@ -16,7 +16,7 @@ Rhum.testSuite('connection', () => {
     password: 'pass',
     name: 'test',
     type: 'demo',
-  } as XapiConfigAccount
+  } as XapiExchangeAccount
 
   Rhum.testCase('should build', () => {
     const conn = new XConn(account)
