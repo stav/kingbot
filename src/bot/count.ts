@@ -1,17 +1,14 @@
 import { getLogger } from 'std/log/mod.ts'
 
-import type TConn from './telegram/telegram.ts'
-import type { KingConn } from './conn.d.ts'
-import ConnectionFactory from './conn.ts'
-
+import config from 'lib/config.ts'
 import Logging from 'lib/logging.ts'
 import { bind } from 'lib/bind.ts'
 import { reflect } from 'lib/reflect.ts'
 import { inspect } from 'lib/inspect.ts'
 
-// These finals should be in config
-const TELEGRAM_SOURCE_INDEX = 0
-const TELEGRAM_TARGET_INDEX = 1
+import type TConn from './telegram/telegram.ts'
+import type { KingConn } from './conn.d.ts'
+import ConnectionFactory from './conn.ts'
 
 export default class KingCount {
 
@@ -55,9 +52,8 @@ export default class KingCount {
 
   async prime () {
     this.conns = ConnectionFactory()
-    const telegramSourceConnection = this.conns[TELEGRAM_SOURCE_INDEX] as TConn
-    const telegramTargetConnection = this.conns[TELEGRAM_TARGET_INDEX]
-    telegramSourceConnection.setup(telegramTargetConnection)
+    const telegramConnection = this.conns[config().Telegram.index] as TConn
+    telegramConnection.setup(this.conns)
     await Logging.setup()
     return this.list()
   }

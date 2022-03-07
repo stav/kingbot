@@ -13,7 +13,7 @@ export default class Server {
 
   #ctl = new AbortController()
 
-  private connection: XConn | null = null
+  private connections: KingConn[] = []
 
   public connected = false
 
@@ -21,7 +21,7 @@ export default class Server {
     try {
       const payload = await request.json() as TelethonMessage
       const signal = await parse(payload)
-      const traded = await this.trade(signal)
+      const traded = await this.trade(payload.eindex, signal)
       return new Response(Deno.inspect(traded))
     }
     catch (error) {
@@ -29,28 +29,34 @@ export default class Server {
     }
   }
 
-  connect (connection: KingConn | null) {
-    this.connection = connection as XConn
+  connect (connections: KingConn[]) {
+    this.connections = connections
     serve( this.handler.bind(this), { signal: this.#ctl.signal } )
     this.connected = true
     const url = 'http://localhost:8000'
-    const account = Deno.inspect(this.connection.Socket.account)
-    return `Listening to ${url} for ${account}`
+    // const account = Deno.inspect(this.connection.Socket.account)
+    return `Listening to ${url} for ${connections.length - 1} connections`
   }
 
-  /** Make sure the target connection is logged in */
-  async login () {
+  /**
+   * Open the underlying socket and login
+   * @todo Generalize usage: right now it's hardcoded for XTB
+   */
+  async login (connection: XConn) {
     // if (this.connection?.Socket.session) { return } // Already logged in
-    await this.connection?.Socket.open()
-    await this.connection?.Socket.login()
+    await connection.Socket.open()
+    await connection.Socket.login()
   }
 
-  async trade (signal: TelegramSignal) {
-    console.log('tttradee', signal, this.connected)
-    await this.login()
-    if (!this.connection) { return }
-    const socket = this.connection.Socket
+  async trade (eindex: number, signal: TelegramSignal) {
+    console.log('ServerTrade', eindex, signal, this.connected)
+    const connection = this.connections[eindex] as XConn
     const results = [] as STREAMING_TRADE_STATUS_RECORD[]
+    const socket = connection.Socket
+
+    if (!connection) { return }
+
+    await this.login(connection)
 
     for (const tp of signal.tps) {
       const data = {

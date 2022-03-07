@@ -224,7 +224,7 @@ Make sure you are in the `kingbot` directory.
 
 Start the **Python** script to listen to configured **Telegram** chats.
 
-    python ./src/bot/telegram/telethonx.py
+    vr pyx
 
     Connection to 149.154.175.52:443/TcpFull complete!
 
