@@ -68,8 +68,8 @@ export default class XapiSocket extends XSocket {
     return {
       getCurrentUserData: await this.fetchCommand('getCurrentUserData'),
       getMarginLevel:     await this.fetchCommand('getMarginLevel'),
-      getVersion:         await this.fetchCommand('getVersion'),
       getServerTime:      await this.fetchCommand('getServerTime'),
+      getVersion:         await this.fetchCommand('getVersion'),
     }
   }
 

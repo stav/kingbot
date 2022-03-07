@@ -12,7 +12,7 @@ import GoldParser, { GOLD } from './gold.ts'
 
 function SignalObjectParser (text: string): TelegramSignal {
   const regex = /(['"])?([a-z0-9A-Z_]+)(['"])?:/g
-  const json = text.replace(regex, '"$2": ');
+  const json = text.replace(regex, '"$2": '); // convert {a:1} to {"a":1}
   return JSON.parse(json)
 }
 
