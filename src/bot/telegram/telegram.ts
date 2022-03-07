@@ -4,7 +4,7 @@ import Server from './server.ts'
 export default class TConn implements KingConn {
 
   private readonly server = new Server()
-  private target: KingConn | null = null
+  private conns: KingConn[] = []
 
   private get state () {
     return (this.server.connected)
@@ -21,13 +21,13 @@ export default class TConn implements KingConn {
     return `CNX ${_index} [${this.prompt()}] ${this.constructor.name}`
   }
 
-  setup (targetConnection: KingConn) {
-    this.target = targetConnection
+  setup (targetConnections: KingConn[]) {
+    this.conns = targetConnections
   }
 
   /** Requires that `setup` is run a priori */
   connect () {
-    return this.server.connect(this.target)
+    return this.server.connect(this.conns)
   }
 
   close () {

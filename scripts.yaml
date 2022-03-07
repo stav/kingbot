@@ -1,6 +1,7 @@
 # https://velociraptor.run/docs/cli
 # vr start
 # vr test
+# vr pyx
 
 scripts:
 
@@ -9,14 +10,14 @@ scripts:
     importMap: denoPaths.json
     unstable: false
     allow:
-      net:
-        - ws.xtb.com
-        - 0.0.0.0:8000
       read: .config/local.yaml
       write:
         - logs/kingbot.log
         - logs/kingmsg.log
         - logs/kingram.log
+      net:
+        - ws.xtb.com
+        - 0.0.0.0:8000
 
   test:
     cmd: deno test
@@ -36,3 +37,5 @@ scripts:
     - rm coverage/*
     - vr test --coverage=coverage
     - deno coverage coverage
+
+  pyx: python src/bot/telegram/telethonx.py

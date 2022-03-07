@@ -12,4 +12,5 @@ export interface TelethonMessage {
   fid: string,
   msg: string,
   date: string,
+  eindex: number,
 }
