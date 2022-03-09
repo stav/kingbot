@@ -44,6 +44,7 @@ scripts:
       net:
         - ws.xtb.com
         - 0.0.0.0:8000
+        - api.kucoin.com
 
   test:
     cmd: deno test
