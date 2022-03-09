@@ -7,8 +7,8 @@ from urllib.request import Request, urlopen
 
 from telethon import TelegramClient, events
 
-with open('.config/local.yaml') as configfile:
-    Telegram = yaml.load(configfile, Loader=yaml.FullLoader)['Telegram']
+with open('.config/telegram.yaml') as configfile:
+    Telegram = yaml.load(configfile, Loader=yaml.FullLoader)
 
 # logging.basicConfig(
 #     format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
@@ -103,6 +103,6 @@ async def run(account):
         await client.run_until_disconnected()
 
 async def main():
-    await asyncio.gather(*[ run(account) for account in Telegram.Accounts ])
+    await asyncio.gather(*[ run(account) for account in Telegram['Accounts'] ])
 
 asyncio.run(main())

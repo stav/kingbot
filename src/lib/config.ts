@@ -1,10 +1,19 @@
 import { parse } from 'std/encoding/yaml.ts'
 
-import type { ConfigContainer, InputContainer } from './config.d.ts'
+import type {
+  ExchangeConfigContainer,
+  TelegramConfigContainer,
+  InputContainer,
+} from './config.d.ts'
 
-export default function () {
-  const content = Deno.readTextFileSync('.config/local.yaml')
-  return parse(content) as ConfigContainer
+export function Exchange () {
+  const content = Deno.readTextFileSync('.config/exchange.yaml')
+  return parse(content) as ExchangeConfigContainer
+}
+
+export function Telegram () {
+  const content = Deno.readTextFileSync('.config/telegram.yaml')
+  return parse(content) as TelegramConfigContainer
 }
 
 export function input () {

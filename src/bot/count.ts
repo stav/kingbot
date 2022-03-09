@@ -1,10 +1,10 @@
 import { getLogger } from 'std/log/mod.ts'
 
-import config from 'lib/config.ts'
 import Logging from 'lib/logging.ts'
 import { bind } from 'lib/bind.ts'
 import { reflect } from 'lib/reflect.ts'
 import { inspect } from 'lib/inspect.ts'
+import { Telegram } from 'lib/config.ts'
 
 import type TConn from './telegram/telegram.ts'
 import type { KingConn } from './conn.d.ts'
@@ -52,7 +52,7 @@ export default class KingCount {
 
   async prime () {
     this.conns = ConnectionFactory()
-    const telegramConnection = this.conns[config().Telegram.index] as TConn
+    const telegramConnection = this.conns[Telegram().index] as TConn
     telegramConnection.setup(this.conns)
     await Logging.setup()
     return this.list()

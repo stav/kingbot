@@ -4,7 +4,7 @@ import * as logging from 'std/log/mod.ts'
 import { Rhum } from 'rhum/mod.ts'
 
 import type { XapiExchangeAccount } from 'lib/config.d.ts'
-import config from 'lib/config.ts'
+import { Exchange } from 'lib/config.ts'
 
 import XConn from 'src/bot/xapi/xconn.ts'
 
@@ -17,7 +17,7 @@ const TEST_INDEX = 0 // TODO config
 
 Rhum.testSuite('connection', () => {
 
-  const account = config().Exchanges[TEST_INDEX] as XapiExchangeAccount
+  const account = Exchange().Accounts[TEST_INDEX] as XapiExchangeAccount
 
   const sellTrade = {
     order: 0,

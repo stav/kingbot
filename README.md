@@ -183,8 +183,11 @@ be installed. Just clone the repository:
 
 ### Configuration
 
-Edit the file `.config/local.example.yaml` with your real information and save
-it as `.config/local.yaml`.
+Edit the file `.config/exchange.example.yaml` with your real information and save
+it as `.config/exchange.yaml`.
+
+Edit the file `.config/telegram.example.yaml` with your real information and save
+it as `.config/telegram.yaml`.
 
 ## Usage
 
