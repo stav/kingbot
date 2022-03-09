@@ -36,12 +36,13 @@ type TelegramAccount = {
 
 type ExchangeAccount = XapiExchangeAccount | KucoinExchangeAccount
 
-export type ConfigContainer = {
-  Exchanges: ExchangeAccount[]
-  Telegram: {
-    index: number
-    Accounts: TelegramAccount[]
-  }
+export type ExchangeConfigContainer = {
+  Accounts: ExchangeAccount[]
+}
+
+export type TelegramConfigContainer = {
+  index: number
+  Accounts: TelegramAccount[]
 }
 
 interface Asset {

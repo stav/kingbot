@@ -6,7 +6,7 @@ import {
 } from 'std/testing/asserts.ts'
 import * as logging from 'std/log/mod.ts'
 
-import config, { input } from 'lib/config.ts'
+import { input, Exchange, Telegram } from 'lib/config.ts'
 import { human } from 'lib/time.ts'
 
 import { bind } from 'lib/bind.ts'
@@ -30,12 +30,16 @@ Deno.test('lib.bind', () => {
 
 Deno.test('lib.config', () => {
   assertExists(input().Hedge.Assets)
-  assertExists(config().Exchanges)
-  assertExists(config().Telegram)
-  const accounts = config().Telegram.Accounts
-  assertExists(accounts)
-  assertStrictEquals(accounts.constructor.name, 'Array')
-  assertNotStrictEquals(accounts.length, 0)
+
+  const eaccounts = Exchange().Accounts
+  assertExists(eaccounts)
+  assertStrictEquals(eaccounts.constructor.name, 'Array')
+  assertNotStrictEquals(eaccounts.length, 0)
+
+  const taccounts = Telegram().Accounts
+  assertExists(taccounts)
+  assertStrictEquals(taccounts.constructor.name, 'Array')
+  assertNotStrictEquals(taccounts.length, 0)
 })
 
 Deno.test('lib.reflect', () => {

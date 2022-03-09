@@ -1,5 +1,6 @@
 .config/input.yaml
-.config/local.yaml
+.config/exchange.yaml
+.config/telegram.yaml
 __pycache__/
 coverage/
 logs/*
