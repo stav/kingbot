@@ -17,7 +17,8 @@ scripts:
       write:
         - logs/kingbot.log
         - logs/kingmsg.log
-        - logs/kingram.log
+        - logs/telegram-parser.log
+        - logs/telegram-server.log
       net:
         - ws.xtb.com
         - 0.0.0.0:8000
@@ -43,3 +44,9 @@ scripts:
     - deno coverage coverage
 
   pyx: python src/bot/telegram/telethonx.py
+
+  log:   tail -f logs/kingbot.log
+  logm:  tail -f logs/kingmsg.log
+  logtp: tail -f logs/telegram-parskler.log
+  logts: tail -f logs/telegram-server.log
+  logtx: tail -f logs/telethonx.log

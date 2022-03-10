@@ -5,7 +5,8 @@ const level = 'NOTSET' as logging.LevelName
 const loggers = {
   default: { level, handlers: ["file", "console"] },
   message: { level, handlers: ["mfile"] },
-  telegram: { level, handlers: ["tfile"] },
+  tparser: { level, handlers: ["tpfile"] },
+  tserver: { level, handlers: ["tsfile"] },
 }
 
 const formatter = (logRecord: logging.LogRecord) => {
@@ -18,6 +19,7 @@ const formatter = (logRecord: logging.LogRecord) => {
 }
 
 const handlers = {
+
   console: new logging.handlers.ConsoleHandler("WARNING"),
 
   file: new logging.handlers.FileHandler("DEBUG", {
@@ -30,10 +32,16 @@ const handlers = {
     formatter,
   }),
 
-  tfile: new logging.handlers.FileHandler("NOTSET", {
-    filename: "./logs/kingram.log",
+  tpfile: new logging.handlers.FileHandler("NOTSET", {
+    filename: "./logs/telegram-parser.log",
     formatter,
   }),
+
+  tsfile: new logging.handlers.FileHandler("NOTSET", {
+    filename: "./logs/telegram-server.log",
+    formatter,
+  }),
+
 }
 const _handlers = Object.values(handlers)
 

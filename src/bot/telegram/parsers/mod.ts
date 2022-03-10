@@ -45,7 +45,7 @@ function parsers (id: number) {
 }
 
 export async function parse (data: TelethonMessage): Promise<TelegramSignal> {
-  const logger = getLogger('telegram')
+  const logger = getLogger('tparser')
   let parsed, signal
 
   logger.info('Parsing', data)

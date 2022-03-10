@@ -1,14 +1,21 @@
 import { serve } from 'std/http/server.ts'
+import { getLogger } from 'std/log/mod.ts'
+
+import Logging from 'lib/logging.ts'
 
 import type { KingConn } from '../conn.d.ts'
 
 import type XConn from '../xapi/xconn.ts'
 import type { STREAMING_TRADE_STATUS_RECORD, TRADE_TRANS_INFO } from '../xapi/xapi.d.ts'
-import { CMD_FIELD, TYPE_FIELD } from '../xapi/xapi.ts'
+import { CMD_FIELD, REQUEST_STATUS_FIELD, TYPE_FIELD } from '../xapi/xapi.ts'
 
 import type { TelethonMessage, TelegramSignal } from './parsers/parsers.d.ts'
 import { parse } from './parsers/mod.ts'
 
+/**
+ * HTTP server listening for signals from Telethon client
+ * @todo Generalize usage: right now it's hardcoded for XTB
+ */
 export default class Server {
 
   #ctl = new AbortController()
@@ -38,10 +45,7 @@ export default class Server {
     return `Listening to ${url} for ${connections.length - 1} connections`
   }
 
-  /**
-   * Open the underlying socket and login
-   * @todo Generalize usage: right now it's hardcoded for XTB
-   */
+  /** Open the underlying socket and login */
   async login (connection: XConn) {
     // if (this.connection?.Socket.session) { return } // Already logged in
     await connection.Socket.open()
@@ -49,7 +53,12 @@ export default class Server {
   }
 
   async trade (eindex: number, signal: TelegramSignal) {
-    console.log('ServerTrade', eindex, signal, this.connected)
+    const klogger = getLogger()
+    const tlogger = getLogger('tserver')
+
+    tlogger.info('ServerTradeSignal', this.connected, eindex, signal)
+    Logging.flush()
+
     const connection = this.connections[eindex] as XConn
     const results = [] as STREAMING_TRADE_STATUS_RECORD[]
     const socket = connection.Socket
@@ -74,8 +83,19 @@ export default class Server {
       } as TRADE_TRANS_INFO
 
       const result = await socket.trade(data) as STREAMING_TRADE_STATUS_RECORD
-      console.log('server-trade-result', data, result)
       results.push(result)
+
+      klogger.info('ServerTradeResult', data, result)
+      tlogger.info(
+        data.customComment,
+        data.symbol,
+        `@${data.price}`,
+        `=${data.tp}`,
+        'order', result.order,
+        REQUEST_STATUS_FIELD[result.requestStatus as REQUEST_STATUS_FIELD],
+        result.message ? result.message : '',
+      )
+      Logging.flush()
     }
     return results
   }
