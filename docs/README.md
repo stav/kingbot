@@ -71,3 +71,44 @@ Installing jekyll 3.9.0
 └─▪ bundle exec jekyll new --force --skip-bundle .
 New jekyll site installed in /home/stav/Work/KingBot/kingbot/docs.
 Bundle install skipped.
+
+└─▪ bundle install
+Fetching gem metadata from https://rubygems.org/..........
+Fetching gem metadata from https://rubygems.org/.
+Resolving dependencies...
+Using public_suffix 4.0.6
+Using addressable 2.8.0
+Using bundler 2.1.4
+Using colorator 1.1.0
+Using concurrent-ruby 1.1.9
+Using eventmachine 1.2.7
+Using http_parser.rb 0.8.0
+Using em-websocket 0.5.3
+Using ffi 1.15.5
+Using forwardable-extended 2.6.0
+Using i18n 0.9.5
+Using rb-fsevent 0.11.1
+Using rb-inotify 0.10.1
+Using sass-listen 4.0.0
+Using sass 3.7.4
+Using jekyll-sass-converter 1.5.2
+Using listen 3.7.1
+Using jekyll-watch 2.2.1
+Using rexml 3.2.5
+Using kramdown 2.3.1
+Using liquid 4.0.3
+Using mercenary 0.3.6
+Using pathutil 0.16.2
+Using rouge 3.28.0
+Using safe_yaml 1.0.5
+Using jekyll 3.9.0
+Fetching jekyll-feed 0.16.0
+Installing jekyll-feed 0.16.0
+Fetching jekyll-seo-tag 2.8.0
+Installing jekyll-seo-tag 2.8.0
+Fetching kramdown-parser-gfm 1.1.0
+Installing kramdown-parser-gfm 1.1.0
+Fetching minima 2.5.1
+Installing minima 2.5.1
+Bundle complete! 7 Gemfile dependencies, 30 gems now installed.
+Bundled gems are installed into `./vendor/bundle`
