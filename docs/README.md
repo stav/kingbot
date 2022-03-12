@@ -1,3 +1,10 @@
+# Documentation Setup
+
+- [Primary guide](https://jekyllrb.com/tutorials/using-jekyll-with-bundler)
+- [Secondary guide](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll#creating-your-site)
+
+## Install
+
 ┌─[stav][legion][±][gh-pages {1} ✓][~/.../kingbot/docs]
 └─▪ bundle init
 Writing new Gemfile to /home/stav/Work/KingBot/kingbot/docs/Gemfile
@@ -60,3 +67,7 @@ Fetching safe_yaml 1.0.5
 Installing safe_yaml 1.0.5
 Fetching jekyll 3.9.0
 Installing jekyll 3.9.0
+
+└─▪ bundle exec jekyll new --force --skip-bundle .
+New jekyll site installed in /home/stav/Work/KingBot/kingbot/docs.
+Bundle install skipped.
