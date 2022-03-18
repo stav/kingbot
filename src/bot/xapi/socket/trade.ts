@@ -40,17 +40,20 @@ export async function trade(this: XapiSocket, trade: TRADE_TRANS_INFO): Promise<
     Logging.flush()
     return
   }
-  const returnData = (<XapiDataResponse>response).returnData
-  getLogger().info('Trade', returnData)
-  Logging.flush()
+  const tradeReturnData = (<XapiDataResponse>response).returnData
 
   // Then check the trade status
   data = {
     command: 'tradeTransactionStatus',
     arguments: {
-      order: returnData.order,
+      order: tradeReturnData.order,
     }
   }
   response = await this.sync(data)
-  return (<XapiDataResponse>response).returnData
+  const statusReturnData = (<XapiDataResponse>response).returnData
+
+  getLogger().info('Trade', tradeReturnData, 'Status', statusReturnData)
+  Logging.flush()
+
+  return statusReturnData
 }

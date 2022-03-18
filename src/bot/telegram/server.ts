@@ -1,3 +1,4 @@
+import { delay } from 'std/async/mod.ts'
 import { serve } from 'std/http/server.ts'
 import { getLogger } from 'std/log/mod.ts'
 
@@ -57,7 +58,6 @@ export default class Server {
     const tlogger = getLogger('tserver')
 
     tlogger.info('ServerTradeSignal', this.connected, eindex, signal)
-    Logging.flush()
 
     const connection = this.connections[eindex] as XConn
     const results = [] as STREAMING_TRADE_STATUS_RECORD[]
@@ -66,6 +66,7 @@ export default class Server {
     if (!connection) { return }
 
     await this.login(connection)
+    await delay(1000) // Grease the wheels
 
     for (const tp of signal.tps) {
       const data = {
@@ -95,8 +96,8 @@ export default class Server {
         REQUEST_STATUS_FIELD[result.requestStatus as REQUEST_STATUS_FIELD],
         result.message ? result.message : '',
       )
-      Logging.flush()
     }
+    Logging.flush()
     return results
   }
 
