@@ -1,7 +1,9 @@
-# Documentation Setup
+# Resources
 
 - [Primary guide](https://jekyllrb.com/tutorials/using-jekyll-with-bundler)
 - [Secondary guide](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll#creating-your-site)
+- [Dependencies](https://pages.github.com/versions/)
+- [Themes](https://pages.github.com/themes/)
 
 ## Install
 
