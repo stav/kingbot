@@ -8,7 +8,7 @@ import type XapiSocket from './socket.ts'
 
 type TradeStatus = STREAMING_TRADE_STATUS_RECORD | void
 
-export async function trades (this: XapiSocket, openedOnly = false): Promise<TRADE_RECORD[]> {
+export async function getOpenTrades (this: XapiSocket, openedOnly = false): Promise<TRADE_RECORD[]> {
   let trades: TRADE_RECORD[] = []
   const data: InputData = {
     command: 'getTrades',

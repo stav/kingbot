@@ -33,7 +33,7 @@ Rhum.testSuite('connection', () => {
 
   Rhum.testCase('should get no trades: unconnected', async () => {
     const conn = new XConn(account)
-    const trades = await conn.Socket.trades()
+    const trades = await conn.Socket.getOpenTrades()
     Rhum.asserts.assertStrictEquals( trades.length, 0 )
   })
 
@@ -52,7 +52,7 @@ Rhum.testSuite('connection', () => {
     Rhum.asserts.assertStrictEquals( result.requestStatus, REQUEST_STATUS_FIELD.ACCEPTED )
 
     // Assert there is at least one trade
-    const trades = await conn.Socket.trades()
+    const trades = await conn.Socket.getOpenTrades()
     Rhum.asserts.assertNotEquals( trades.length, 0 )
 
     // Delete the order
