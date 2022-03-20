@@ -7,15 +7,17 @@ const loggers = {
   message: { level, handlers: ["mfile"] },
   tparser: { level, handlers: ["tpfile"] },
   tserver: { level, handlers: ["tsfile"] },
+  binding: { level, handlers: ["infile"] },
 }
 
 const formatter = (logRecord: logging.LogRecord) => {
-  const level = logRecord.levelName
-  const date = format(logRecord.datetime, 'yyyy-MM-dd HH:mm:ss')
   const msg = logRecord.msg
-
-  return `${date} ${level} ${msg} `
-    + logRecord.args.map(arg => Deno.inspect(arg)).join(' ')
+  const args = logRecord.args.map(arg => Deno.inspect(arg))
+  const date = format(logRecord.datetime, 'yyyy-MM-dd HH:mm:ss')
+  const level = logRecord.levelName
+  const preamble = `${date} ${level} ${msg} `
+  const formattedRecord = preamble + args.join(' ')
+  return formattedRecord.trim()
 }
 
 const handlers = {
@@ -39,6 +41,11 @@ const handlers = {
 
   tsfile: new logging.handlers.FileHandler("NOTSET", {
     filename: "./logs/telegram-server.log",
+    formatter,
+  }),
+
+  infile: new logging.handlers.FileHandler("NOTSET", {
+    filename: "./logs/bindings.log",
     formatter,
   }),
 

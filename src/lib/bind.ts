@@ -8,16 +8,13 @@ import { getLogger } from 'std/log/mod.ts'
  *
  * @param c         - The object in question.
  * @param props     - The property path to traverse.
- * @param recursing - Will be set to true once we start recursing.
  */
 // deno-lint-ignore no-explicit-any
-export function bind (c: any, props: string[], recursing = false): any {
+export function bind (c: any, props: string[]): any {
 
-  const logger = getLogger()
+  const logger = getLogger('binding')
 
   const cname = c?.constructor?.name || typeof c
-
-  if (!recursing) logger.info(''); // Log blank line for top of recursion
 
   function log () {
     if (prop) // Duplicate check for prop to make linter happy
@@ -42,7 +39,7 @@ export function bind (c: any, props: string[], recursing = false): any {
     log()
     if (prop in c)
       return (props.length)
-        ? bind(c[prop], props, true)
+        ? bind(c[prop], props)
         : typeof c[prop] === 'function'
           ? c[prop].bind(c)
           : c[prop]

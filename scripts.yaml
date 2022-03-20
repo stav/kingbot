@@ -17,6 +17,7 @@ scripts:
       write:
         - logs/kingbot.log
         - logs/kingmsg.log
+        - logs/bindings.log
         - logs/telegram-parser.log
         - logs/telegram-server.log
       net:

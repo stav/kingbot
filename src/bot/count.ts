@@ -60,6 +60,7 @@ export default class KingCount {
 
   bind (command: string) {
     if (command) {
+      getLogger('binding').info('') // Log blank line
       // First try to bind to KingCount
       let fObj = bind(this, command.split('.'))
       // Secondly try to bind to the Connection
