@@ -8,6 +8,7 @@ const loggers = {
   tserver: { level, handlers: ["kfile", "tsfile"] },
   message: { level, handlers: ["mfile"] },
   binding: { level, handlers: ["infile"] },
+  sending: { level, handlers: ["snfile"] },
 }
 
 const formatter = (logRecord: logging.LogRecord) => {
@@ -23,7 +24,7 @@ const formatter = (logRecord: logging.LogRecord) => {
 
 const handlers = {
 
-  console: new logging.handlers.ConsoleHandler("WARNING"),
+  console: new logging.handlers.ConsoleHandler("WARNING", { formatter }),
 
   kfile: new logging.handlers.FileHandler("DEBUG", {
     filename: "./logs/kingbot.log",
@@ -47,6 +48,11 @@ const handlers = {
 
   infile: new logging.handlers.FileHandler("NOTSET", {
     filename: "./logs/bindings.log",
+    formatter,
+  }),
+
+  snfile: new logging.handlers.FileHandler("NOTSET", {
+    filename: "./logs/send.log",
     formatter,
   }),
 
