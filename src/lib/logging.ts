@@ -3,17 +3,18 @@ import { format } from 'std/datetime/mod.ts'
 
 const level = 'NOTSET' as logging.LevelName
 const loggers = {
-  default: { level, handlers: ["file", "console"] },
+  default: { level, handlers: ["kfile", "console"] },
+  tparser: { level, handlers: ["kfile", "tpfile"] },
+  tserver: { level, handlers: ["kfile", "tsfile"] },
   message: { level, handlers: ["mfile"] },
-  tparser: { level, handlers: ["tpfile"] },
-  tserver: { level, handlers: ["tsfile"] },
   binding: { level, handlers: ["infile"] },
 }
 
 const formatter = (logRecord: logging.LogRecord) => {
   const msg = logRecord.msg
+  const utc = logRecord.datetime.toJSON().replace('Z', '') // Pretend we're in UTC
   const args = logRecord.args.map(arg => Deno.inspect(arg))
-  const date = format(logRecord.datetime, 'yyyy-MM-dd HH:mm:ss')
+  const date = format(new Date(utc), 'yyyy-MM-dd HH:mm:ss UTC')
   const level = logRecord.levelName
   const preamble = `${date} ${level} ${msg} `
   const formattedRecord = preamble + args.join(' ')
@@ -24,7 +25,7 @@ const handlers = {
 
   console: new logging.handlers.ConsoleHandler("WARNING"),
 
-  file: new logging.handlers.FileHandler("DEBUG", {
+  kfile: new logging.handlers.FileHandler("DEBUG", {
     filename: "./logs/kingbot.log",
     formatter,
   }),
