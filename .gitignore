@@ -5,3 +5,6 @@ __pycache__/
 coverage/
 logs/*
 !logs/.gitkeep
+
+# Ignore gh-pages devel
+docs/
