@@ -54,11 +54,17 @@ export default class Server {
   }
 
   async trade (eindex: number, signal: TelegramSignal) {
-    getLogger('tserver').info('ServerTradeSignal', this.connected, eindex, signal)
+    const logger = getLogger('tserver')
+
+    logger.info('ServerTradeSignal', this.connected, eindex, signal)
     Logging.flush()
 
     const connection = this.connections[eindex] as XConn
-    if (!connection) { return }
+    if (!connection) {
+      logger.error('Closed connection', connection, 'at index', eindex, 'for signal', signal)
+      Logging.flush()
+      return
+    }
 
     await this.login(connection)
     await delay(1000) // Grease the wheels
