@@ -150,7 +150,7 @@ Rhum.testPlan("profits", () => {
 
     class XapiSocketMock {
       check = check
-      trades = (_arg: boolean) => []
+      getOpenTrades = (_arg: boolean) => []
     }
 
     Rhum.beforeEach(() => {
@@ -159,12 +159,12 @@ Rhum.testPlan("profits", () => {
 
     Rhum.testCase("should do nothing", async () => {
       await xSocketMock.check({ closed: false } as STREAMING_TRADE_RECORD)
-      Rhum.asserts.assertEquals( xSocketMock.calls.trades, 0 )
+      Rhum.asserts.assertEquals( xSocketMock.calls.getOpenTrades, 0 )
     })
 
-    Rhum.testCase("should call trades once", async () => {
+    Rhum.testCase("should get trades only once", async () => {
       await xSocketMock.check(tpData)
-      Rhum.asserts.assertEquals( xSocketMock.calls.trades, 1 )
+      Rhum.asserts.assertEquals( xSocketMock.calls.getOpenTrades, 1 )
     })
 
   })

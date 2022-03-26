@@ -101,7 +101,7 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
 
     const openedOnly = true
 
-    const trades: TRADE_RECORD[] = await this.trades(openedOnly)
+    const trades: TRADE_RECORD[] = await this.getOpenTrades(openedOnly)
     getLogger().info('check', trades.length, 'trades in total')
 
     const family = trades.filter(symbolStoploss)

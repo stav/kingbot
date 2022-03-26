@@ -2,13 +2,14 @@ import { getLogger } from 'std/log/mod.ts'
 
 import Logging from 'lib/logging.ts'
 
+import { REQUEST_STATUS_FIELD } from '../xapi.ts'
 import type { TRADE_RECORD, TRADE_TRANS_INFO, STREAMING_TRADE_STATUS_RECORD } from '../xapi.d.ts'
 import type { InputData, XapiResponse, XapiDataResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
 
 type TradeStatus = STREAMING_TRADE_STATUS_RECORD | void
 
-export async function trades (this: XapiSocket, openedOnly = false): Promise<TRADE_RECORD[]> {
+export async function getOpenTrades (this: XapiSocket, openedOnly = false): Promise<TRADE_RECORD[]> {
   let trades: TRADE_RECORD[] = []
   const data: InputData = {
     command: 'getTrades',
@@ -20,13 +21,13 @@ export async function trades (this: XapiSocket, openedOnly = false): Promise<TRA
     trades.sort((a: TRADE_RECORD, b: TRADE_RECORD) => a.open_time - b.open_time)
   }
   else {
-    getLogger().error('Trades', response)
+    getLogger().error('Trades: data', data, 'response', response)
     Logging.flush()
   }
   return trades
 }
 
-export async function trade(this: XapiSocket, trade: TRADE_TRANS_INFO): Promise<TradeStatus> {
+export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO): Promise<TradeStatus> {
   // First make the trade
   let data: InputData = {
     command: 'tradeTransaction',
@@ -40,17 +41,43 @@ export async function trade(this: XapiSocket, trade: TRADE_TRANS_INFO): Promise<
     Logging.flush()
     return
   }
-  const returnData = (<XapiDataResponse>response).returnData
-  getLogger().info('Trade', returnData)
-  Logging.flush()
+  const tradeReturnData = (<XapiDataResponse>response).returnData
 
   // Then check the trade status
   data = {
     command: 'tradeTransactionStatus',
     arguments: {
-      order: returnData.order,
+      order: tradeReturnData.order,
     }
   }
   response = await this.sync(data)
-  return (<XapiDataResponse>response).returnData
+  const statusReturnData = (<XapiDataResponse>response).returnData
+
+  getLogger().info('Trade', tradeReturnData, 'Status', statusReturnData)
+  Logging.flush()
+
+  return statusReturnData
+}
+
+export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) {
+  const klogger = getLogger()
+  const tlogger = getLogger('tserver')
+  const results = [] as STREAMING_TRADE_STATUS_RECORD[]
+
+  for (const trade of trades) {
+    const result = await makeTrade.bind(this)(trade) as STREAMING_TRADE_STATUS_RECORD
+    results.push(result)
+
+    klogger.info('ServerTradeResult', trade, result)
+    tlogger.info(
+      trade.customComment,
+      trade.symbol,
+      `@${trade.price}`,
+      `=${trade.tp}`,
+      'order', result.order,
+      REQUEST_STATUS_FIELD[result.requestStatus as REQUEST_STATUS_FIELD],
+      result.message ? result.message : '',
+    )
+  }
+  return results
 }

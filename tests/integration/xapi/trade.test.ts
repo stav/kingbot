@@ -33,7 +33,7 @@ Rhum.testSuite('connection', () => {
 
   Rhum.testCase('should get no trades: unconnected', async () => {
     const conn = new XConn(account)
-    const trades = await conn.Socket.trades()
+    const trades = await conn.Socket.getOpenTrades()
     Rhum.asserts.assertStrictEquals( trades.length, 0 )
   })
 
@@ -45,14 +45,14 @@ Rhum.testSuite('connection', () => {
     await conn.Socket.login()
 
     // Make the trade
-    let result = await conn.Socket.trade(sellTrade) as STREAMING_TRADE_STATUS_RECORD
+    let result = await conn.Socket.makeTrade(sellTrade) as STREAMING_TRADE_STATUS_RECORD
 
     // Assert trade result was accepted
     if (!result) return // Make sure we didn't get an error
     Rhum.asserts.assertStrictEquals( result.requestStatus, REQUEST_STATUS_FIELD.ACCEPTED )
 
     // Assert there is at least one trade
-    const trades = await conn.Socket.trades()
+    const trades = await conn.Socket.getOpenTrades()
     Rhum.asserts.assertNotEquals( trades.length, 0 )
 
     // Delete the order
@@ -60,7 +60,7 @@ Rhum.testSuite('connection', () => {
       order: result.order,
       type: TYPE_FIELD.DELETE,
     } as TRADE_TRANS_INFO)
-    result = await conn.Socket.trade(deleteTrade) as STREAMING_TRADE_STATUS_RECORD
+    result = await conn.Socket.makeTrade(deleteTrade) as STREAMING_TRADE_STATUS_RECORD
 
     // Close the connection
     conn.Socket.close()
