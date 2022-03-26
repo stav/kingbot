@@ -16,8 +16,9 @@ const formatter = (logRecord: logging.LogRecord) => {
   const utc = logRecord.datetime.toJSON().replace('Z', '') // Pretend we're in UTC
   const args = logRecord.args.map(arg => Deno.inspect(arg))
   const date = format(new Date(utc), 'yyyy-MM-dd HH:mm:ss UTC')
+  const name = logRecord.loggerName
   const level = logRecord.levelName
-  const preamble = `${date} ${level} ${msg} `
+  const preamble = `${date} ${level} [${name}] ${msg} `
   const formattedRecord = preamble + args.join(' ')
   return formattedRecord.trim()
 }
