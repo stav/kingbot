@@ -1,3 +1,5 @@
+import type { TRADE_TRANS_INFO } from '../bot/xapi/xapi.d.ts'
+
 export type XapiAccount = {
   id: number
   pw?: string
@@ -54,4 +56,5 @@ interface Asset {
 
 export type InputContainer = {
   Hedge: { Assets: Asset[] }
+  Price: string[]
 }

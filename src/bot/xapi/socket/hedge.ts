@@ -4,26 +4,7 @@ import { input } from 'lib/config.ts'
 import type { TICK_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 
-import type { XapiResponse, XapiDataResponse, SyncFunction } from './socket.d.ts'
 import XapiSocket from './socket.ts'
-
-async function fetchHedgePrices(sync: SyncFunction, symbols: string[]): Promise<TICK_RECORD[]> {
-  const data = {
-    command: 'getTickPrices',
-    arguments: {
-      level: 0,
-      symbols,
-      timestamp: 0,
-    }
-  }
-  const response: XapiResponse = await sync(data)
-  if (response.status)
-    return (<XapiDataResponse>response).returnData.quotations
-  else {
-    console.error(response)
-    return []
-  }
-}
 
 function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_INFO[] {
   const tpRates = [ 0.005, 0.007, 0.009 ]
@@ -68,17 +49,17 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
   return orders
 }
 
-async function getHedgeOrders (sync: SyncFunction): Promise<TRADE_TRANS_INFO[]> {
+async function getHedgeOrders (socket: XapiSocket): Promise<TRADE_TRANS_INFO[]> {
   const assets = input().Hedge.Assets
   // deno-lint-ignore no-explicit-any
   const symbols = assets.map((a: any) => a.symbol)
-  const prices = await fetchHedgePrices(sync, symbols)
+  const prices = await socket.getPriceQuotes(symbols)
   const orders = genHedgeOrders(assets, prices)
   return orders
 }
 
 export default async function hedge (this: XapiSocket) {
-  const orders = await getHedgeOrders(this.sync.bind(this))
+  const orders = await getHedgeOrders(this)
   console.log('Creating', orders.length, 'orders', orders)
   // for (const order of orders) {
   for (let i=0; i<orders.length; i++) {

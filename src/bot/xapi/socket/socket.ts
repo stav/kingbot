@@ -7,6 +7,7 @@ import { XSocket } from '../xsocket.ts'
 
 import type { InputData, XapiResponse, XapiDataResponse, XapiLoginResponse } from './socket.d.ts'
 import { makeTrade, makeTrades, getOpenTrades } from './trade.ts'
+import { getPriceQuotes } from './price.ts'
 import { send, sync } from './send.ts'
 import { check } from './profits.ts'
 import hedge from './hedge.ts'
@@ -16,6 +17,7 @@ export default class XapiSocket extends XSocket {
   #account: XapiAccount
   session = ''
 
+  getPriceQuotes = getPriceQuotes
   getOpenTrades = getOpenTrades
   makeTrades = makeTrades
   makeTrade = makeTrade
@@ -33,6 +35,7 @@ export default class XapiSocket extends XSocket {
     this.#account = Object.assign({ pw: account.password }, this.account)
   }
 
+  // deno-lint-ignore no-explicit-any
   protected async fetchCommand (command: string, args: any = {}) {
     const data: InputData = { command, arguments: args }
     const response: XapiResponse = await this.sync(data)

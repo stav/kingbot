@@ -11,3 +11,8 @@ Hedge:
     - symbol: ETHEREUM
       volume: 1
       digits: 3
+
+Price:
+  - US30
+  - ETHEREUM
+  - GOLD

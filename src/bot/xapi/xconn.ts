@@ -2,6 +2,7 @@ import { delay } from 'std/async/mod.ts'
 
 import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import { inspect } from 'lib/inspect.ts'
+import { input } from 'lib/config.ts'
 
 import type { KingConn } from '../conn.d.ts'
 
@@ -89,6 +90,10 @@ export default class XConn implements KingConn {
 
   async hedge () {
     return await this.Socket.hedge()
+  }
+
+  async price () {
+    return await this.Socket.getPriceQuotes(input().Price)
   }
 
   logout () {

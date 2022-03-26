@@ -9,12 +9,6 @@ export type InputData = {
   prettyPrint?: boolean
 }
 
-/* Functions */
-
-export interface SyncFunction {
-  (data: InputData): Promise<XapiResponse>
-}
-
 /* Responses */
 
 export interface XapiLoginResponse {
