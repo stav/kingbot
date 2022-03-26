@@ -20,6 +20,7 @@ scripts:
         - logs/bindings.log
         - logs/telegram-parser.log
         - logs/telegram-server.log
+        - logs/send.log
       net:
         - ws.xtb.com
         - 0.0.0.0:8000

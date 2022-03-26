@@ -33,10 +33,11 @@ export default class XapiSocket extends XSocket {
     this.#account = Object.assign({ pw: account.password }, this.account)
   }
 
-  protected async fetchCommand (command: string) {
-    const data: InputData = { command }
+  protected async fetchCommand (command: string, args: any = {}) {
+    const data: InputData = { command, arguments: args }
     const response: XapiResponse = await this.sync(data)
-    return (<XapiDataResponse>response).returnData
+    const returnData = (<XapiDataResponse>response).returnData
+    return returnData || response
   }
 
   ping (): void {

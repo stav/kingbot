@@ -25,7 +25,7 @@ import type XapiSocket from './socket.ts'
  export function send (this: XapiSocket, data: InputData) {
   if (this.isOpen) {
     const json = JSON.stringify(data)
-    getLogger().info('Sending', json)
+    getLogger('sending').info('Sending', json)
     this.socket?.send(json)
   }
 }
