@@ -8,6 +8,9 @@ const kingcount = new KingCount()
 async function start (): Promise<void> {
   for await (const input of getInput(kingcount)) {
 
+    // Prime it
+    kingcount.prime() // This laziness is only here because I don't know if we're in a test
+
     // Bind it
     const obj = kingcount.bind(input)
 

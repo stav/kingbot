@@ -15,6 +15,7 @@ export default class KingCount {
   conns: KingConn[] = []
 
   #currentAccountIndex = 0
+  #primed = false
 
   f = [0, 1, 2, 3, 4].map(i => () => this.fKey(i)) // Switch between connections
 
@@ -51,10 +52,13 @@ export default class KingCount {
   }
 
   async prime () {
-    this.conns = ConnectionFactory()
-    const telegramConnection = this.conns[Telegram().index] as TConn
-    telegramConnection.setup(this.conns)
-    await Logging.setup()
+    if (!this.#primed) {
+      this.conns = ConnectionFactory()
+      const telegramConnection = this.conns[Telegram().index] as TConn
+      telegramConnection.setup(this.conns)
+      await Logging.setup()
+      this.#primed = true
+    }
     return this.list()
   }
 
