@@ -38,19 +38,6 @@ export default class KingCount {
     return `\n${i}[${p}]> `
   }
 
-  async logging () {
-    return await Logging.setup()
-  }
-
-  log () {
-    const logger = getLogger()
-    logger.debug("Hello world")
-    logger.info(123456)
-    logger.warning(true)
-    logger.error({ foo: "bar", fizz: "bazz" })
-    logger.critical("500 Internal server error")
-  }
-
   async prime () {
     if (!this.#primed) {
       this.conns = ConnectionFactory()
