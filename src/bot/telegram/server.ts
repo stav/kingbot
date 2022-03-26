@@ -68,7 +68,7 @@ export default class Server {
       tp => ({
         cmd:           CMD_FIELD[`${signal.type}_STOP`],
         customComment:'Kingbot Telegram Signal',
-        expiration:    Date.now() + 60000 * 60 * 24 * 365,
+        expiration:    Date.now() + 60000 * 60 * 24 * 365, // 1 year
         offset:        0,
         order:         0,
         symbol:        signal.symbol,
