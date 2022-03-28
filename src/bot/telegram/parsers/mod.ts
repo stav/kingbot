@@ -10,12 +10,6 @@ import MoneybagsParser, { MONEYBAGS } from './moneybags.ts'
 import DowjonesParser, { DOWJONES } from './dowjones.ts'
 import GoldParser, { GOLD } from './gold.ts'
 
-function SignalObjectParser (text: string): TelegramSignal {
-  const regex = /(['"])?([a-z0-9A-Z_]+)(['"])?:/g
-  const json = text.replace(regex, '"$2": '); // convert {a:1} to {"a":1}
-  return JSON.parse(json)
-}
-
 const TelethonMessageSchema = yup.object().shape({
   symbol: yup.string().required(),
   volume: yup.number().required(),
@@ -24,6 +18,19 @@ const TelethonMessageSchema = yup.object().shape({
   tps: yup.array(yup.number()).required(),
   sl: yup.number().required(),
 })
+
+function SignalObjectParser (text: string): TelegramSignal {
+  const regex = /(['"])?([a-z0-9A-Z_]+)(['"])?:/g
+  const json = text.replace(regex, '"$2": '); // convert {a:1} to {"a":1}
+  return JSON.parse(json)
+}
+
+function sanitize (signal: TelegramSignal): TelegramSignal {
+  if (signal.symbol === 'S&P500') signal.symbol = 'US500'
+  if (signal.symbol === 'NAS100') signal.symbol = 'US100'
+  if (signal.symbol === 'XAUUSD') signal.symbol = 'GOLD'
+  return signal
+}
 
 function parsers (id: number) {
   // First check if we know about the given id.
@@ -54,7 +61,7 @@ export async function parse (data: TelethonMessage): Promise<TelegramSignal> {
     try {
       parsed = parse(data.msg)
       signal = await TelethonMessageSchema.validate(parsed)
-      return signal as TelegramSignal
+      return sanitize(signal) as TelegramSignal
     }
     catch (error) {
       if ( !(error instanceof yup.ValidationError) && !(error instanceof SyntaxError) )
