@@ -3,7 +3,13 @@ import { getLogger } from 'std/log/mod.ts'
 import Logging from 'lib/logging.ts'
 
 import { CMD_FIELD, REQUEST_STATUS_FIELD } from '../xapi.ts'
-import type { TRADE_RECORD, TRADE_TRANS_INFO, STREAMING_TRADE_STATUS_RECORD } from '../xapi.d.ts'
+import type {
+  TICK_RECORD,
+  TRADE_RECORD,
+  TRADE_TRANS_INFO,
+  STREAMING_TRADE_STATUS_RECORD,
+} from '../xapi.d.ts'
+
 import type { InputData, XapiResponse, XapiDataResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
 
@@ -63,16 +69,28 @@ function isBuyOrder(cmd: number): boolean {
   return ['BUY', 'BUY_LIMIT', 'BUY_STOP'].includes(CMD_FIELD[cmd])
 }
 
+function getTradeCommand(trade: TRADE_TRANS_INFO, quote: TICK_RECORD) {
+  let cmd: 'BUY' | 'SELL' | 'BUY_LIMIT' | 'SELL_LIMIT' | 'BUY_STOP' | 'SELL_STOP' | 'BALANCE' | 'CREDIT'
+  if (isBuyOrder(trade.cmd)) {
+    cmd = quote.ask > trade.price ? 'BUY_STOP' : 'BUY_LIMIT'
+  }
+  else {
+    cmd = quote.bid > trade.price ? 'SELL_STOP' : 'SELL_LIMIT'
+  }
+  return CMD_FIELD[cmd]
+}
+
 export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) {
   const tlogger = getLogger('traders')
   const results = [] as STREAMING_TRADE_STATUS_RECORD[]
 
   const symbols = trades.map(trade => trade.symbol)
   const quotes = await this.getPriceQuotes(symbols)
-  const quote = quotes[0]
   getLogger().info('ServerTradeQuotes', quotes)
 
   for (const trade of trades) {
+    const quote = quotes.filter(quote => quote.symbol === trade.symbol)[0]
+    trade.cmd = getTradeCommand(trade, quote) // cmd updated based on price
     const result = await makeTrade.bind(this)(trade) as STREAMING_TRADE_STATUS_RECORD
     results.push(result)
 
