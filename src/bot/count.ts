@@ -74,4 +74,10 @@ export default class KingCount {
       return this.#currentAccountIndex = index
   }
 
+  close () {
+    for (const conn of this.conns) {
+      conn.close()
+    }
+  }
+
 }

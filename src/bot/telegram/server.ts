@@ -89,6 +89,9 @@ export default class Server {
   }
 
   close () {
+    if (this.connected) {
+      getLogger().warning('Closing Telegram server')
+    }
     this.#ctl.abort()
     this.connected = false
   }

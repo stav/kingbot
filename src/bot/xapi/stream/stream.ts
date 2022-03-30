@@ -1,8 +1,10 @@
+import { getLogger } from 'std/log/mod.ts'
+
 import type { XapiExchangeAccount } from 'lib/config.d.ts'
 
-import { XSocket } from '../xsocket.ts'
-
 import type XapiSocket from '../socket/socket.ts'
+
+import { XSocket } from '../xsocket.ts'
 
 // deno-lint-ignore no-explicit-any
 type Symbolic = { [index: symbol]: any }
@@ -32,7 +34,7 @@ export default class XapiStream extends XSocket {
   async #listener (message: MessageEvent) {
     const m = JSON.parse(message.data)
     if (m.command === 'trade') {
-      console.log('got MESSAGE', m.data)
+      getLogger().info('Stream message', m.data)
       // print familys, trades
       await this.Socket.check(m.data)
       // print all trades
@@ -95,6 +97,7 @@ export default class XapiStream extends XSocket {
 
   close () {
     if (this.socket) {
+      getLogger().warning('Closing XApi Stream', this.account)
       this.unlisten()
       this.isOpen && this.socket.close(1000)
     }

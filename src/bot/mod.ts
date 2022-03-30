@@ -25,6 +25,7 @@ async function start (): Promise<void> {
     Logging.flush()
 
   }
+  kingcount.close()
 }
 
 export default {

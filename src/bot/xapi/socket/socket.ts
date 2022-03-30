@@ -88,6 +88,7 @@ export default class XapiSocket extends XSocket {
 
   close (): void {
     if (this.socket) {
+      getLogger().warning('Closing XApi Socket', this.account)
       // Close 1000 so the bot does not try and restart
       this.isOpen && this.socket.close(1000)
       getLogger().info(this.status)
