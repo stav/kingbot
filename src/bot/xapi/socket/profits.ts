@@ -70,7 +70,8 @@ async function setFamilyStoploss( tpData: STREAMING_TRADE_RECORD,
                                   trades: TRADE_RECORD[],
                                  xsocket: XapiSocket,
 ) {
-  getLogger().info('Updating stop loss for', trades.length, 'orders')
+  const logger = getLogger()
+  logger.info('Updating stop loss for', trades.length, 'orders')
   const transaction: UpdateOrderEvent = {
     type: TYPE_FIELD.MODIFY,
     sl: getStopLoss(tpData),
@@ -80,10 +81,10 @@ async function setFamilyStoploss( tpData: STREAMING_TRADE_RECORD,
       command: 'tradeTransaction',
       arguments: { tradeTransInfo: Object.assign({}, trade, transaction) }
     }
-    getLogger().error('setFamilyStoploss: transaction')
+    logger.debug('setFamilyStoploss: data', data)
     // The transaction will fail if the take-profit is "worse" than the entry price
     const response = await xsocket.sync(data)
-    getLogger().debug('setFamilyStoploss: response', response)
+    logger.info('setFamilyStoploss: response', response)
   }
 }
 
