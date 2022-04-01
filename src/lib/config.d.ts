@@ -1,5 +1,3 @@
-import type { TRADE_TRANS_INFO } from '../bot/xapi/xapi.d.ts'
-
 export type XapiAccount = {
   id: number
   pw?: string
@@ -29,8 +27,11 @@ export type ExchangeConfigContainer = {
   Accounts: ExchangeAccount[]
 }
 
+export type TelegramChatMap = { [index: number]: string }
+
 export type TelegramConfigContainer = {
   index: number
+  ChatMap: TelegramChatMap
   Accounts: TelegramAccount[]
 }
 

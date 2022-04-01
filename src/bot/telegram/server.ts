@@ -2,6 +2,8 @@ import { delay } from 'std/async/mod.ts'
 import { serve } from 'std/http/server.ts'
 import { getLogger } from 'std/log/mod.ts'
 
+import type { TelegramChatMap } from 'lib/config.d.ts'
+import { Telegram } from 'lib/config.ts'
 import Logging from 'lib/logging.ts'
 
 import type { KingConn } from '../conn.d.ts'
@@ -21,15 +23,43 @@ export default class Server {
 
   #ctl = new AbortController()
 
+  #chatMap: TelegramChatMap = {}
+
   private connections: KingConn[] = []
 
   public connected = false
+
+  #getChannel (cid: number) {
+    const ids = Object.keys(this.#chatMap)
+    const id = cid in ids ? cid : +ids.filter(id => id.includes(String(cid)))[0]
+    const title = this.#chatMap[id]
+    return `${cid} ${id} ${title}`
+  }
+
+  #getFrom (from: string) {
+    if (!from) return '??'
+    const ids = Object.keys(this.#chatMap)
+    const frids = from.match(/\d+/)    // ["374139448"]
+    const frid = frids ? frids[0] : '' // "374139448"
+    const id = frid in ids ? +frid : +ids.filter(id => id.includes(frid))[0]
+    const title = this.#chatMap[id]
+    return `${from} ${id} ${title}`
+  }
 
   async handler (request: Request) {
     try {
       const payload = await request.json() as TelethonMessage
       const signal = await parse(payload)
       const traded = await this.trade(payload.eindex, signal)
+
+      getLogger('tserver').info(
+        'Signal', signal,
+        'Eindex', payload.eindex, this.connected ? 'connected' : 'not connected',
+        'Channel', this.#getChannel(payload.cid),
+        'From', this.#getFrom(payload.fid),
+      )
+      Logging.flush()
+
       return new Response(Deno.inspect(traded))
     }
     catch (error) {
@@ -38,6 +68,7 @@ export default class Server {
   }
 
   connect (connections: KingConn[]) {
+    this.#chatMap = Telegram().ChatMap
     this.connections = connections
     serve( this.handler.bind(this), { signal: this.#ctl.signal } )
     this.connected = true
@@ -54,15 +85,10 @@ export default class Server {
   }
 
   async trade (eindex: number, signal: TelegramSignal) {
-    const logger = getLogger('tserver')
-
-    logger.info('ServerTradeSignal', this.connected, eindex, signal)
-    Logging.flush()
-
     const connection = this.connections[eindex] as XConn
     if (!connection) {
-      logger.error('Closed connection', connection, 'at index', eindex, 'for signal', signal)
-      Logging.flush()
+      getLogger('tserver').error(
+        'Closed connection', connection, 'at index', eindex, 'for signal', signal)
       return
     }
 

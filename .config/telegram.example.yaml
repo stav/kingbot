@@ -2,6 +2,11 @@
 
 index: 0
 
+ChatMap:
+  1234567890    : Joey
+  -987654321    : Johnny
+  -1001234567899: Best Chan
+
 Accounts:
 
   - name: John
