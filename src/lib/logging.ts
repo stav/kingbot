@@ -32,9 +32,11 @@ const handlers = {
     formatter,
   }),
 
-  mfile: new logging.handlers.FileHandler("NOTSET", {
+  mfile: new logging.handlers.RotatingFileHandler("NOTSET", {
     filename: "./logs/kingmsg.log",
     formatter,
+    maxBytes: 5e6, // five million bytes
+    maxBackupCount: 10,
   }),
 
   tpfile: new logging.handlers.FileHandler("NOTSET", {
@@ -52,9 +54,11 @@ const handlers = {
     formatter,
   }),
 
-  snfile: new logging.handlers.FileHandler("NOTSET", {
+  snfile: new logging.handlers.RotatingFileHandler("NOTSET", {
     filename: "./logs/send.log",
     formatter,
+    maxBytes: 1e6, // one million bytes
+    maxBackupCount: 10,
   }),
 
 }
