@@ -10,10 +10,16 @@ import type {
   STREAMING_TRADE_STATUS_RECORD,
 } from '../xapi.d.ts'
 
-import type { InputData, XapiResponse, XapiDataResponse } from './socket.d.ts'
 import type XapiSocket from './socket.ts'
+import type {
+  InputData,
+  XapiResponse,
+  XapiDataResponse,
+  ErrorResponse,
+} from './socket.d.ts'
 
 type TradeStatus = STREAMING_TRADE_STATUS_RECORD | void
+type TradeResponse = Promise<TradeStatus | ErrorResponse>
 
 export async function getOpenTrades (this: XapiSocket, openedOnly = false): Promise<TRADE_RECORD[]> {
   let trades: TRADE_RECORD[] = []
@@ -33,7 +39,7 @@ export async function getOpenTrades (this: XapiSocket, openedOnly = false): Prom
   return trades
 }
 
-export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO): Promise<TradeStatus> {
+export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO): TradeResponse {
   // First make the trade
   let data: InputData = {
     command: 'tradeTransaction',
@@ -45,7 +51,7 @@ export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO): Prom
   if (!response.status) {
     getLogger().error(response)
     Logging.flush()
-    return
+    return response as ErrorResponse
   }
   const tradeReturnData = (<XapiDataResponse>response).returnData
 

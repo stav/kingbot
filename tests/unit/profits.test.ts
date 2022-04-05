@@ -114,7 +114,8 @@ Rhum.testPlan("profits", () => {
   Rhum.testSuite("setFamilyStoploss", () => {
 
     class XapiSocketMock {
-      async sync (_data: unknown) {}
+      setFamilyStoploss = setFamilyStoploss
+      async makeTrade (_data: unknown) {}
     }
     // deno-lint-ignore no-explicit-any
     let xsocketMock: any
@@ -123,23 +124,23 @@ Rhum.testPlan("profits", () => {
     })
 
     Rhum.testCase("should attempt to modify no orders in the family", async () => {
-      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
-      await setFamilyStoploss(tpData, [], xsocketMock as unknown as XapiSocket)
-      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+      Rhum.asserts.assertEquals( xsocketMock.calls.makeTrade, 0 )
+      await setFamilyStoploss.bind(xsocketMock)(tpData, [])
+      Rhum.asserts.assertEquals( xsocketMock.calls.makeTrade, 0 )
     })
 
     Rhum.testCase("should attempt to modify one order in the family", async () => {
-      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+      Rhum.asserts.assertEquals( xsocketMock.calls.makeTrade, 0 )
       const trades = [ {} as TRADE_RECORD ]
-      await setFamilyStoploss(tpData, trades, xsocketMock as unknown as XapiSocket)
-      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 1 )
+      await setFamilyStoploss.bind(xsocketMock)(tpData, trades)
+      Rhum.asserts.assertEquals( xsocketMock.calls.makeTrade, 1 )
     })
 
     Rhum.testCase("should attempt to modify nine orders in the family", async () => {
-      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 0 )
+      Rhum.asserts.assertEquals( xsocketMock.calls.makeTrade, 0 )
       const trades = new Array(9).fill( {} as TRADE_RECORD )
-      await setFamilyStoploss(tpData, trades, xsocketMock as unknown as XapiSocket)
-      Rhum.asserts.assertEquals( xsocketMock.calls.sync, 9 )
+      await setFamilyStoploss.bind(xsocketMock)(tpData, trades)
+      Rhum.asserts.assertEquals( xsocketMock.calls.makeTrade, 9 )
     })
 
   })

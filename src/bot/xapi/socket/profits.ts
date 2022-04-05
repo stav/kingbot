@@ -64,11 +64,10 @@ function isBuyOrder(cmd: number): boolean {
  * Issue order stop-loss modification transactions for all orders in _family_
  * @param tpData The take-profit order data sent by the exchange
  * @param trades The order family of trades belonging to the `tpData`
- * @param xsocket The object that has a `sync` method to do the update
  */
-async function setFamilyStoploss( tpData: STREAMING_TRADE_RECORD,
+async function setFamilyStoploss( this: XapiSocket,
+                                  tpData: STREAMING_TRADE_RECORD,
                                   trades: TRADE_RECORD[],
-                                 xsocket: XapiSocket,
 ) {
   const logger = getLogger()
   logger.info('Updating stop loss for', trades.length, 'orders')
@@ -77,13 +76,10 @@ async function setFamilyStoploss( tpData: STREAMING_TRADE_RECORD,
     sl: getStopLoss(tpData),
   }
   for (const trade of trades) {
-    const data = {
-      command: 'tradeTransaction',
-      arguments: { tradeTransInfo: Object.assign({}, trade, transaction) }
-    }
-    logger.debug('setFamilyStoploss: data', data)
+    const _trade = Object.assign({}, trade, transaction) as TRADE_TRANS_INFO
+    logger.debug('setFamilyStoploss: trade', _trade)
     // The transaction will fail if the take-profit is "worse" than the entry price
-    const response = await xsocket.sync(data)
+    const response = await this.makeTrade(_trade)
     logger.info('setFamilyStoploss: response', response)
   }
 }
@@ -109,7 +105,7 @@ export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
     getLogger().info('check', family.length, 'family of', data.symbol)
 
     if (family.length > 0) {
-      await setFamilyStoploss(data, family, this)
+      await setFamilyStoploss.bind(this)(data, family)
     }
   }
   else {

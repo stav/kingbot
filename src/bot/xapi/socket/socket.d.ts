@@ -38,7 +38,7 @@ interface KingErrorResponse {
   errorDescr: string
 }
 
-type ErrorResponse = XapiErrorResponse | KingErrorResponse
+export type ErrorResponse = XapiErrorResponse | KingErrorResponse
 
 type SuccessResponse = XapiLoginResponse | XapiLogoutResponse | XapiDataResponse
 
