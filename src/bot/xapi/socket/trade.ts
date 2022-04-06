@@ -39,13 +39,12 @@ export async function getOpenTrades (this: XapiSocket, openedOnly = false): Prom
   return trades
 }
 
-export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO): TradeResponse {
+export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO, customTag = ''): TradeResponse {
   // First make the trade
   let data: InputData = {
     command: 'tradeTransaction',
-    arguments: {
-      tradeTransInfo: trade,
-    }
+    arguments: { tradeTransInfo: trade },
+    customTag
   }
   let response: XapiResponse = await this.sync(data)
   if (!response.status) {
@@ -94,10 +93,13 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
   const quotes = await this.getPriceQuotes(symbols)
   getLogger().info('ServerTradeQuotes', quotes)
 
-  for (const trade of trades) {
+  // for (const trade of trades) {
+  for (let i=0; i<trades.length; i++) {
+    const trade = trades[i]
+    const customTag = `Order ${i+1} of ${trades.length}`
     const quote = quotes.filter(quote => quote.symbol === trade.symbol)[0]
     trade.cmd = getTradeCommand(trade, quote) // cmd updated based on price
-    const result = await makeTrade.bind(this)(trade) as STREAMING_TRADE_STATUS_RECORD
+    const result = await makeTrade.bind(this)(trade, customTag) as STREAMING_TRADE_STATUS_RECORD
     results.push(result)
 
     tlogger.info('ServerTradeResult', trade, result)
