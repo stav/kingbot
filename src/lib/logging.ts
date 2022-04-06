@@ -6,6 +6,7 @@ const loggers = {
   default: { level, handlers: ["kfile", "console"] },
   tparser: { level, handlers: ["kfile", "tpfile"] },
   tserver: { level, handlers: ["kfile", "tsfile"] },
+  traders: { level, handlers: ["kfile", "tradefile"] },
   message: { level, handlers: ["mfile"] },
   binding: { level, handlers: ["infile"] },
   sending: { level, handlers: ["snfile"] },
@@ -37,6 +38,11 @@ const handlers = {
     formatter,
     maxBytes: 5e6, // five million bytes
     maxBackupCount: 10,
+  }),
+
+  tradefile: new logging.handlers.FileHandler("NOTSET", {
+    filename: "./logs/trades.log",
+    formatter,
   }),
 
   tpfile: new logging.handlers.FileHandler("NOTSET", {

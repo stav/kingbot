@@ -64,20 +64,19 @@ function isBuyOrder(cmd: number): boolean {
 }
 
 export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) {
-  const klogger = getLogger()
-  const tlogger = getLogger('tserver')
+  const tlogger = getLogger('traders')
   const results = [] as STREAMING_TRADE_STATUS_RECORD[]
 
   const symbols = trades.map(trade => trade.symbol)
   const quotes = await this.getPriceQuotes(symbols)
   const quote = quotes[0]
-  klogger.info('ServerTradeQuotes', quotes)
+  getLogger().info('ServerTradeQuotes', quotes)
 
   for (const trade of trades) {
     const result = await makeTrade.bind(this)(trade) as STREAMING_TRADE_STATUS_RECORD
     results.push(result)
 
-    klogger.info('ServerTradeResult', trade, result)
+    tlogger.info('ServerTradeResult', trade, result)
     tlogger.info(
       trade.customComment,
       trade.symbol,
