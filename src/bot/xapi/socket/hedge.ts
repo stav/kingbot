@@ -1,5 +1,8 @@
+import { getLogger } from 'std/log/mod.ts'
+
 import type { Asset } from 'lib/config.d.ts'
 import { input } from 'lib/config.ts'
+import Logging from 'lib/logging.ts'
 
 import type { TICK_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
@@ -7,7 +10,12 @@ import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
 import XapiSocket from './socket.ts'
 
 function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_INFO[] {
-  const tpRates = [ 0.005, 0.007, 0.009 ]
+
+  const tlogger = getLogger('traders')
+  tlogger.debug('genHedgeOrders', assets, records)
+  Logging.flush()
+
+  const tpRates = [ 0.002, 0.004, 0.006 ]
   const timestamp = Date.now()
   const orders: TRADE_TRANS_INFO[] = []
   const _order = {
@@ -19,10 +27,11 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
 
   for (const record of records) {
     const asset = assets.find(a => a.symbol === record.symbol)
-    const volume = asset?.volume || 0.01
-    const mod = asset?.modify || 1
+    const volume = asset?.volume ?? 0.01
+    const mod = asset?.modify ?? 1
+    const ask = record.ask
     const bid = record.bid
-    const buyPrice = parseFloat((bid + bid * 0.002 * mod).toFixed(asset?.digits))
+    const buyPrice = parseFloat((ask + ask * 0.001 * mod).toFixed(asset?.digits))
     const sellPrice = parseFloat((bid - bid * 0.001 * mod).toFixed(asset?.digits))
     let tpLevel = 0
 
@@ -36,7 +45,7 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
         cmd: CMD_FIELD.BUY_STOP,
         price: buyPrice,
         tp: parseFloat((buyPrice + buyPrice * rate * mod).toFixed(asset?.digits)),
-        sl: parseFloat((bid * 0.96).toFixed(asset?.digits)),
+        sl: parseFloat((ask * 0.96).toFixed(asset?.digits)),
       }))
       orders.push(Object.assign({}, order, {
         cmd: CMD_FIELD.SELL_STOP,
@@ -54,21 +63,12 @@ async function getHedgeOrders (socket: XapiSocket): Promise<TRADE_TRANS_INFO[]> 
   // deno-lint-ignore no-explicit-any
   const symbols = assets.map((a: any) => a.symbol)
   const prices = await socket.getPriceQuotes(symbols)
-  const orders = genHedgeOrders(assets, prices)
-  return orders
+  return genHedgeOrders(assets, prices)
 }
 
 export default async function hedge (this: XapiSocket) {
   const orders = await getHedgeOrders(this)
-  console.log('Creating', orders.length, 'orders', orders)
-  // for (const order of orders) {
-  for (let i=0; i<orders.length; i++) {
-    const order = orders[i]
-    this.send({
-      command: 'tradeTransaction',
-      arguments: { tradeTransInfo: order },
-      customTag: `Order#${i+1}`
-    })
-  }
-  return `Requested ${orders.length} orders`
+  console.log('Requesting', orders.length, 'orders')
+  const results = await this.makeTrades(orders)
+  return `Requested ${results.length} orders`
 }
