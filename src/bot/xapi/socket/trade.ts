@@ -74,17 +74,37 @@ function isBuyOrder(cmd: number): boolean {
   return ['BUY', 'BUY_LIMIT', 'BUY_STOP'].includes(CMD_FIELD[cmd])
 }
 
+/** getTradeCommand
+ *
+ * If the trade command is exactly "BUY" or "SELL" then use the current market
+ * price to determine if should be a LIMIT or STOP order. Otherwise just return
+ * the original trade command.
+ *
+ * @param trade The trade in question
+ * @param quote The current market price quotation for the asset on the trade
+ * @returns number - The trade "command", for example: "BUY_LIMIT"
+ */
 function getTradeCommand(trade: TRADE_TRANS_INFO, quote: TICK_RECORD) {
-  let cmd: 'BUY' | 'SELL' | 'BUY_LIMIT' | 'SELL_LIMIT' | 'BUY_STOP' | 'SELL_STOP' | 'BALANCE' | 'CREDIT'
-  if (isBuyOrder(trade.cmd)) {
-    cmd = quote.ask > trade.price ? 'BUY_STOP' : 'BUY_LIMIT'
+  if (trade.cmd === CMD_FIELD.BUY) {
+    return quote.ask > trade.price ? CMD_FIELD.BUY_STOP : CMD_FIELD.BUY_LIMIT
   }
-  else {
-    cmd = quote.bid > trade.price ? 'SELL_STOP' : 'SELL_LIMIT'
+  if (trade.cmd === CMD_FIELD.SELL) {
+    return quote.bid > trade.price ? CMD_FIELD.SELL_STOP : CMD_FIELD.SELL_LIMIT
   }
-  return CMD_FIELD[cmd]
+  return trade.cmd
 }
 
+/** makeTrades
+ *
+ * Creates orders.
+ *
+ * Note: The type of order designated by the `cmd` field may be changed based on
+ * market price.
+ * @see getTradeCommand
+ *
+ * @param trades The list of trades we want to create
+ * @returns array - A list of the results from the order creation requests
+ */
 export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) {
   const tlogger = getLogger('traders')
   const results = [] as STREAMING_TRADE_STATUS_RECORD[]
