@@ -15,19 +15,6 @@ export type XapiExchangeAccount = {
   type: 'real' | 'demo'
 }
 
-export type KucoinExchangeAccount = {
-  broker: string
-  accountId: string
-  password: string
-  name: string
-  type: 'live' | 'sandbox'
-  api: {
-    key: string
-    secret: string
-    passphrase: string
-  }
-}
-
 type TelegramAccount = {
   name: string
   api_id: number
@@ -36,7 +23,7 @@ type TelegramAccount = {
   chats: number[]
 }
 
-type ExchangeAccount = XapiExchangeAccount | KucoinExchangeAccount
+type ExchangeAccount = XapiExchangeAccount
 
 export type ExchangeConfigContainer = {
   Accounts: ExchangeAccount[]

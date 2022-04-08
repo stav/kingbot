@@ -1,9 +1,8 @@
-import type { KucoinExchangeAccount, XapiExchangeAccount } from 'lib/config.d.ts'
+import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import { Exchange } from 'lib/config.ts'
 
 import type { KingConn } from './conn.d.ts'
 import TConn from './telegram/telegram.ts'
-import KuConn from './kucoin/kuconn.ts'
 import XConn from './xapi/xconn.ts'
 
 export default function () {
@@ -18,10 +17,6 @@ export default function () {
 
       case 'XAPI':
         conns.push(new XConn(account as XapiExchangeAccount))
-        break
-
-      case 'KUCOIN':
-        conns.push(new KuConn(account as KucoinExchangeAccount))
         break
 
       default:
