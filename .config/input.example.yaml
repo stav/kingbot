@@ -26,3 +26,52 @@ Xapi:
     symbol: GOLD
     price: 1868
     time: "04 May 2022 09:19:00 GMT-04:00"
+
+Forex:
+
+  Order:
+    AllocationProfileId: null
+    Applicability: null
+    AuditId: "8049808-0-0-0-O"
+    AutoRollover: false
+    BidPrice: 1.4395
+    Currency: USD
+    Direction: Buy
+    ExpiryDateTimeUTC: null
+    Guaranteed: null
+    IfDone: []
+    MarketId: 401484392
+    OcoOrder: null
+    OfferPrice: 1.4397
+    OrderId: 0
+    OrderReference: null
+    PositionMethodId: 1
+    Quantity: 10
+    Reference: GCAPI
+    Source: null
+    TradingAccountId: 123456789
+    TriggerPrice: null
+
+  Trade:
+    AuditId: "8049808-0-0-0-T"
+    AutoRollover: false
+    BidPrice: 1.4395
+    Close: []
+    Currency: USD
+    Direction: Buy
+    IfDone: []
+    MarketId: 401166448
+    OfferPrice: 1.4397
+    PositionMethodId: 1
+    Quantity: 10
+    QuoteId: null
+    Reference: GCAPI
+    TradingAccountId: 123456789
+
+  Bars:
+    price: 1978    # Price to highlight on chart
+    span: 1        # Number of each interval per price-bar
+    bars: 10       # Total number of price-bars to return
+    type: MID      # Price type being requested: ASK, MID, BID
+    interval: DAY  # Pricebar interval
+    time: "2022-05-14T17:35:03.000Z"

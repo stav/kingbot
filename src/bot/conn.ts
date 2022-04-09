@@ -1,8 +1,9 @@
-import type { XapiExchangeAccount } from 'lib/config.d.ts'
+import type { ForexExchangeAccount, XapiExchangeAccount } from 'lib/config.d.ts'
 import { Exchange } from 'lib/config.ts'
 
 import type { KingConn } from './conn.d.ts'
 import TConn from './telegram/telegram.ts'
+import ForConn from './forex/forex.ts'
 import XConn from './xapi/xconn.ts'
 
 export default function () {
@@ -17,6 +18,10 @@ export default function () {
 
       case 'XAPI':
         conns.push(new XConn(account as XapiExchangeAccount))
+        break
+
+      case 'FOREX':
+        conns.push(new ForConn(account as ForexExchangeAccount))
         break
 
       default:

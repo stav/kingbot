@@ -7,3 +7,9 @@ Accounts:
     password: secret
     name: Uncle Joe
     type: demo # real / demo
+
+  - broker: FOREX
+    name: Forex.com devel
+    username: goldkingwin
+    password: tradesecret
+    appKey: ABC

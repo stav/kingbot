@@ -1,3 +1,6 @@
+// deno-lint-ignore-file no-explicit-any
+type AnyObject = { [index: string]: any }
+
 export type XapiAccount = {
   id: number
   pw?: string
@@ -13,6 +16,15 @@ export type XapiExchangeAccount = {
   type: 'real' | 'demo'
 }
 
+export type ForexExchangeAccount = {
+  broker: string
+  username: string
+  password: string
+  appKey: string
+  name: string
+  type: 'test'
+}
+
 type TelegramAccount = {
   name: string
   api_id: number
@@ -22,7 +34,7 @@ type TelegramAccount = {
   chats: number[]
 }
 
-type ExchangeAccount = XapiExchangeAccount
+type ExchangeAccount = XapiExchangeAccount | ForexExchangeAccount
 
 export type ExchangeConfigContainer = {
   Accounts: ExchangeAccount[]
@@ -50,9 +62,19 @@ export type XapiPriceBarsConfig = {
   time: string
 }
 
+export type ForexPriceBarsConfig = {
+  price: number
+  time: string
+  span: number
+  bars: number
+  type: 'ASK' | 'MID' | 'BID'
+  interval: 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | string
+}
+
 export type InputContainer = {
   Hedge: { Assets: Asset[] }
   Price: string[]
   Signal: string
+  Forex: { Order: AnyObject, Trade: AnyObject, Bars: ForexPriceBarsConfig }
   Xapi: { Bars: XapiPriceBarsConfig }
 }
