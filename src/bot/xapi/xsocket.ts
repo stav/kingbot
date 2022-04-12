@@ -7,6 +7,8 @@ import Logging from 'lib/logging.ts'
 
 import Socket from '../socket.ts'
 
+const MSG_FILTER = ['{"status":true}', '"keepAlive"']
+
 export abstract class XSocket extends Socket {
 
   // deno-lint-ignore no-explicit-any
@@ -58,7 +60,10 @@ export abstract class XSocket extends Socket {
   }
 
   protected gotMessage (message: MessageEvent): void {
-    getLogger('message').info(message.data)
+    const data = message.data as string
+    getLogger('message').info(data)              // Log to message log
+    if (!MSG_FILTER.some(s => data.includes(s))) // If filters not present
+      getLogger().info('Message', data)          // Log to default
     Logging.flush()
   }
 

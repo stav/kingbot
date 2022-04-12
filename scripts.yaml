@@ -14,13 +14,33 @@ scripts:
         - .config/input.yaml
         - .config/exchange.yaml
         - .config/telegram.yaml
+        - logs
       write:
         - logs/kingbot.log
-        - logs/kingmsg.log
         - logs/bindings.log
         - logs/telegram-parser.log
         - logs/telegram-server.log
+        - logs/trades.log
+        - logs/kingmsg.log
+        - logs/kingmsg.log.1
+        - logs/kingmsg.log.2
+        - logs/kingmsg.log.3
+        - logs/kingmsg.log.4
+        - logs/kingmsg.log.5
+        - logs/kingmsg.log.6
+        - logs/kingmsg.log.7
+        - logs/kingmsg.log.8
+        - logs/kingmsg.log.9
         - logs/send.log
+        - logs/send.log.1
+        - logs/send.log.2
+        - logs/send.log.3
+        - logs/send.log.4
+        - logs/send.log.5
+        - logs/send.log.6
+        - logs/send.log.7
+        - logs/send.log.8
+        - logs/send.log.9
       net:
         - ws.xtb.com
         - 0.0.0.0:8000

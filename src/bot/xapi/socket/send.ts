@@ -13,6 +13,8 @@ import type XapiSocket from './socket.ts'
  *
  * This function becomes a method of the XapiSocket class.
  *
+ * WARNING: Exposes passwords in send log (not default log)
+ *
  * "Each command invocation should not contain more than 1kB of data."
  * "User should send requests in 200 ms intervals. This rule can be broken,
  *  but if it happens 6 times in a row the connection is dropped."
@@ -24,9 +26,15 @@ import type XapiSocket from './socket.ts'
  */
  export function send (this: XapiSocket, data: InputData) {
   if (this.isOpen) {
-    const json = JSON.stringify(data)
-    getLogger('sending').info('Sending', json)
-    this.socket?.send(json)
+    getLogger('sending').info('Sending', data)
+
+    this.socket?.send(JSON.stringify(data))
+
+    if (data.command !== 'ping') {
+      if (data.command === 'login')
+        data.arguments.password = '<REDACTED>'
+      getLogger().info('Sending', data)
+    }
   }
 }
 
