@@ -39,16 +39,12 @@ def sanitize(text):
     return text.encode("ascii", "ignore").decode()
 
 def blurb(text, length=44):
-    return sanitize(text).replace('\n', ' ')[:length].strip()
+    return sanitize(text).replace('\n', ' ').replace('  ', ' ')[:length].strip()
 
 async def sender(event):
-    sender = await event.get_sender()
-    result = None
-    try:
-        return blurb(f'{sender.id} {sender.title}')
-    except Exception:
-        name = f'{sender.first_name} {sender.last_name or ""}'
-        return blurb(f'{sender.id} {sender.username}')
+    s = await event.get_sender()
+    print('SENDER', s)
+    return blurb(f"{s.id} {getattr(s, 'first_name', '')} {getattr(s, 'last_name', '')} {getattr(s, 'title', '')} {getattr(s, 'username', '')}".replace('  ', ' ').strip())
 
 def send(message):
     data = json.dumps(message, default=str).encode('utf-8')
@@ -71,29 +67,39 @@ async def run(account):
     hash = account['api_hash']
     session = f"logs/telethonx.{name}.{id}"
     async with TelegramClient(session, id, hash) as client:
-        message = f"Starting {client} as {name} {id}"
-        logger.info(message)
-        print(message)
+        starting = f"Starting {client} as {name} {id}"
+        logger.info(starting)
+        print(starting)
 
         # @client.on(events.NewMessage())
         @client.on(events.NewMessage(chats=account['chats']))
         async def my_event_handler(event):
             logger.debug('Got event message %s', event.message.stringify())
+            print('')
             msg = blurb(event.message.message)
             sndr = await sender(event)
             date = event.message.date
-            print('')
-            print('Got event:', sndr, f'"{msg}"', date)
+            print('Got event: from', sndr, f'"{msg}"', date)
             if msg:
-                send(
-                    dict(
-                        cid = event.message.peer_id.channel_id,
-                        fid = event.message.from_id,
-                        date = event.message.date,
-                        eindex = account['exchange_index'],
-                        msg = sanitize(event.message.message),
+                message = sanitize(event.message.message)
+                cid = event.message.peer_id.channel_id
+                forward = account.get('forwards', {}).get(cid, False)
+                if forward:
+                    entity = await client.get_entity(forward)
+                    forwarding = f"Forwarding message from {cid} to {entity.id} {getattr(entity, 'title')}"
+                    print(forwarding)
+                    logger.info(forwarding)
+                    await client.send_message(entity=entity, message=message)
+                else:
+                    send(
+                        dict(
+                            cid = cid,
+                            fid = event.message.from_id,
+                            date = event.message.date,
+                            eindex = account['exchange_index'],
+                            msg = message,
+                        )
                     )
-                )
             # s = await event.get_sender()
             # messages = client.iter_messages(s, ids=event.message.id)
             # async for message in messages:

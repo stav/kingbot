@@ -17,6 +17,8 @@ Accounts:
       - -1001234567890  # Homesteading channel
       - 123456789  # Work group
       - 987654321
+    forwards:
+      -1001234567890: -100987654321
 
   - name: Joe
     api_id: 12345678

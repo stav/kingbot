@@ -18,6 +18,7 @@ type TelegramAccount = {
   api_id: number
   api_hash: string
   exchange_index: number
+  forwards: { [index: number]: number }
   chats: number[]
 }
 
