@@ -51,7 +51,9 @@ scripts:
     importMap: denoPaths.json
     allow:
       env: CI # Rhum: if (Deno.env.get("CI") === "true")
-      net: ws.xtb.com
+      net:
+        - ws.xtb.com
+        - echo.jsontest.com
       read:
         - .config/input.yaml
         - .config/exchange.yaml

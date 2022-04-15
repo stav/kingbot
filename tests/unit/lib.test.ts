@@ -2,7 +2,9 @@ import {
   assertNotStrictEquals,
   assertArrayIncludes,
   assertStrictEquals,
+  assertRejects,
   assertExists,
+  assert,
 } from 'std/testing/asserts.ts'
 import * as logging from 'std/log/mod.ts'
 
@@ -11,6 +13,8 @@ import { human } from 'lib/time.ts'
 
 import { bind } from 'lib/bind.ts'
 import { reflect } from 'lib/reflect.ts'
+
+import { Fetch } from 'lib/web.ts'
 
 await logging.setup({ loggers: { default: { level: "WARNING" } } })
 
@@ -63,4 +67,9 @@ Deno.test('lib.time', () => {
   assertStrictEquals( human({s: 121}), '0h2m1s' )
   assertStrictEquals( human({s: 3661}), '1h1m1s' )
   assertStrictEquals( human({m: 2, s: 1}), '0h2m1s' )
+})
+
+Deno.test('lib.web', () => {
+  assert( Fetch )
+  assertRejects( async () => await Fetch('asdf') )
 })

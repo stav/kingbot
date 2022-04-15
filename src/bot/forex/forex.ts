@@ -5,7 +5,11 @@ import { input } from 'lib/config.ts'
 import type { PriceBars } from 'lib/candles.d.ts'
 import { priceCandles } from 'lib/candles.ts'
 
+import { Fetch } from 'lib/web.ts'
+
 import type { KingConn } from '../conn.d.ts'
+
+import { get, post } from './web.ts'
 
 type User = {
   Additional2FAMethods: any,
@@ -32,33 +36,8 @@ export default class ForConn implements KingConn {
     this.account = account
   }
 
-  private async fetch (target: string | Request, options?: any): Promise<any> {
-    const response = await fetch(target, options)
-    if (response.ok) {
-      return await response.json()
-    }
-    console.log(target, options, await response.text())
-    return response
-  }
-
-  private async get (url: string): Promise<any> {
-    const headers = {
-      UserName: this.account.username,
-      Session: this.user.Session,
-    }
-    return await this.fetch(this.base + url, { headers })
-  }
-
-  private async post (url: string, options: any = {}) {
-    const method = options.method ?? 'POST'
-    const headers = Object.assign({
-      "Content-Type": 'application/json',
-      UserName: this.account.username,
-      Session: this.user.Session,
-    }, options.headers ?? {})
-    const request = new Request(url, { method, headers, body: options.body })
-    return await this.fetch(request)
-  }
+  private get = get
+  private post = post
 
   prompt () {
     return this.user.Session ? 'l' : '-'
@@ -81,7 +60,7 @@ export default class ForConn implements KingConn {
       AppComments: "Kingbot",
       AppVersion: "1",
     })
-    return await this.fetch(url, { method, headers, body })
+    return await Fetch(url, { method, headers, body })
   }
 
   async connect () {
@@ -103,7 +82,7 @@ export default class ForConn implements KingConn {
       UserName: this.account.username,
       Session: this.user.Session,
     })
-    return await this.fetch(url, { method, headers, body })
+    return await Fetch(url, { method, headers, body })
     // { IsAuthenticated: true }
   }
 
