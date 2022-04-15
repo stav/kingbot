@@ -5,6 +5,8 @@
 
     "rhum/": "https://deno.land/x/rhum@v1.1.14/",
 
+    "wire/": "https://deno.land/x/date_wire@v0.1/",
+
     "lib/": "./src/lib/",
     "src/": "./src/"
   }
