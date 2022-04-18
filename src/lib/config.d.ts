@@ -46,4 +46,5 @@ interface Asset {
 export type InputContainer = {
   Hedge: { Assets: Asset[] }
   Price: string[]
+  Signal: string
 }
