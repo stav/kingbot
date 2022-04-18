@@ -72,8 +72,8 @@ export async function sync (this: XapiSocket, data: InputData): Promise<XapiResp
   async function wait () { while (!result) await delay(200) }
 
   // 1. Send data
-  const customTag = Math.random().toString()
-  const _data = Object.assign({ customTag }, data)
+  const customTag = `${Math.random()} ${data.customTag || ''}`.trim()
+  const _data = Object.assign({}, data, { customTag })
   this.send(_data)
 
   // 2. Wait for Result 2 seconds max
