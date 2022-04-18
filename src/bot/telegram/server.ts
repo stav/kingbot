@@ -47,23 +47,27 @@ export default class Server {
   }
 
   async handler (request: Request) {
+    const logger = getLogger('tserver')
+    const payload = await request.json() as TelethonMessage
+    logger.info('Received payload', payload)
+
     try {
-      const payload = await request.json() as TelethonMessage
       const signal = await parse(payload)
       const traded = await this.trade(payload.eindex, signal)
 
-      getLogger('tserver').info(
+      logger.info(
         'Signal', signal,
         'Eindex', payload.eindex, this.connected ? 'connected' : 'not connected',
         'Channel', this.#getChannel(payload.cid),
         'From', this.#getFrom(payload.fid),
       )
-      Logging.flush()
-
       return new Response(Deno.inspect(traded))
     }
     catch (error) {
       return new Response(error)
+    }
+    finally {
+      Logging.flush()
     }
   }
 
