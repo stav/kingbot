@@ -4,7 +4,6 @@ import Logging from 'lib/logging.ts'
 
 import { CMD_FIELD, REQUEST_STATUS_FIELD } from '../xapi.ts'
 import type {
-  TICK_RECORD,
   TRADE_RECORD,
   TRADE_TRANS_INFO,
   STREAMING_TRADE_STATUS_RECORD,
@@ -70,37 +69,9 @@ export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO, custo
   return statusReturnData
 }
 
-function isBuyOrder(cmd: number): boolean {
-  return ['BUY', 'BUY_LIMIT', 'BUY_STOP'].includes(CMD_FIELD[cmd])
-}
-
-/** getTradeCommand
- *
- * If the trade command is exactly "BUY" or "SELL" then use the current market
- * price to determine if should be a LIMIT or STOP order. Otherwise just return
- * the original trade command.
- *
- * @param trade The trade in question
- * @param quote The current market price quotation for the asset on the trade
- * @returns number - The trade "command", for example: "BUY_LIMIT"
- */
-function getTradeCommand(trade: TRADE_TRANS_INFO, quote: TICK_RECORD) {
-  if (trade.cmd === CMD_FIELD.BUY) {
-    return quote.ask > trade.price ? CMD_FIELD.BUY_STOP : CMD_FIELD.BUY_LIMIT
-  }
-  if (trade.cmd === CMD_FIELD.SELL) {
-    return quote.bid > trade.price ? CMD_FIELD.SELL_STOP : CMD_FIELD.SELL_LIMIT
-  }
-  return trade.cmd
-}
-
 /** makeTrades
  *
  * Creates orders.
- *
- * Note: The type of order designated by the `cmd` field may be changed based on
- * market price.
- * @see getTradeCommand
  *
  * @param trades The list of trades we want to create
  * @returns array - A list of the results from the order creation requests
@@ -109,16 +80,10 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
   const tlogger = getLogger('traders')
   const results = [] as STREAMING_TRADE_STATUS_RECORD[]
 
-  const symbols = trades.map(trade => trade.symbol)
-  const quotes = await this.getPriceQuotes(symbols)
-  getLogger().info('ServerTradeQuotes', quotes)
-
   // for (const trade of trades) {
   for (let i=0; i<trades.length; i++) {
     const trade = trades[i]
     const customTag = `Order ${i+1} of ${trades.length}`
-    const quote = quotes.filter(quote => quote.symbol === trade.symbol)[0]
-    trade.cmd = getTradeCommand(trade, quote) // cmd updated based on price
     const result = await makeTrade.bind(this)(trade, customTag) as STREAMING_TRADE_STATUS_RECORD
     results.push(result)
 
@@ -126,7 +91,6 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
     tlogger.info(
       trade.customComment,
       trade.symbol,
-      isBuyOrder(trade.cmd) ? quote?.ask : quote?.bid,
       CMD_FIELD[trade.cmd],
       '@', trade.price,
       '=', trade.tp,

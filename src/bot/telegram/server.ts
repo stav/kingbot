@@ -102,7 +102,7 @@ export default class Server {
     const socket = connection.Socket
     const trades = signal.tps.map(
       tp => ({
-        cmd:           CMD_FIELD[signal.type], // STOP/LIMIT determined in makeTrades
+        cmd:           CMD_FIELD[signal.type],
         customComment:'Kingbot Telegram Signal',
         expiration:    Date.now() + 60000 * 60 * 24 * 365, // 1 year
         offset:        0,
