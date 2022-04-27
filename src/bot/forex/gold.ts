@@ -40,13 +40,18 @@ export async function barHistoryToday (this: ForConn, config: ForexPriceBarsConf
   return await this.get(url)
 }
 
+function timestampString (zuluDateTime: string) {
+  const timestamp = new Date(zuluDateTime).getTime() / 1000
+  return timestamp.toString()
+}
+
 export async function barHistoryDate (this: ForConn, config: ForexPriceBarsConfig): Promise<PriceBars & Response> {
   const params = new URLSearchParams()
   params.append('span', config.span.toString())
   params.append('maxResults', config.bars.toString())
   params.append('priceType', config.type)
   params.append('interval', config.interval)
-  params.append('fromTimestampUTC', new Date(config.time).getTime().toString())
+  params.append('fromTimestampUTC', timestampString(config.time))
   const id = await this.goldId()
   const url = `/market/${id}/barhistoryafter?` + params.toString()
   return await this.get(url)
