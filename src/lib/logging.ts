@@ -37,7 +37,7 @@ const handlers = {
     filename: "./logs/kingmsg.log",
     formatter,
     maxBytes: 5e6, // five million bytes
-    maxBackupCount: 10,
+    maxBackupCount: 9,
   }),
 
   tradefile: new logging.handlers.FileHandler("NOTSET", {
@@ -64,7 +64,7 @@ const handlers = {
     filename: "./logs/send.log",
     formatter,
     maxBytes: 1e6, // one million bytes
-    maxBackupCount: 10,
+    maxBackupCount: 9,
   }),
 
 }
