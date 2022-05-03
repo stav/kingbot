@@ -1,4 +1,7 @@
+// deno-lint-ignore-file no-explicit-any
 import { getLogger } from 'std/log/mod.ts'
+
+import { human } from 'lib/time.ts'
 
 import type { TRADE_RECORD, TRADE_TRANS_INFO, STREAMING_TRADE_RECORD } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
@@ -55,8 +58,35 @@ function isBuyOrder(cmd: number): boolean {
   const margin = level * 0.0003
   const betterment = isBuyOrder(data.cmd) ? +margin : -margin
   const stopLoss = +(level + betterment).toFixed(data.digits)
-  getLogger().info('STOP LOSS:', stopLoss, '=', level, '+', betterment)
+  getLogger().info(`STOP LOSS: ${stopLoss} = ${level} + ${betterment}`)
   return stopLoss
+}
+
+function copy (trade: TRADE_RECORD, tpData: STREAMING_TRADE_RECORD) {
+  const update: UpdateOrderEvent = {
+    cmd: undefined,
+    customComment: undefined,
+    expiration: undefined,
+    offset: undefined,
+    order: undefined,
+    price: undefined,
+    symbol: undefined,
+    tp: undefined,
+    volume: undefined,
+  }
+  const transaction = {} as TRADE_TRANS_INFO & { [index: string]: any }
+  for (const key in update) {
+    // deno-lint-ignore no-prototype-builtins
+    if (update.hasOwnProperty(key)) {
+      const value = (trade as any)[key]
+      if (value !== undefined)
+        transaction[key] = value
+    }
+  }
+  return Object.assign(transaction, {
+    sl: getStopLoss(tpData),
+    type: TYPE_FIELD.MODIFY,
+  }) as TRADE_TRANS_INFO
 }
 
 /** @name setFamilyStoploss */
@@ -70,42 +100,62 @@ async function setFamilyStoploss( this: XapiSocket,
                                   trades: TRADE_RECORD[],
 ) {
   const logger = getLogger()
-  logger.info('Updating stop loss for', trades.length, 'orders')
-  const transaction: UpdateOrderEvent = {
-    type: TYPE_FIELD.MODIFY,
-    sl: getStopLoss(tpData),
-  }
+  logger.info(`Updating stop loss for ${trades.length} orders`)
+
   for (const trade of trades) {
-    const _trade = Object.assign({}, trade, transaction) as TRADE_TRANS_INFO
-    logger.debug('setFamilyStoploss: trade', _trade)
     // The transaction will fail if the take-profit is "worse" than the entry price
-    const response = await this.makeTrade(_trade)
-    logger.info('setFamilyStoploss: response', response)
+    const response = await this.makeTrade(copy(trade, tpData))
+    logger.info({ function: 'setFamilyStoploss', 'response': response})
   }
+}
+
+type IndexableRecord = STREAMING_TRADE_RECORD & { [index: string]: any }
+
+function translate (data: IndexableRecord) {
+  if (data.open_time && data.close_time) {
+    data.open_length = human({s: (data.close_time - data.open_time) / 1000})
+  }
+  if (data.open_time) {
+    data.open_time_str = new Date(data.open_time)
+  }
+  if (data.close_time) {
+    data.close_time_str = new Date(data.close_time)
+  }
+  data.cmd_field = CMD_FIELD[data.cmd]
+  data.type_field = TYPE_FIELD[data.type]
+  if (data.open_price && data.close_price) {
+    data.price_diff = parseFloat(Math.abs(data.close_price - data.open_price).toFixed(data.digits))
+  }
+  return data
 }
 
 /** @name check */
 /**
- * Set the family stop loss if our trade is closed due to _take-profit_
+ * Check to see if our trade was closed due to _take-profit_.
+ *
+ * If so then set the _stop-loss_es for all orders in the family.
+ *
+ * @param data The take-profit order data sent by the exchange
+ * @param func The function to set the stop-loss, this is used in testing
  */
-export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
+export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD, func = setFamilyStoploss) {
   function symbolStoploss(trade: TRADE_RECORD) {
     return trade.symbol === data.symbol
       && trade.sl === data.sl
   }
   if (data.closed && data.comment === '[T/P]') {
-    getLogger().debug('TAKE PROFIT', data)
+    getLogger().info('TAKE PROFIT', translate(data))
 
     const openedOnly = true
 
     const trades: TRADE_RECORD[] = await this.getOpenTrades(openedOnly)
-    getLogger().info('check', trades.length, 'trades in total')
+    getLogger().info(`check1: ${trades.length} open trades in total`)
 
     const family = trades.filter(symbolStoploss)
-    getLogger().info('check', family.length, 'family of', data.symbol)
+    getLogger().info(`check2: ${family.length} in family of ${data.symbol}`)
 
     if (family.length > 0) {
-      await setFamilyStoploss.bind(this)(data, family)
+      await func.bind(this)(data, family)
     }
   }
   else {

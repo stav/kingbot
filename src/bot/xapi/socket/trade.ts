@@ -61,7 +61,7 @@ export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO, custo
     }
   }
   response = await this.sync(data)
-  const statusReturnData = (<XapiDataResponse>response).returnData
+  const statusReturnData = (<XapiDataResponse>response).returnData as TradeResponse
 
   getLogger().info('Trade', tradeReturnData, 'Status', statusReturnData)
   Logging.flush()
