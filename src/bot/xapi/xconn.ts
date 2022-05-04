@@ -38,6 +38,10 @@ export default class XConn implements KingConn {
            (this.Stream.prompt())
   }
 
+  list (index: number) {
+    return `CNX ${index || ''} [${this.prompt()}] ${this.constructor.name} ${this.Socket.info} ${this.Stream.info}`
+  }
+
   async start () {
     await this.Stream.open()
     await this.Socket.open()
@@ -92,8 +96,12 @@ export default class XConn implements KingConn {
     return await this.Socket.hedge()
   }
 
-  async price () {
+  async quote () {
     return await this.Socket.getPriceQuotes(input().Price)
+  }
+
+  async price () {
+    return await this.Socket.getPriceHistory(input().Xapi.Bars)
   }
 
   logout () {
@@ -110,10 +118,6 @@ export default class XConn implements KingConn {
       this.Socket.status,
       this.Stream.status,
     ]
-  }
-
-  list (index: number) {
-    return `CNX ${index || ''} [${this.prompt()}] ${this.constructor.name} ${this.Socket.info} ${this.Stream.info}`
   }
 
 }

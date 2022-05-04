@@ -43,8 +43,19 @@ interface Asset {
   modify: number
 }
 
+export type XapiPriceBarsConfig = {
+  period: number
+  symbol: string
+  start: number
+  price: number
+  time: string
+  type: 'ASK' | 'MID' | 'BID'
+  interval: 'MINUTE' | 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | string
+}
+
 export type InputContainer = {
   Hedge: { Assets: Asset[] }
   Price: string[]
   Signal: string
+  Xapi: { Bars: XapiPriceBarsConfig }
 }
