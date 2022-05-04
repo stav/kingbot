@@ -104,6 +104,14 @@ export default class XConn implements KingConn {
     return await this.Socket.getPriceHistory(input().Xapi.Bars)
   }
 
+  async p () {
+    if (!this.Socket.isOpen) {
+      await this.Socket.open()
+      await this.Socket.login()
+    }
+    return await this.Socket.candles(input().Xapi.Bars)
+  }
+
   logout () {
     this.Socket.logout()
   }
