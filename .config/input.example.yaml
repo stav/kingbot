@@ -18,3 +18,12 @@ Price:
   - GOLD
 
 Signal: "XAUUSD SELL ENTRADA: 1993 SL: 2003 TP1: 1991"
+
+Xapi:
+
+  Bars:
+    period: 1440
+    symbol: GOLD
+    price: 1868
+    time: "04 May 2022 09:19:00 GMT-04:00"
+    bars: -20
