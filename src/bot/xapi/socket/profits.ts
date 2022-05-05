@@ -2,11 +2,9 @@ import { getLogger } from 'std/log/mod.ts'
 
 import type { TRADE_RECORD, TRADE_TRANS_INFO, STREAMING_TRADE_RECORD } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
-import { translate } from '../record.ts'
+import { assignTradeTransaction, translate } from '../record.ts'
 
 import type XapiSocket from './socket.ts'
-
-type UpdateOrderEvent = Partial<TRADE_TRANS_INFO>
 
 /** @name isBuyOrder */
 /**
@@ -60,33 +58,6 @@ function isBuyOrder(cmd: number): boolean {
   return stopLoss
 }
 
-function copy (trade: TRADE_RECORD, tpData: STREAMING_TRADE_RECORD) {
-  const update: UpdateOrderEvent = {
-    cmd: undefined,
-    customComment: undefined,
-    expiration: undefined,
-    offset: undefined,
-    order: undefined,
-    price: undefined,
-    symbol: undefined,
-    tp: undefined,
-    volume: undefined,
-  }
-  const transaction = {} as TRADE_TRANS_INFO & { [index: string]: any }
-  for (const key in update) {
-    // deno-lint-ignore no-prototype-builtins
-    if (update.hasOwnProperty(key)) {
-      const value = (trade as any)[key]
-      if (value !== undefined)
-        transaction[key] = value
-    }
-  }
-  return Object.assign(transaction, {
-    sl: getStopLoss(tpData),
-    type: TYPE_FIELD.MODIFY,
-  }) as TRADE_TRANS_INFO
-}
-
 /** @name setFamilyStoploss */
 /**
  * Issue order stop-loss modification transactions for all orders in _family_
@@ -97,12 +68,19 @@ async function setFamilyStoploss( this: XapiSocket,
                                   tpData: STREAMING_TRADE_RECORD,
                                   trades: TRADE_RECORD[],
 ) {
+  const stopLoss = getStopLoss(tpData)
   const logger = getLogger()
-  logger.info(`Updating stop loss for ${trades.length} orders`)
+  logger.info(`Updating stop loss to ${stopLoss} for ${trades.length} orders`)
 
   for (const trade of trades) {
+    const transaction = assignTradeTransaction(
+      Object.assign( {}, trade, {
+        type: TYPE_FIELD.MODIFY,
+        sl: stopLoss,
+      }) as TRADE_RECORD
+    ) as TRADE_TRANS_INFO
     // The transaction will fail if the take-profit is "worse" than the entry price
-    const response = await this.makeTrade(copy(trade, tpData))
+    const response = await this.makeTrade(transaction)
     logger.info({ function: 'setFamilyStoploss', 'response': response})
   }
 }

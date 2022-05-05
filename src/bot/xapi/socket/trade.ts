@@ -2,13 +2,14 @@ import { getLogger } from 'std/log/mod.ts'
 
 import Logging from 'lib/logging.ts'
 
-import { CMD_FIELD, REQUEST_STATUS_FIELD } from '../xapi.ts'
 import type {
   TRADE_RECORD,
   TRADE_TRANS_INFO,
   STREAMING_TRADE_STATUS_RECORD,
   TradeTransInfoPosition,
 } from '../xapi.d.ts'
+import { CMD_FIELD, REQUEST_STATUS_FIELD } from '../xapi.ts'
+import { tradeTransInfoFields } from '../record.ts'
 
 import type XapiSocket from './socket.ts'
 import type {
@@ -103,10 +104,6 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
   Logging.flush()
   return results
 }
-
-const tradeTransInfoFields = [
-  'cmd', 'offset', 'order', 'sl', 'symbol', 'tp', 'type', 'volume',
-]
 
 type IndexableTradeRecord = TRADE_RECORD & { [index: string]: string | number }
 

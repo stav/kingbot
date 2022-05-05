@@ -104,13 +104,14 @@ describe('Profits', () => {
 
   it('make trade', async () => {
     const stopLoss = {
-      volume: 0.01,
-      symbol: 'GOLD',
-      order: 144310429,
-      type: 3,
       cmd: 1,
+      order: 144310429,
+      price: 16295.77,
       sl: 16290.88,
+      symbol: "GOLD",
       tp: 16295.21,
+      type: 3,
+      volume: 0.01,
     } as TRADE_TRANS_INFO
     const makeSpy = spy(makeTrade)
     Socket.makeTrade = makeSpy
