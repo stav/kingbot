@@ -42,14 +42,6 @@ export default class XConn implements KingConn {
     return `CNX ${index || ''} [${this.prompt()}] ${this.constructor.name} ${this.Socket.info} ${this.Stream.info}`
   }
 
-  async start () {
-    await this.Stream.open()
-    await this.Socket.open()
-    await this.Socket.login()
-    this.alive()
-    return this.status()
-  }
-
   connect () {
     this.Socket.connect()
     this.Stream.connect()
@@ -60,8 +52,17 @@ export default class XConn implements KingConn {
    * @see https://palantir.github.io/tslint/rules/no-floating-promises
    */
   async login () {
-    await this.Socket.open()
-    this.Socket.login() // Floating promise
+    if (!this.Socket.isOpen) {
+      await this.Socket.open()
+      await this.Socket.login()
+    }
+  }
+
+  async start () {
+    await this.Stream.open()
+    await this.login()
+    this.alive()
+    return this.status()
   }
 
   ping () {
@@ -78,8 +79,7 @@ export default class XConn implements KingConn {
   }
 
   async balance () {
-    await this.Socket.open()
-    await this.Socket.login()
+    await this.login()
     const story = await this.story()
     return story.getMarginLevel.balance
   }
@@ -105,10 +105,7 @@ export default class XConn implements KingConn {
   }
 
   async p () {
-    if (!this.Socket.isOpen) {
-      await this.Socket.open()
-      await this.Socket.login()
-    }
+    await this.login()
     return await this.Socket.candles(input().Xapi.Bars)
   }
 
