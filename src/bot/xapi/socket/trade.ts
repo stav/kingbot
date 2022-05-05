@@ -7,6 +7,7 @@ import type {
   TRADE_RECORD,
   TRADE_TRANS_INFO,
   STREAMING_TRADE_STATUS_RECORD,
+  TradeTransInfoPosition,
 } from '../xapi.d.ts'
 
 import type XapiSocket from './socket.ts'
@@ -101,4 +102,27 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
   }
   Logging.flush()
   return results
+}
+
+const tradeTransInfoFields = [
+  'cmd', 'offset', 'order', 'sl', 'symbol', 'tp', 'type', 'volume',
+]
+
+type IndexableTradeRecord = TRADE_RECORD & { [index: string]: string | number }
+
+export async function update (this:XapiSocket, data: TradeTransInfoPosition) {
+  const trades: TRADE_RECORD[] = await this.getOpenTrades()
+  console.log(`update: ${trades.length} open trades in total`)
+
+  const positions = trades.filter(t => t.position === data.position)
+  console.log(`update: ${positions.length} position(s) for ${data.position}`)
+
+  const pos = positions[0] as IndexableTradeRecord
+  const price = pos.open_price
+  for (const key in pos) {
+    if (!tradeTransInfoFields.includes(key))
+      delete pos[key]
+  }
+  const transaction = Object.assign({ price }, pos, data)
+  return await this.makeTrade(transaction)
 }

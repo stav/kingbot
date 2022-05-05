@@ -54,6 +54,7 @@ export type XapiPriceBarsConfig = {
 export type InputContainer = {
   Hedge: { Assets: Asset[] }
   Price: string[]
+  Update: { [index: string]: string | number }
   Signal: string
   Xapi: { Bars: XapiPriceBarsConfig }
 }

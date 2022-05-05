@@ -6,6 +6,7 @@ import { input } from 'lib/config.ts'
 
 import type { KingConn } from '../conn.d.ts'
 
+import type { TradeTransInfoPosition } from './xapi.d.ts'
 import XapiSocket from './socket/socket.ts'
 import XapiStream from './stream/stream.ts'
 
@@ -107,6 +108,11 @@ export default class XConn implements KingConn {
   async p () {
     await this.login()
     return await this.Socket.candles(input().Xapi.Bars)
+  }
+
+  async update () {
+    await this.login()
+    return await this.Socket.update(input().Update as unknown as TradeTransInfoPosition)
   }
 
   logout () {
