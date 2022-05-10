@@ -17,6 +17,11 @@ Price:
   - ETHEREUM
   - GOLD
 
+Update:
+  position: 383119357
+  type: 3
+  sl: 2781
+
 Signal: "XAUUSD SELL ENTRADA: 1993 SL: 2003 TP1: 1991"
 
 Xapi:

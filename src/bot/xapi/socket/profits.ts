@@ -2,10 +2,9 @@ import { getLogger } from 'std/log/mod.ts'
 
 import type { TRADE_RECORD, TRADE_TRANS_INFO, STREAMING_TRADE_RECORD } from '../xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
+import { assignTradeTransaction, translate } from '../record.ts'
 
 import type XapiSocket from './socket.ts'
-
-type UpdateOrderEvent = Partial<TRADE_TRANS_INFO>
 
 /** @name isBuyOrder */
 /**
@@ -55,7 +54,7 @@ function isBuyOrder(cmd: number): boolean {
   const margin = level * 0.0003
   const betterment = isBuyOrder(data.cmd) ? +margin : -margin
   const stopLoss = +(level + betterment).toFixed(data.digits)
-  getLogger().info('STOP LOSS:', stopLoss, '=', level, '+', betterment)
+  getLogger().info(`STOP LOSS: ${stopLoss} = ${level} + ${betterment}`)
   return stopLoss
 }
 
@@ -69,43 +68,50 @@ async function setFamilyStoploss( this: XapiSocket,
                                   tpData: STREAMING_TRADE_RECORD,
                                   trades: TRADE_RECORD[],
 ) {
+  const stopLoss = getStopLoss(tpData)
   const logger = getLogger()
-  logger.info('Updating stop loss for', trades.length, 'orders')
-  const transaction: UpdateOrderEvent = {
-    type: TYPE_FIELD.MODIFY,
-    sl: getStopLoss(tpData),
-  }
+  logger.info(`Updating stop loss to ${stopLoss} for ${trades.length} orders`)
+
   for (const trade of trades) {
-    const _trade = Object.assign({}, trade, transaction) as TRADE_TRANS_INFO
-    logger.debug('setFamilyStoploss: trade', _trade)
+    const transaction = assignTradeTransaction(
+      Object.assign( {}, trade, {
+        type: TYPE_FIELD.MODIFY,
+        sl: stopLoss,
+      }) as TRADE_RECORD
+    ) as TRADE_TRANS_INFO
     // The transaction will fail if the take-profit is "worse" than the entry price
-    const response = await this.makeTrade(_trade)
-    logger.info('setFamilyStoploss: response', response)
+    const response = await this.makeTrade(transaction)
+    logger.info({ function: 'setFamilyStoploss', 'response': response})
   }
 }
 
 /** @name check */
 /**
- * Set the family stop loss if our trade is closed due to _take-profit_
+ * Check to see if our trade was closed due to _take-profit_.
+ *
+ * If so then set the _stop-loss_es for all orders in the family.
+ *
+ * @param data The take-profit order data sent by the exchange
+ * @param func The function to set the stop-loss, supplied in testing
  */
-export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD) {
+export async function check (this: XapiSocket, data: STREAMING_TRADE_RECORD, func = setFamilyStoploss) {
   function symbolStoploss(trade: TRADE_RECORD) {
     return trade.symbol === data.symbol
       && trade.sl === data.sl
   }
   if (data.closed && data.comment === '[T/P]') {
-    getLogger().debug('TAKE PROFIT', data)
+    getLogger().info('TAKE PROFIT', translate(data))
 
     const openedOnly = true
 
     const trades: TRADE_RECORD[] = await this.getOpenTrades(openedOnly)
-    getLogger().info('check', trades.length, 'trades in total')
+    getLogger().info(`check1: ${trades.length} open trades in total`)
 
     const family = trades.filter(symbolStoploss)
-    getLogger().info('check', family.length, 'family of', data.symbol)
+    getLogger().info(`check2: ${family.length} in family of ${data.symbol}`)
 
     if (family.length > 0) {
-      await setFamilyStoploss.bind(this)(data, family)
+      await func.bind(this)(data, family)
     }
   }
   else {

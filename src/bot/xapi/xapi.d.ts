@@ -91,6 +91,8 @@ export interface TRADE_TRANS_INFO {
   volume: number
 }
 
+export type TradeTransInfoPosition = TRADE_TRANS_INFO & { position: number }
+
 export interface STREAMING_TRADE_STATUS_RECORD {
   customComment: string | null
   message: string | null

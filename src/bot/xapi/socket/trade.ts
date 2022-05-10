@@ -2,12 +2,14 @@ import { getLogger } from 'std/log/mod.ts'
 
 import Logging from 'lib/logging.ts'
 
-import { CMD_FIELD, REQUEST_STATUS_FIELD } from '../xapi.ts'
 import type {
   TRADE_RECORD,
   TRADE_TRANS_INFO,
   STREAMING_TRADE_STATUS_RECORD,
+  TradeTransInfoPosition,
 } from '../xapi.d.ts'
+import { CMD_FIELD, REQUEST_STATUS_FIELD } from '../xapi.ts'
+import { tradeTransInfoFields } from '../record.ts'
 
 import type XapiSocket from './socket.ts'
 import type {
@@ -61,7 +63,7 @@ export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO, custo
     }
   }
   response = await this.sync(data)
-  const statusReturnData = (<XapiDataResponse>response).returnData
+  const statusReturnData = (<XapiDataResponse>response).returnData as TradeResponse
 
   getLogger().info('Trade', tradeReturnData, 'Status', statusReturnData)
   Logging.flush()
@@ -101,4 +103,23 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
   }
   Logging.flush()
   return results
+}
+
+type IndexableTradeRecord = TRADE_RECORD & { [index: string]: string | number }
+
+export async function update (this:XapiSocket, data: TradeTransInfoPosition) {
+  const trades: TRADE_RECORD[] = await this.getOpenTrades()
+  console.log(`update: ${trades.length} open trades in total`)
+
+  const positions = trades.filter(t => t.position === data.position)
+  console.log(`update: ${positions.length} position(s) for ${data.position}`)
+
+  const pos = positions[0] as IndexableTradeRecord
+  const price = pos.open_price
+  for (const key in pos) {
+    if (!tradeTransInfoFields.includes(key))
+      delete pos[key]
+  }
+  const transaction = Object.assign({ price }, pos, data)
+  return await this.makeTrade(transaction)
 }
