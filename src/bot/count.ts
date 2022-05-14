@@ -15,11 +15,18 @@ export default class KingCount {
   conns: KingConn[] = []
 
   #currentAccountIndex = 0
-  #primed = false
 
   f = [0, 1, 2, 3, 4].map(i => () => this.fKey(i)) // Switch between connections
 
   inspect: () => void = inspect
+
+  constructor () {
+    // if (!Deno.env.get('DENOTEST'))
+    this.conns = ConnectionFactory()
+    const telegramConnection = this.conns[Telegram().index] as TConn
+    telegramConnection.setup(this.conns)
+    Logging.setup().then(console.debug)
+  }
 
   get Conn (): KingConn {
     return this.conns[ this.#currentAccountIndex ]
@@ -36,17 +43,6 @@ export default class KingCount {
     const i = this.#currentAccountIndex
     const p = this.Conn?.prompt() || ''
     return `\n${i}[${p}]> `
-  }
-
-  async prime () {
-    if (!this.#primed) {
-      this.conns = ConnectionFactory()
-      const telegramConnection = this.conns[Telegram().index] as TConn
-      telegramConnection.setup(this.conns)
-      await Logging.setup()
-      this.#primed = true
-    }
-    return this.list()
   }
 
   bind (command: string) {

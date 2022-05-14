@@ -3,13 +3,11 @@ import Logging from 'lib/logging.ts'
 import getInput from './input.ts'
 import KingCount from './count.ts'
 
-const kingcount = new KingCount()
-
 async function start (): Promise<void> {
-  for await (const input of getInput(kingcount)) {
 
-    // Prime it
-    kingcount.prime() // This laziness is only here because I don't know if we're in a test
+  const kingcount = new KingCount()
+
+  for await (const input of getInput(kingcount)) {
 
     // Bind it
     const obj = kingcount.bind(input)
