@@ -13,11 +13,11 @@ describe("Signal", async () => {
     fid: '',
     msg: input().Signal,
     date: '',
-    eindex: -9,
+    eindexes: [-9],
   } as TelethonMessage
 
   const signal = await parse(payload)
   assertObjectMatch(signal, {})
-  console.log(signal)
+  console.info(signal)
 
 })

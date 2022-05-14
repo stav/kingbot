@@ -10,6 +10,7 @@ scripts:
     importMap: denoPaths.json
     unstable: false
     allow:
+      env: TESTING
       read:
         - .config/input.yaml
         - .config/exchange.yaml
@@ -43,20 +44,26 @@ scripts:
         - logs/send.log.9
       net:
         - ws.xtb.com
-        - 0.0.0.0:8000
+        - 0.0.0.0
 
   test:
     cmd: deno test
     importMap: denoPaths.json
     allow:
-      env: CI # Rhum: if (Deno.env.get("CI") === "true")
-      net: ws.xtb.com
+      env:
+        - TESTING
+        - CI # Rhum: if (Deno.env.get("CI") === "true")
+      net:
+        - ws.xtb.com
+        - localhost
+        - 0.0.0.0
       read:
         - .config/input.yaml
         - .config/exchange.yaml
         - .config/telegram.yaml
     env:
       CI: false # Rhum
+      TESTING: true
 
   tu: vr test tests/unit
   ti: vr test tests/integration

@@ -21,11 +21,11 @@ export default class KingCount {
   inspect: () => void = inspect
 
   constructor () {
-    // if (!Deno.env.get('DENOTEST'))
     this.conns = ConnectionFactory()
     const telegramConnection = this.conns[Telegram().index] as TConn
     telegramConnection.setup(this.conns)
-    Logging.setup().then(console.debug)
+    if (!Deno.env.get('TESTING'))
+      Logging.setup().then(console.debug)
   }
 
   get Conn (): KingConn {

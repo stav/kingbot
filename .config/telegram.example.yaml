@@ -12,7 +12,7 @@ Accounts:
   - name: John
     api_id: 23456789
     api_hash: qwerasdfzxcv321654987rtuyfghbnm0
-    exchange_index: 1
+    exchange_indexes: [1]
     chats:
       - -1001234567890  # Homesteading channel
       - 123456789  # Work group
@@ -23,5 +23,5 @@ Accounts:
   - name: Joe
     api_id: 12345678
     api_hash: q1w2e3r4t5y67i8o9p0a1s2d3f4g5h6j
-    exchange_index: 0
+    exchange_indexes: [0]
     chats: []

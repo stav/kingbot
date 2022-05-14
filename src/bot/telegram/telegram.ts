@@ -3,13 +3,18 @@ import Server from './server.ts'
 
 export default class TConn implements KingConn {
 
-  private readonly server = new Server()
   private conns: KingConn[] = []
 
   private get state () {
     return (this.server.connected)
       ? 'Connected'
       : '-Disconnected'
+  }
+
+  readonly server = new Server()
+
+  get connected( ){
+    return this.server.connected
   }
 
   prompt () {
@@ -23,6 +28,7 @@ export default class TConn implements KingConn {
 
   setup (targetConnections: KingConn[]) {
     this.conns = targetConnections
+    return this.conns.length
   }
 
   /** Requires that `setup` is run a priori */

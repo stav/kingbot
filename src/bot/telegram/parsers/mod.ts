@@ -60,8 +60,8 @@ export async function parse (data: TelethonMessage): Promise<TelegramSignal> {
   for (const parse of parsers(data.cid)) {
     try {
       parsed = parse(data.msg)
-      signal = await TelethonMessageSchema.validate(parsed)
-      return sanitize(signal) as TelegramSignal
+      signal = await TelethonMessageSchema.validate(parsed) as TelegramSignal
+      return sanitize(signal)
     }
     catch (error) {
       if ( !(error instanceof yup.ValidationError) && !(error instanceof SyntaxError) )

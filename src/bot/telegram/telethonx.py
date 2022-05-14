@@ -96,7 +96,7 @@ async def run(account):
                             cid = cid,
                             fid = event.message.from_id,
                             date = event.message.date,
-                            eindex = account['exchange_index'],
+                            eindexes = account['exchange_indexes'],
                             msg = message,
                         )
                     )

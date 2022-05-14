@@ -52,16 +52,18 @@ export default class Server {
     logger.info('Received payload', payload)
 
     try {
+      const trades: STREAMING_TRADE_STATUS_RECORD[][] = []
       const signal = await parse(payload)
-      const traded = await this.trade(payload.eindex, signal)
-
       logger.info(
         'Signal', signal,
-        'Eindex', payload.eindex, this.connected ? 'connected' : 'not connected',
+        'Eindexs', payload.eindexes, this.connected ? 'connected' : 'not connected',
         'Channel', this.#getChannel(payload.cid),
         'From', this.#getFrom(payload.fid),
       )
-      return new Response(Deno.inspect(traded))
+      for (const eindex of payload.eindexes) {
+        trades.push(await this.trade(eindex, signal) as STREAMING_TRADE_STATUS_RECORD[])
+      }
+      return new Response(Deno.inspect(trades))
     }
     catch (error) {
       return new Response(error)
@@ -71,14 +73,13 @@ export default class Server {
     }
   }
 
-  connect (connections: KingConn[]) {
+  connect (connections: KingConn[], port = 8000) {
     this.#chatMap = Telegram().ChatMap
     this.connections = connections
-    serve( this.handler.bind(this), { signal: this.#ctl.signal } )
+    serve( this.handler.bind(this), { port, signal: this.#ctl.signal } )
     this.connected = true
-    const url = 'http://localhost:8000'
-    // const account = Deno.inspect(this.connection.Socket.account)
-    return `Listening to ${url} for ${connections.length - 1} connections`
+    // const url = 'http://localhost:8000'
+    return `I am aware of ${connections.length - 1} connections`
   }
 
   /** Open the underlying socket and login */
