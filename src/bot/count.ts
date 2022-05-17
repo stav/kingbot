@@ -9,6 +9,7 @@ import { Telegram } from 'lib/config.ts'
 import type TConn from './telegram/telegram.ts'
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
+import XConn from './xapi/xconn.ts'
 
 export default class KingCount {
 
@@ -66,6 +67,13 @@ export default class KingCount {
         ? this.availableCommands
         : fObj
     }
+  }
+
+  startall () {
+    this.conns
+      .filter(c => c instanceof XConn)
+      .map(c => c as XConn)
+      .forEach(async xconn => await xconn.start())
   }
 
   close () {

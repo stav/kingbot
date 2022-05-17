@@ -60,8 +60,9 @@ export default class XConn implements KingConn {
   }
 
   async start () {
-    await this.Stream.open()
     await this.login()
+    await this.Stream.open()
+    this.Stream.listen()
     this.alive()
     return this.status()
   }
@@ -69,10 +70,6 @@ export default class XConn implements KingConn {
   ping () {
     this.Socket.ping()
     this.Stream.ping()
-  }
-
-  listen () {
-    this.Stream.listen()
   }
 
   unlisten () {
