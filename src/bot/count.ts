@@ -12,13 +12,16 @@ import ConnectionFactory from './conn.ts'
 
 export default class KingCount {
 
-  conns: KingConn[] = []
-
   #currentAccountIndex = 0
+  conns: KingConn[] = []
+  f = [0, 1, 2, 3, 4].map(i => () => this.#fKey(i)) // Switch between connections
 
-  f = [0, 1, 2, 3, 4].map(i => () => this.fKey(i)) // Switch between connections
+  #fKey (index: number) {
+    if (index < this.conns.length)
+      return this.#currentAccountIndex = index
+  }
 
-  inspect: () => void = inspect
+  inspect = inspect
 
   constructor () {
     this.conns = ConnectionFactory()
@@ -45,6 +48,11 @@ export default class KingCount {
     return `\n${i}[${p}]> `
   }
 
+  list () {
+    return this.conns
+      .map((c, i) => c.list(i)) // Run list for all connections
+  }
+
   bind (command: string) {
     if (command) {
       getLogger('binding').info('') // Log blank line
@@ -58,16 +66,6 @@ export default class KingCount {
         ? this.availableCommands
         : fObj
     }
-  }
-
-  list () {
-    return this.conns
-      .map((c, i) => c.list(i)) // Run list for all connections
-  }
-
-  fKey (index: number) {
-    if (index < this.conns.length)
-      return this.#currentAccountIndex = index
   }
 
   close () {
