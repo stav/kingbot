@@ -65,7 +65,7 @@ export async function makeTrade(this: XapiSocket, trade: TRADE_TRANS_INFO, custo
   response = await this.sync(data)
   const statusReturnData = (<XapiDataResponse>response).returnData as TradeResponse
 
-  getLogger().info('Trade', tradeReturnData, 'Status', statusReturnData)
+  getLogger().info('Trade', { data: tradeReturnData, status: statusReturnData })
   Logging.flush()
 
   return statusReturnData
@@ -89,8 +89,9 @@ export async function makeTrades (this: XapiSocket, trades: TRADE_TRANS_INFO[]) 
     const result = await makeTrade.bind(this)(trade, customTag) as STREAMING_TRADE_STATUS_RECORD
     results.push(result)
 
-    tlogger.info('ServerTradeResult', trade, result)
+    tlogger.info('ServerTradeResult1', { trade, result })
     tlogger.info(
+      'ServerTradeResult2',
       trade.customComment,
       trade.symbol,
       CMD_FIELD[trade.cmd],

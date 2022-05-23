@@ -26,14 +26,15 @@ import type XapiSocket from './socket.ts'
  */
  export function send (this: XapiSocket, data: InputData) {
   if (this.isOpen) {
-    getLogger('sending').info('Sending', data)
+    const log = { payload: data, account: this.account }
+    getLogger('sending').info('Sending', log)
 
     this.socket?.send(JSON.stringify(data))
 
     if (data.command !== 'ping') {
       if (data.command === 'login')
         data.arguments.password = '<REDACTED>'
-      getLogger().info('Sending', data)
+      getLogger().info('Sending', log)
     }
   }
 }

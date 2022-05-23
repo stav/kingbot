@@ -63,6 +63,7 @@ export default class Server {
       for (const eindex of payload.eindexes) {
         trades.push(await this.trade(eindex, signal) as STREAMING_TRADE_STATUS_RECORD[])
       }
+      getLogger().info('TServer trades response', { trades })
       return new Response(Deno.inspect(trades))
     }
     catch (error) {
