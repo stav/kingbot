@@ -27,7 +27,7 @@ export default class KingCount {
   constructor () {
     this.conns = ConnectionFactory()
     const telegramConnection = this.conns[Telegram().index] as TConn
-    telegramConnection.setup(this.conns)
+    telegramConnection.setup(this)
     if (!Deno.env.get('TESTING'))
       Logging.setup().then(console.debug)
   }
