@@ -1,4 +1,4 @@
-import { blue, green, red, yellow } from "std/fmt/colors.ts"
+import { blue, green, red, yellow } from 'std/fmt/colors.ts'
 import { sprintf } from 'std/fmt/printf.ts'
 
 import { date } from 'wire/wcf.ts'
@@ -27,11 +27,12 @@ export function priceCandles (prices: PriceBars, price?: number) {
   )
 
   // Print header
-  let header = ' '.repeat(69)
+  const spacer = 58
+  let header = ' '.repeat(spacer)
   for (let i=0; i<=9; i++)
     header += sprintf('| %-*d', 9, (low + i * diff / 9).toFixed(diff < 9 ? 1 : 0))
   if (price) {
-    const index = (price - low) * blockSize + 69
+    const index = (price - low) * blockSize + spacer
     const char = yellow(header.charAt(index).replace(' ', '') || '|')
     header = header.substring(0, index) + char + header.substring(index + 1)
   }
@@ -74,11 +75,11 @@ export function priceCandles (prices: PriceBars, price?: number) {
       + ' ' + red   (sprintf('%4.1f', bar.Open.toString()))
       + ' ' + yellow(sprintf('%4.1f', bar.Close.toString()))
       + ' ' + blue  (sprintf('%4.1f', bar.High.toString()))
-      + ' ' + yellow(sprintf('%2d', Math.round(lowOffset).toString()))
-      + ' ' + blue  (sprintf('%2d', lowBlocks.toString()))
-      + ' ' + blue  (sprintf('%2d', highBlocks.toString()))
-      + ' ' + yellow(sprintf('%2d', openIndex.toString()))
-      + ' ' + yellow(sprintf('%2d', closeIndex.toString()))
+      // + ' ' + yellow(sprintf('%2d', Math.round(lowOffset).toString()))
+      // + ' ' + blue  (sprintf('%2d', lowBlocks.toString()))
+      // + ' ' + blue  (sprintf('%2d', highBlocks.toString()))
+      // + ' ' + yellow(sprintf('%2d', openIndex.toString()))
+      // + ' ' + yellow(sprintf('%2d', closeIndex.toString()))
       + ' ' + graph + '\n'
     )
   }
