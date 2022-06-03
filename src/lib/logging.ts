@@ -63,7 +63,7 @@ const handlers = {
   snfile: new logging.handlers.RotatingFileHandler("NOTSET", {
     filename: "./logs/send.log",
     formatter,
-    maxBytes: 1e6, // one million bytes
+    maxBytes: 2e6, // two million bytes
     maxBackupCount: 9,
   }),
 
