@@ -109,6 +109,6 @@ async def run(account):
         await client.run_until_disconnected()
 
 async def main():
-    await asyncio.gather(*[ run(account) for account in Telegram['Accounts'] ])
+    await asyncio.gather(*( run(account) for account in Telegram['Accounts'] ))
 
-asyncio.run(main())
+asyncio.run( main() )
