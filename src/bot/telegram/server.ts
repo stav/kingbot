@@ -50,16 +50,18 @@ export default class Server {
     const logger = getLogger('tserver')
     const payload = await request.json() as TelethonMessage
     logger.info('Received payload', payload)
-
     try {
       const trades: STREAMING_TRADE_STATUS_RECORD[][] = []
       const signal = await parse(payload)
-      logger.info(
-        'Signal', signal,
-        'Eindexs', payload.eindexes, this.connected ? 'connected' : 'not connected',
-        'Channel', this.#getChannel(payload.cid),
-        'From', this.#getFrom(payload.fid),
-      )
+      const log = {
+        signal,
+        account: payload.account,
+        connection: this.connected,
+        eindexes: payload.eindexes,
+        channel: this.#getChannel(payload.cid),
+        from: this.#getFrom(payload.fid),
+      }
+      logger.info('Telegram-server-signal', JSON.stringify(log))
       for (const eindex of payload.eindexes) {
         trades.push(await this.trade(eindex, signal) as STREAMING_TRADE_STATUS_RECORD[])
       }
@@ -80,7 +82,7 @@ export default class Server {
     serve( this.handler.bind(this), { port, signal: this.#ctl.signal } )
     this.connected = true
     // const url = 'http://localhost:8000'
-    return `I am aware of ${connections.length - 1} connections`
+    return `I am aware of ${connections.length - 1} exchange connections`
   }
 
   /** Open the underlying socket and login */

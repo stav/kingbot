@@ -95,9 +95,10 @@ async def run(account):
                         dict(
                             cid = cid,
                             fid = event.message.from_id,
-                            date = event.message.date,
-                            eindexes = account['exchange_indexes'],
                             msg = message,
+                            date = event.message.date,
+                            account = f'{id} {name}',
+                            eindexes = account['exchange_indexes'],
                         )
                     )
             # s = await event.get_sender()
