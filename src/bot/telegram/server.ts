@@ -1,4 +1,3 @@
-import { delay } from 'std/async/mod.ts'
 import { serve } from 'std/http/server.ts'
 import { getLogger } from 'std/log/mod.ts'
 
@@ -7,17 +6,13 @@ import { Telegram } from 'lib/config.ts'
 import Logging from 'lib/logging.ts'
 
 import type { KingConn } from '../conn.d.ts'
+import { Trader } from '../trader.ts'
 
-import type XConn from '../xapi/xconn.ts'
-import type { STREAMING_TRADE_STATUS_RECORD, TRADE_TRANS_INFO } from '../xapi/xapi.d.ts'
-import { CMD_FIELD, TYPE_FIELD } from '../xapi/xapi.ts'
-
-import type { TelethonMessage, TelegramSignal } from './parsers/parsers.d.ts'
+import type { TelethonMessage } from './parsers/parsers.d.ts'
 import { parse } from './parsers/mod.ts'
 
 /**
  * HTTP server listening for signals from Telethon client
- * @todo Generalize usage: right now it's hardcoded for XTB
  */
 export default class Server {
 
@@ -28,6 +23,8 @@ export default class Server {
   private connections: KingConn[] = []
 
   public connected = false
+
+  public trader: Trader | null = null
 
   #getChannel (cid: number) {
     const ids = Object.keys(this.#chatMap)
@@ -47,11 +44,11 @@ export default class Server {
   }
 
   async handler (request: Request) {
+    const agent = request.headers.get('user-agent')
     const logger = getLogger('tserver')
     const payload = await request.json() as TelethonMessage
-    logger.info('Received payload', payload)
+    logger.info('Received payload from', agent, payload)
     try {
-      const trades: STREAMING_TRADE_STATUS_RECORD[][] = []
       const signal = await parse(payload)
       const log = {
         signal,
@@ -62,10 +59,14 @@ export default class Server {
         from: this.#getFrom(payload.fid),
       }
       logger.info('Telegram-server-signal', JSON.stringify(log))
-      for (const eindex of payload.eindexes) {
-        trades.push(await this.trade(eindex, signal) as STREAMING_TRADE_STATUS_RECORD[])
+
+      // deno-lint-ignore no-explicit-any
+      let trades: any[][] = []
+      if (this.trader) {
+        trades = await this.trader.signalTrades(payload.eindexes, signal)
       }
       getLogger().info('TServer trades response', { trades })
+
       return new Response(Deno.inspect(trades))
     }
     catch (error) {
@@ -76,50 +77,13 @@ export default class Server {
     }
   }
 
-  connect (connections: KingConn[], port = 8000) {
+  connect (trader: Trader, port = 8000) {
     this.#chatMap = Telegram().ChatMap
-    this.connections = connections
+    this.trader = trader
     serve( this.handler.bind(this), { port, signal: this.#ctl.signal } )
     this.connected = true
     // const url = 'http://localhost:8000'
-    return `I am aware of ${connections.length - 1} exchange connections`
-  }
-
-  /** Open the underlying socket and login */
-  async login (connection: XConn) {
-    // if (this.connection?.Socket.session) { return } // Already logged in
-    await connection.Socket.open()
-    await connection.Socket.login()
-  }
-
-  async trade (eindex: number, signal: TelegramSignal) {
-    const connection = this.connections[eindex] as XConn
-    if (!connection) {
-      getLogger('tserver').error(
-        'Closed connection', connection, 'at index', eindex, 'for signal', signal)
-      return
-    }
-
-    await this.login(connection)
-    await delay(1000) // Grease the wheels
-
-    const socket = connection.Socket
-    const trades = signal.tps.map(
-      tp => ({
-        cmd:           CMD_FIELD[signal.type],
-        customComment:'Kingbot Telegram Signal',
-        expiration:    Date.now() + 60000 * 60 * 24 * 365, // 1 year
-        offset:        0,
-        order:         0,
-        symbol:        signal.symbol,
-        price:         signal.entry,
-        sl:            signal.sl,
-        tp,
-        type:          TYPE_FIELD.OPEN,
-        volume:        signal.volume,
-      } as TRADE_TRANS_INFO)
-    )
-    return await socket.makeTrades(trades) as STREAMING_TRADE_STATUS_RECORD[]
+    return `I am aware of ${trader.conns.length - 1} exchange connections`
   }
 
   close () {

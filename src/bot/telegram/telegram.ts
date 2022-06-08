@@ -1,4 +1,5 @@
 import type { KingConn } from '../conn.d.ts'
+import { Trader } from '../trader.ts'
 import Server from './server.ts'
 
 export default class TConn implements KingConn {
@@ -13,6 +14,8 @@ export default class TConn implements KingConn {
 
   readonly server = new Server()
 
+  public trader: Trader | null = null
+
   get connected( ){
     return this.server.connected
   }
@@ -26,14 +29,16 @@ export default class TConn implements KingConn {
     return `CNX ${_index} [${this.prompt()}] ${this.constructor.name}`
   }
 
-  setup (targetConnections: KingConn[]) {
-    this.conns = targetConnections
-    return this.conns.length
+  setup (trader: Trader) {
+    this.trader = trader
   }
 
   /** Requires that `setup` is run a priori */
   connect () {
-    return this.server.connect(this.conns)
+    if (this.trader)
+      return this.server.connect(this.trader)
+    else
+      return 'TConn.setup() must be run before connect()'
   }
 
   close () {
