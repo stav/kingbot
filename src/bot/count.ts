@@ -9,6 +9,7 @@ import { Telegram } from 'lib/config.ts'
 import type TConn from './telegram/telegram.ts'
 import type { KingConn } from './conn.d.ts'
 import ConnectionFactory from './conn.ts'
+import { Trader } from './trader.ts'
 import XConn from './xapi/xconn.ts'
 
 export default class KingCount {
@@ -27,7 +28,7 @@ export default class KingCount {
   constructor () {
     this.conns = ConnectionFactory()
     const telegramConnection = this.conns[Telegram().index] as TConn
-    telegramConnection.setup(this.conns)
+    telegramConnection.setup(new Trader(this.conns))
     if (!Deno.env.get('TESTING'))
       Logging.setup().then(console.debug)
   }
@@ -69,6 +70,9 @@ export default class KingCount {
     }
   }
 
+  /**
+   * @todo XTB hardcode
+   */
   startall () {
     this.conns
       .filter(c => c instanceof XConn)
