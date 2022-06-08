@@ -8,3 +8,6 @@ logs/*
 
 # Ignore gh-pages devel
 docs/
+
+# Rust
+/tools/target
