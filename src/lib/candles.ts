@@ -1,44 +1,43 @@
-import { blue, green, red, yellow } from 'std/fmt/colors.ts'
+import { blue, green, red, yellow, inverse } from 'std/fmt/colors.ts'
 import { sprintf } from 'std/fmt/printf.ts'
 
-import { date } from 'wire/wcf.ts'
+import { date, timestamp } from 'wire/wcf.ts'
 
-import type { PriceBars } from './candles.d.ts'
+import type { XapiPriceBarsTimeConfig } from 'lib/config.d.ts'
 
-export function priceCandles (prices: PriceBars, price?: number) {
-  let output = ''
-  // Function scope finals
-  const bars = prices.PriceBars
-  const lows = bars.map(bar => bar.Low)
+import type { PriceBar } from './candles.d.ts'
+
+const MAX_GRAPH_LENGTH = 108
+const SPACER = 58
+
+function header (low: number, diff: number, blockSize: number, prices: number[]) {
+  let header = ''
+
+  for (let i=0; i<=9; i++) {
+    header += sprintf('| %-*d', 9, (low + i * diff / 9).toFixed(diff < 9 ? 1 : 0))
+  }
+  const chars = header.split('')
+
+  for (const price of prices) {
+    const index = Math.floor((price - low) * blockSize)
+    if (chars[index] !== undefined)
+      chars[index] = yellow(chars[index].replace(' ', '') || '|')
+  }
+  return ' '.repeat(SPACER) + chars.join('').trimEnd() + '\n'
+}
+
+export function priceCandles (bars: PriceBar[], time: XapiPriceBarsTimeConfig, prices: number[]) {
   const highs = bars.map(bar => bar.High)
+  const lows = bars.map(bar => bar.Low)
   const high = Math.max(...highs)
   const low = Math.min(...lows)
   const diff = high - low
   const blockSize = 100 / diff
-  const colWidth = Math.ceil(blockSize) - blockSize/3
 
-  // Debug print finals
-  console.debug(
-    low, high,
-    diff.toFixed(1),
-    green(blockSize.toFixed(1)),
-    colWidth.toFixed(1),
-    prices.PartialPriceBar,
-  )
+  console.log(bars.length, time, prices.length)
 
-  // Print header
-  const spacer = 58
-  let header = ' '.repeat(spacer)
-  for (let i=0; i<=9; i++)
-    header += sprintf('| %-*d', 9, (low + i * diff / 9).toFixed(diff < 9 ? 1 : 0))
-  if (price) {
-    const index = (price - low) * blockSize + spacer
-    const char = yellow(header.charAt(index).replace(' ', '') || '|')
-    header = header.substring(0, index) + char + header.substring(index + 1)
-  }
-  output += header.trimEnd() + '\n'
+  let output = header(low, diff, blockSize, prices)
 
-  // Loop thru bars printing candles
   for (const bar of bars) {
     // Init data points
     const lowOffset = bar.Low - low
@@ -58,18 +57,23 @@ export function priceCandles (prices: PriceBars, price?: number) {
     candle = candle.substring(0, min + 1) + body + candle.substring(max + (max > min ? 0 : 1))
 
     // Build line graph
-    let graph = ' '.repeat(lowBlocks+1) + candle
-    if (price) {
-      const index = (price - low) * blockSize + 1
-      graph += ' '.repeat(100)
-      const char = yellow(graph.charAt(index).replace(' ', '') || '|')
-      graph = graph.substring(0, index) + char + graph.substring(index + 1)
-      graph = graph.trimEnd()
+    let graph = ' '.repeat(lowBlocks+1) + candle + ' '.repeat(MAX_GRAPH_LENGTH)
+    const cGraph = graph.split('')
+    cGraph.length = MAX_GRAPH_LENGTH
+
+    // Add price lines
+    for (const price of prices) {
+      const index = Math.floor((price - low) * blockSize) + 1
+      if (cGraph[index] !== undefined)
+        cGraph[index] = yellow(cGraph[index].replace(' ', '') || '|')
     }
+    graph = cGraph.join('').trimEnd()
+
+    // Color winner or loser
     graph = openIndex < closeIndex ? green(graph) : red(graph)
 
     // Output line including data and graph
-    output += (''
+    let line = (''
       + ''  + (date(bar.BarDate) || new Date()).toISOString()
       + ' ' + blue  (sprintf('%4.1f', bar.Low.toString()))
       + ' ' + red   (sprintf('%4.1f', bar.Open.toString()))
@@ -82,6 +86,14 @@ export function priceCandles (prices: PriceBars, price?: number) {
       // + ' ' + yellow(sprintf('%2d', closeIndex.toString()))
       + ' ' + graph + '\n'
     )
+    const ts = Date.parse(time.light)
+    const barTs = timestamp(bar.BarDate) || 0
+    const d = barTs - ts
+    if (d === 0) {
+      line = inverse(line)
+    }
+    output += line
+    console.log(barTs, ts, d)
   }
   return output
 

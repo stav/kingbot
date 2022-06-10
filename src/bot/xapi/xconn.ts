@@ -99,12 +99,12 @@ export default class XConn implements KingConn {
   }
 
   async price () {
-    return await this.Socket.getPriceHistory(input().Xapi.Bars).catch(console.error)
+    return await this.Socket.getPriceHistory(input().Xapi.BarsParams).catch(console.error)
   }
 
   async p () {
     await this.login()
-    return await this.Socket.candles(input().Xapi.Bars)
+    return await this.Socket.candles(input().Xapi.BarsParams)
   }
 
   async update () {

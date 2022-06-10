@@ -1,5 +1,5 @@
 import type { XapiPriceBarsConfig } from 'lib/config.d.ts'
-import type { PriceBar, PriceBars } from 'lib/candles.d.ts'
+import type { PriceBar } from 'lib/candles.d.ts'
 import { priceCandles } from 'lib/candles.ts'
 
 import type { TICK_RECORD } from '../xapi.d.ts'
@@ -17,17 +17,17 @@ export async function getPriceQuotes (this: XapiSocket, symbols: string[]) {
   return result.quotations as TICK_RECORD[]
 }
 
-function getPriceArgs (bars: XapiPriceBarsConfig) {
+function getPriceArgs (priceConfig: XapiPriceBarsConfig) {
   let priceArguments: PriceArguments
-  if (bars.bars) {
+  if (priceConfig.bars) {
     priceArguments = [
       'getChartRangeRequest',
       {
         info: {
-          period: bars.period,
-          symbol: bars.symbol,
-          start: Date.parse(bars.time),
-          ticks: bars.bars,
+          period: priceConfig.period,
+          symbol: priceConfig.symbol,
+          start: Date.parse(priceConfig.time.start),
+          ticks: priceConfig.bars,
         }
       }
     ]
@@ -37,9 +37,9 @@ function getPriceArgs (bars: XapiPriceBarsConfig) {
       'getChartLastRequest',
       {
         info: {
-          period: bars.period,
-          symbol: bars.symbol,
-          start: Date.parse(bars.time),
+          period: priceConfig.period,
+          symbol: priceConfig.symbol,
+          start: Date.parse(priceConfig.time.start),
         }
       }
     ]
@@ -48,8 +48,8 @@ function getPriceArgs (bars: XapiPriceBarsConfig) {
   return priceArguments
 }
 
-export async function getPriceHistory (this: XapiSocket, bars: XapiPriceBarsConfig) {
-  function x (r: RATE_INFO_RECORD) {
+export async function getPriceHistory (this: XapiSocket, priceConfig: XapiPriceBarsConfig) {
+  function dates (r: RATE_INFO_RECORD) {
     return {
       ctm: r.ctm,
       ctms: r.ctmString,
@@ -57,21 +57,21 @@ export async function getPriceHistory (this: XapiSocket, bars: XapiPriceBarsConf
       utc: new Date(r.ctm).toUTCString(),
     }
   }
-  const result = await this.fetchCommand(...getPriceArgs(bars))
+  const result = await this.fetchCommand(...getPriceArgs(priceConfig))
   if (result.status === false) throw result
-  console.log('infos', result.rateInfos.map(x))
+  console.log('infos', result.rateInfos.map(dates))
   return result as chartHistory
 }
 
-export async function candles (this: XapiSocket, bars: XapiPriceBarsConfig) {
-  console.log('bars', bars)
+export async function candles (this: XapiSocket, priceConfig: XapiPriceBarsConfig) {
+  console.log('priceConfig', priceConfig)
 
-  let prices: chartHistory
-  try { prices = await this.getPriceHistory(bars) } catch (e) { return e }
-  console.log('prices', prices)
+  let history: chartHistory
+  try { history = await this.getPriceHistory(priceConfig) } catch (e) { return e }
+  console.log('history', history)
 
-  function x (rateInfo: RATE_INFO_RECORD) {
-    const div = 10 ** prices.digits
+  function olhc (rateInfo: RATE_INFO_RECORD) {
+    const div = 10 ** history.digits
     const openPrice = rateInfo.open / div
     return {
       BarDate: `/Date(${rateInfo.ctm})/`,
@@ -81,12 +81,8 @@ export async function candles (this: XapiSocket, bars: XapiPriceBarsConfig) {
       Close: openPrice + rateInfo.close / div,
     }
   }
-  const priceBars: PriceBars = {
-    PriceBars: prices.rateInfos.map(x),
-    PartialPriceBar: {} as PriceBar,
-  }
-  console.log('priceBars', priceBars)
+  const bars: PriceBar[] = history.rateInfos.map(olhc)
+  const candles = priceCandles(bars, priceConfig.time, priceConfig.prices)
 
-  const candles = priceCandles(priceBars, bars.price)
   return candles
 }

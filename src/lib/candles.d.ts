@@ -5,8 +5,3 @@ export type PriceBar = {
   Low: number,
   Close: number,
 }
-
-export type PriceBars = {
-  PriceBars: PriceBar[],
-  PartialPriceBar: PriceBar,
-}

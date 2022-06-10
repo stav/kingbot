@@ -43,11 +43,16 @@ interface Asset {
   modify: number
 }
 
+export type XapiPriceBarsTimeConfig = {
+  start: string
+  light: string
+}
+
 export type XapiPriceBarsConfig = {
   period: 1 | 5 | 15 | 30 | 60 | 240 | 1440 | 10080 | 43200
   symbol: string
-  price: number
-  time: string
+  prices: number[]
+  time: XapiPriceBarsTimeConfig
   bars: number
 }
 
@@ -56,5 +61,5 @@ export type InputContainer = {
   Price: string[]
   Update: { [index: string]: string | number }
   Signal: string
-  Xapi: { Bars: XapiPriceBarsConfig }
+  Xapi: { BarsParams: XapiPriceBarsConfig }
 }
