@@ -125,17 +125,13 @@ fn main() {
     // If an argument is supplied
     if let Some(arg) = env::args().nth(1) {
         println!("Argument ({})", arg);
-        // Check if it's an order number
-        if let Ok(order_num) = arg.trim().parse::<usize>() {
-            analyze_order(logs, order_num)
-        }
         // Check if it's a date
-        else if let Ok(date) = NaiveDate::parse_from_str(&arg, "%Y-%m-%d") {
+        if let Ok(date) = NaiveDate::parse_from_str(&arg, "%Y-%m-%d") {
             express_logs_date(logs, date);
         }
-        // Else error
+        // Else use the arg as a search string
         else {
-            println!("{}", " Order number must be numeric and date must be YYYY-MM-DD ".white().on_red())
+            analyze_order(logs, &arg);
         };
     }
     // Otherwise no arguments supplied
@@ -272,11 +268,10 @@ fn express_order(order: &str, result: &str, log: &Log, re: Captures) {
     );
 }
 
-fn analyze_order(logs: Vec<Log>, order_num: usize) {
+fn analyze_order(logs: Vec<Log>, search: &str) {
     let message_re_string = [PREAMBLE_RE_STRING, MESSAGE_RE_STRING].join(" ");
     let message_re = Regex::new(&message_re_string).unwrap();
-    let order_num = order_num.to_string();
-    let logs_with_order = logs.iter().filter(|log| log.line.contains(&order_num));
+    let logs_with_order = logs.iter().filter(|log| log.line.contains(&search));
 
     for (i, log) in logs_with_order.enumerate() {
         print!("\n{} ", (i + 1).to_string().black().on_blue());
@@ -291,7 +286,7 @@ fn analyze_order(logs: Vec<Log>, order_num: usize) {
             let message_str = message_cap.name("json").unwrap().as_str();
             println!("{}",
                 match json5::from_str(message_str) {
-                    Ok(parsed_json) => format_json(parsed_json, Some(&order_num)),
+                    Ok(parsed_json) => format_json(parsed_json, Some(search)),
                     Err(_) => (&message_str.red()).to_string(),
                 }
             );
