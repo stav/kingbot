@@ -33,6 +33,12 @@ in production come the spring with the following features:
 
 With these features the bot can theoretically run fully-automatically.
 
+## Components
+
+1. Bot written in TypeScript
+2. Telegram client written in Python
+3. Log file tools written in Rust
+
 ## Installation
 
 The Kingbot uses these components:
@@ -97,9 +103,28 @@ Start the **deno** runtime with [Velociraptor][5].
 
     vr start
 
-#### Prime the Connections
+You will spawn an interactive Kingbot interpreter:
 
-    0[]> prime
+    0[-]>
+
+#### The prompt shows:
+
+The exchange account index number currently active:
+
+    0
+
+Zero (0) index is the Telegram connection.
+
+The prompt also shows the login status of current connection
+surrounded by square brackets.
+
+Dash (Telegram not connected):
+
+    [-]
+
+Finally, the greater-than input pointer character
+
+    >
 
 #### Start the Telegram Server
 
@@ -110,6 +135,10 @@ Enter the `connect` command to start the server:
     0[-]> connect
     input "connect" (function) [Function: bound connect]
     Listening to localhost:8000 for { id:123456, name:"Demo", type:"demo" }
+
+    0[C]>
+
+Send EOF (Ctrl-D End-of-file) to exit.
 
 ### Start the Telegram Client
 
@@ -130,122 +159,11 @@ Start the **Python** script to listen to configured **Telegram** chats.
     Please enter the code you received: 12345
     Signed in successfully
 
-## CLI Feature Showcase
+Send Interupt signal (Ctrl-C) to exit.
 
-```bash
-vr start
-```
+### Tools
 
-    0[]> ?
-    input "?" (object) [
-      "conns",
-      "f",
-      "inspect",
-      "Conn",
-      "availableCommands",
-      "prompt",
-      "prime",
-      "bind",
-      "list",
-      "fKey"
-    ]
-
-    0[]> prime
-    input "prime" (function) [Function: bound prime]
-    [
-      "CNX 0 [-] TConn",
-      "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
-      "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
-      "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
-    ]
-
-Enter the command: `f.1` to switch to the first connection:
-
-    0[-]> f.1
-    input "f.1" (function) [Function: bound ]
-    1
-
-    1[--]> ?
-    input "?" (object) [
-      "conns",             "f",
-      "inspect",           "Conn",
-      "availableCommands", "prompt",
-      "bind",              "list",
-      "fKey",              "Conn.Socket",
-      "Conn.Stream",       "Conn.inspect",
-      "Conn.alive",        "Conn.prompt",
-      "Conn.start",        "Conn.connect",
-      "Conn.login",        "Conn.ping",
-      "Conn.listen",       "Conn.unlisten",
-      "Conn.story",        "Conn.trades",
-      "Conn.trade",        "Conn.hedge",
-      "Conn.logout",       "Conn.close",
-      "Conn.status",       "Conn.list"
-    ]
-
-    1[--]> start
-    input "start" (function) [AsyncFunction: bound start]
-    [
-      "XapiSocket  wss://ws.xtb.com/demo  123456|Demo  OPEN|0h0m0s  0010afe3-...",
-      "XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  OPEN|0h0m0s  001..."
-    ]
-
-    1[lo]> list
-    input "list" (function) [Function: bound list]
-    [
-      "CNX 0 [-] TConn",
-      "CNX 1 [lo] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
-      "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
-      "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
-    ]
-
-    1[lo]> listen
-    input "listen" (function) [Function: bound listen]
-
-    1[ll]> list
-    input "list" (function) [Function: bound list]
-    [
-      "CNX 0 [-] TConn",
-      "CNX 1 [ll] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
-      "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
-      "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
-    ]
-
-    1[ll]> story
-    input "story" (function) [Function: bound story]
-    XapiSocket  wss://ws.xtb.com/demo  123456|Demo  OPEN|0h0m53s
-    {
-      leverage: 1,
-      currency: "PLN",
-      ibAccount: false,
-      trailingStop: true,
-      leverageMultiplier: 1,
-      balance: 10540.91,
-      margin: 2589.93,
-      equityFX: 9850.01,
-      equity: 9850.01,
-      margin_free: 7260.08,
-      margin_level: 380.32,
-    }
-    { version: "2.5.0" }
-    { time: 1644262683119, timeString: "Feb 7, 2022, 8:38:03 PM" }
-
-    1[ll]> close
-    input "close" (function) [Function: bound close]
-    XapiSocket  wss://ws.xtb.com/demo        123456|Demo  CLOSED|0h9m11s
-    XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  CLOSING|0h9m12s
-    XapiStream  wss://ws.xtb.com/demoStream  123456|Demo  CLOSED|0h9m12s
-
-    1[--]> list
-    input "list" (function) [Function: bound list]
-    [
-      "CNX 0 [-] TConn",
-      "CNX 1 [--] XConn XapiSocket(123456|Demo) XapiStream(123456|Demo)",
-      "CNX 2 [--] XConn XapiSocket(234567|Test) XapiStream(234567|Test)",
-      "CNX 3 [--] XConn XapiSocket(345678|Cherry) XapiStream(345678|Cherry)",
-    ]
-
-Send EOF (Ctrl-D End-of-file) to exit.
+See the [tools documentation][7] to learn how to analyze the log files.
 
 ## Development
 
@@ -280,3 +198,4 @@ Send EOF (Ctrl-D End-of-file) to exit.
 [4]: https://telegram.org/
 [5]: https://velociraptor.run/
 [6]: https://deno.land/manual/getting_started/installation#installation
+[7]: https://github.com/stav/kingbot/tree/master/tools#readme
