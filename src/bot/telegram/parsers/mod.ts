@@ -30,6 +30,7 @@ function sanitize (signal: TelegramSignal): TelegramSignal {
   if (signal.symbol === 'NAS100') signal.symbol = 'US100'
   if (signal.symbol === 'XAUUSD') signal.symbol = 'GOLD'
   if (signal.symbol === 'GER30' ) signal.symbol = 'DE30'
+  if (signal.symbol === 'USOIL' ) signal.symbol = 'OIL'
   return signal
 }
 
