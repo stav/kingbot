@@ -49,17 +49,8 @@ function getPriceArgs (priceConfig: XapiPriceBarsConfig) {
 }
 
 export async function getPriceHistory (this: XapiSocket, priceConfig: XapiPriceBarsConfig) {
-  function dates (r: RATE_INFO_RECORD) {
-    return {
-      ctm: r.ctm,
-      ctms: r.ctmString,
-      date: new Date(r.ctm),
-      utc: new Date(r.ctm).toUTCString(),
-    }
-  }
   const result = await this.fetchCommand(...getPriceArgs(priceConfig))
   if (result.status === false) throw result
-  console.log('infos', result.rateInfos.map(dates))
   return result as chartHistory
 }
 
@@ -68,7 +59,6 @@ export async function candles (this: XapiSocket, priceConfig: XapiPriceBarsConfi
 
   let history: chartHistory
   try { history = await this.getPriceHistory(priceConfig) } catch (e) { return e }
-  console.log('history', history)
 
   function olhc (rateInfo: RATE_INFO_RECORD) {
     const div = 10 ** history.digits

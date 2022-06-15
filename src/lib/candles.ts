@@ -21,14 +21,14 @@ import { sprintf } from 'std/fmt/printf.ts'
 
 import { date, timestamp } from 'wire/wcf.ts'
 
-import type { XapiPriceBarsConfig } from 'lib/config.d.ts'
+import type { XapiPriceBarsConfig, XapiPriceBarsPricesConfig } from 'lib/config.d.ts'
 
 import type { PriceBar } from './candles.d.ts'
 
 const MAX_GRAPH_LENGTH = 108
 const SPACER = 58
 
-function header (low: number, diff: number, blockSize: number, prices: number[]) {
+function header (low: number, diff: number, blockSize: number, prices: XapiPriceBarsPricesConfig) {
   let headers = []
   let xLabel = ''
 
@@ -37,10 +37,10 @@ function header (low: number, diff: number, blockSize: number, prices: number[])
   }
   const xChars = xLabel.split('')
 
-  for (const price of prices) {
+  for (const [label, price] of Object.entries(prices)) {
     const index = Math.floor((price - low) * blockSize)
     if (xChars[index] !== undefined) {
-      headers.push(' '.repeat(index) + yellow(String(price)))
+      headers.push(' '.repeat(index) + yellow(`${price} ${label}`))
       xChars[index] = yellow(xChars[index].replace(' ', '') || '|')
     }
   }
@@ -53,14 +53,15 @@ function header (low: number, diff: number, blockSize: number, prices: number[])
 }
 
 export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig, zoom: boolean) {
+  const prices = Object.values(priceConfig.prices)
   const highs = bars.map(bar => bar.High)
   const lows = bars.map(bar => bar.Low)
-  const high = Math.max(...highs, ...(zoom ? priceConfig.prices : []))
-  const low = Math.min(...lows, ...(zoom ? priceConfig.prices : []))
+  const high = Math.max(...highs, ...(zoom ? prices : []))
+  const low = Math.min(...lows, ...(zoom ? prices : []))
   const diff = high - low
   const blockSize = 100 / diff
 
-  console.log(bars.length, priceConfig.time, priceConfig.prices.length)
+  console.log(bars.length, priceConfig.time, prices.length)
 
   let output = header(low, diff, blockSize, priceConfig.prices)
 
@@ -90,7 +91,7 @@ export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig
     cGraph.length = MAX_GRAPH_LENGTH
 
     // Add price lines
-    for (const price of priceConfig.prices) {
+    for (const price of prices) {
       const index = Math.floor((price - low) * blockSize) + 1
       if (cGraph[index] !== undefined)
         cGraph[index] = yellow(cGraph[index].replace(' ', '') || '|')
@@ -112,15 +113,16 @@ export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig
       // + ' ' + blue  (sprintf('%2d', highBlocks.toString()))
       // + ' ' + yellow(sprintf('%2d', openIndex.toString()))
       // + ' ' + yellow(sprintf('%2d', closeIndex.toString()))
-      + ' ' + graph + '\n'
+      + ' ' + graph
     )
-    const ts = Date.parse(priceConfig.time.light)
+    const light = priceConfig.time.light
+    const ts = Date.parse(light[0])
     const barTs = timestamp(bar.BarDate) || 0
     if (barTs - ts > 0 && !highlit) {
-      line = inverse(line)
+      line = inverse(line) + ' ' + light.slice(1)
       highlit = true
     }
-    output += line
+    output += line + '\n'
   }
   return output
 

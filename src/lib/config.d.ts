@@ -45,13 +45,17 @@ interface Asset {
 
 export type XapiPriceBarsTimeConfig = {
   start: string
-  light: string
+  light: string[]
+}
+
+export type XapiPriceBarsPricesConfig = {
+  [index: string]: number
 }
 
 export type XapiPriceBarsConfig = {
   period: 1 | 5 | 15 | 30 | 60 | 240 | 1440 | 10080 | 43200
   symbol: string
-  prices: number[]
+  prices: XapiPriceBarsPricesConfig
   time: XapiPriceBarsTimeConfig
   bars: number
 }
