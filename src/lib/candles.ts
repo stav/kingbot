@@ -3,7 +3,7 @@ import { sprintf } from 'std/fmt/printf.ts'
 
 import { date, timestamp } from 'wire/wcf.ts'
 
-import type { XapiPriceBarsTimeConfig } from 'lib/config.d.ts'
+import type { XapiPriceBarsConfig } from 'lib/config.d.ts'
 
 import type { PriceBar } from './candles.d.ts'
 
@@ -26,7 +26,7 @@ function header (low: number, diff: number, blockSize: number, prices: number[])
   return ' '.repeat(SPACER) + chars.join('').trimEnd() + '\n'
 }
 
-export function priceCandles (bars: PriceBar[], time: XapiPriceBarsTimeConfig, prices: number[]) {
+export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig) {
   const highs = bars.map(bar => bar.High)
   const lows = bars.map(bar => bar.Low)
   const high = Math.max(...highs)
@@ -34,9 +34,11 @@ export function priceCandles (bars: PriceBar[], time: XapiPriceBarsTimeConfig, p
   const diff = high - low
   const blockSize = 100 / diff
 
-  console.log(bars.length, time, prices.length)
+  console.log(bars.length, priceConfig.time, priceConfig.prices.length)
 
-  let output = header(low, diff, blockSize, prices)
+  let output = header(low, diff, blockSize, priceConfig.prices)
+
+  let highlit = false
 
   for (const bar of bars) {
     // Init data points
@@ -62,7 +64,7 @@ export function priceCandles (bars: PriceBar[], time: XapiPriceBarsTimeConfig, p
     cGraph.length = MAX_GRAPH_LENGTH
 
     // Add price lines
-    for (const price of prices) {
+    for (const price of priceConfig.prices) {
       const index = Math.floor((price - low) * blockSize) + 1
       if (cGraph[index] !== undefined)
         cGraph[index] = yellow(cGraph[index].replace(' ', '') || '|')
@@ -86,14 +88,13 @@ export function priceCandles (bars: PriceBar[], time: XapiPriceBarsTimeConfig, p
       // + ' ' + yellow(sprintf('%2d', closeIndex.toString()))
       + ' ' + graph + '\n'
     )
-    const ts = Date.parse(time.light)
+    const ts = Date.parse(priceConfig.time.light)
     const barTs = timestamp(bar.BarDate) || 0
-    const d = barTs - ts
-    if (d === 0) {
+    if (barTs - ts > 0 && !highlit) {
       line = inverse(line)
+      highlit = true
     }
     output += line
-    console.log(barTs, ts, d)
   }
   return output
 

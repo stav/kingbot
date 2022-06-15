@@ -82,7 +82,7 @@ export async function candles (this: XapiSocket, priceConfig: XapiPriceBarsConfi
     }
   }
   const bars: PriceBar[] = history.rateInfos.map(olhc)
-  const candles = priceCandles(bars, priceConfig.time, priceConfig.prices)
+  const candles = priceCandles(bars, priceConfig)
 
   return candles
 }
