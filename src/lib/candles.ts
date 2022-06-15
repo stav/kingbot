@@ -1,3 +1,21 @@
+/**
+ * candles.ts
+ *
+ * Print horizontal colored candles:
+ *
+ *                        11450
+ *                                          11470
+ *                                                                    11500
+ *     ============================================================================================================
+ *     | 11428    | 11441 |  | 11453    | 11466    | 11478    | 11491 |  | 11503    | 11516    | 11528    | 11541
+ *          ------------------O====C----------------------            |
+ *     --------------------------C===O------------------              |
+ *                        |     O=========================================C-------
+ *                        |                 |         -----------C========O---------
+ *                        |             --C=======================O-----------
+ *
+ * priceCandles() uses headers()
+ **/
 import { blue, green, red, yellow, inverse } from 'std/fmt/colors.ts'
 import { sprintf } from 'std/fmt/printf.ts'
 
@@ -11,7 +29,7 @@ const MAX_GRAPH_LENGTH = 108
 const SPACER = 58
 
 function header (low: number, diff: number, blockSize: number, prices: number[]) {
-  const header = '-'.repeat(SPACER) + '='.repeat(MAX_GRAPH_LENGTH) + '\n'
+  let headers = []
   let xLabel = ''
 
   for (let i=0; i<=9; i++) {
@@ -21,10 +39,17 @@ function header (low: number, diff: number, blockSize: number, prices: number[])
 
   for (const price of prices) {
     const index = Math.floor((price - low) * blockSize)
-    if (xChars[index] !== undefined)
+    if (xChars[index] !== undefined) {
+      headers.push(' '.repeat(index) + yellow(String(price)))
       xChars[index] = yellow(xChars[index].replace(' ', '') || '|')
+    }
   }
-  return header + ' '.repeat(SPACER) + xChars.join('').trimEnd() + '\n'
+  headers.push('='.repeat(MAX_GRAPH_LENGTH))
+  headers.push(xChars.join('').trimEnd())
+  // Add in the left hand spacing and newline to each header
+  headers = headers.map(h => ' '.repeat(SPACER) + h + '\n')
+
+  return headers.join('')
 }
 
 export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig, zoom: boolean) {
