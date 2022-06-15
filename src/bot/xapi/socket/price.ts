@@ -63,7 +63,7 @@ export async function getPriceHistory (this: XapiSocket, priceConfig: XapiPriceB
   return result as chartHistory
 }
 
-export async function candles (this: XapiSocket, priceConfig: XapiPriceBarsConfig) {
+export async function candles (this: XapiSocket, priceConfig: XapiPriceBarsConfig, zoom = false) {
   console.log('priceConfig', priceConfig)
 
   let history: chartHistory
@@ -82,7 +82,7 @@ export async function candles (this: XapiSocket, priceConfig: XapiPriceBarsConfi
     }
   }
   const bars: PriceBar[] = history.rateInfos.map(olhc)
-  const candles = priceCandles(bars, priceConfig)
+  const candles = priceCandles(bars, priceConfig, zoom)
 
   return candles
 }

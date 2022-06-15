@@ -26,11 +26,11 @@ function header (low: number, diff: number, blockSize: number, prices: number[])
   return ' '.repeat(SPACER) + chars.join('').trimEnd() + '\n'
 }
 
-export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig) {
+export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig, zoom: boolean) {
   const highs = bars.map(bar => bar.High)
   const lows = bars.map(bar => bar.Low)
-  const high = Math.max(...highs)
-  const low = Math.min(...lows)
+  const high = Math.max(...highs, ...(zoom ? priceConfig.prices : []))
+  const low = Math.min(...lows, ...(zoom ? priceConfig.prices : []))
   const diff = high - low
   const blockSize = 100 / diff
 

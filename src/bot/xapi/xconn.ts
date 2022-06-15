@@ -107,6 +107,11 @@ export default class XConn implements KingConn {
     return await this.Socket.candles(input().Xapi.BarsParams)
   }
 
+  async pp () {
+    await this.login()
+    return await this.Socket.candles(input().Xapi.BarsParams, true)
+  }
+
   async update () {
     await this.login()
     return await this.Socket.update(input().Update as unknown as TradeTransInfoPosition)
