@@ -11,19 +11,20 @@ const MAX_GRAPH_LENGTH = 108
 const SPACER = 58
 
 function header (low: number, diff: number, blockSize: number, prices: number[]) {
-  let header = ''
+  const header = '-'.repeat(SPACER) + '='.repeat(MAX_GRAPH_LENGTH) + '\n'
+  let xLabel = ''
 
   for (let i=0; i<=9; i++) {
-    header += sprintf('| %-*d', 9, (low + i * diff / 9).toFixed(diff < 9 ? 1 : 0))
+    xLabel += sprintf('| %-*d', 9, (low + i * diff / 9).toFixed(diff < 9 ? 1 : 0))
   }
-  const chars = header.split('')
+  const xChars = xLabel.split('')
 
   for (const price of prices) {
     const index = Math.floor((price - low) * blockSize)
-    if (chars[index] !== undefined)
-      chars[index] = yellow(chars[index].replace(' ', '') || '|')
+    if (xChars[index] !== undefined)
+      xChars[index] = yellow(xChars[index].replace(' ', '') || '|')
   }
-  return ' '.repeat(SPACER) + chars.join('').trimEnd() + '\n'
+  return header + ' '.repeat(SPACER) + xChars.join('').trimEnd() + '\n'
 }
 
 export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig, zoom: boolean) {
