@@ -1,7 +1,7 @@
 /**
  * candles.ts
  *
- * Print horizontal colored candles:
+ * Print horizontal candles:
  *
  *                        11450
  *                                          11470
@@ -28,6 +28,15 @@ import type { PriceBar } from './candles.d.ts'
 const MAX_GRAPH_LENGTH = 108
 const SPACER = 58
 
+/**
+ * Price headings
+ *
+ * @param low The lowest price of all the bars
+ * @param diff The difference between the low price and high price
+ * @param blockSize The number of characters for each unit (dollar)
+ * @param prices Values are price numbers and keys are the labels
+ * @returns A single string showing all the price headings
+ */
 function header (low: number, diff: number, blockSize: number, prices: XapiPriceBarsPricesConfig) {
   let headers = []
   let xLabel = ''
@@ -52,6 +61,14 @@ function header (low: number, diff: number, blockSize: number, prices: XapiPrice
   return headers.join('')
 }
 
+/**
+ * Calculate the display of horizontal price candles for given price bars
+ *
+ * @param bars OHLC historical price data
+ * @param priceConfig The input parameters for the price data and how to display it
+ * @param zoom Should we zoom out to show all the desired price lines?
+ * @returns A giant string to show all the candles with price headings
+ */
 export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig, zoom: boolean) {
   const prices = Object.values(priceConfig.prices)
   const highs = bars.map(bar => bar.High)
@@ -59,13 +76,16 @@ export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig
   const high = Math.max(...highs, ...(zoom ? prices : []))
   const low = Math.min(...lows, ...(zoom ? prices : []))
   const diff = high - low
-  const blockSize = 100 / diff
+  const blockSize = MAX_GRAPH_LENGTH / diff
 
-  console.log(bars.length, priceConfig.time, prices.length)
+  console.log('priceCandles', {
+    bars: bars.length,
+    prices: prices.length,
+    diff,
+    blockSize,
+  })
 
   let output = header(low, diff, blockSize, priceConfig.prices)
-
-  let highlit = false
 
   for (const bar of bars) {
     // Init data points
@@ -102,7 +122,7 @@ export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig
     graph = openIndex < closeIndex ? green(graph) : red(graph)
 
     // Output line including data and graph
-    let line = (''
+    const line = (''
       + ''  + (date(bar.BarDate) || new Date()).toISOString()
       + ' ' + blue  (sprintf('%4.1f', bar.Low.toString()))
       + ' ' + red   (sprintf('%4.1f', bar.Open.toString()))
@@ -115,15 +135,28 @@ export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig
       // + ' ' + yellow(sprintf('%2d', closeIndex.toString()))
       + ' ' + graph
     )
-    const light = priceConfig.time.light
-    const ts = Date.parse(light[0])
-    const barTs = timestamp(bar.BarDate) || 0
-    if (barTs - ts > 0 && !highlit) {
-      line = inverse(line) + ' ' + light.slice(1)
-      highlit = true
-    }
-    output += line + '\n'
+    output += highlight(bar, line) + '\n'
   }
-  return output
 
+  /**
+   * Inverse the colors for the given line if the given bar is configured
+   *
+   * @param bar OHLC price data
+   * @param line The rendered candle with price line markings, if any
+   * @returns The given line with colors inverted and labels added if needed
+   */
+  function highlight (bar: PriceBar, line: string) {
+    const barTs = timestamp(bar.BarDate) || 0
+
+    for (const light of priceConfig.time.lights) {
+      const ts = Date.parse(light[0])
+      const d = (barTs - ts) / 1000
+      if (d >= 0 && d < priceConfig.period * 60) {
+        line = inverse(line) + ' ^ ' + light.slice(1)
+      }
+    }
+    return line
+  }
+
+  return output
 }

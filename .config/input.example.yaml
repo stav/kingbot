@@ -26,9 +26,19 @@ Signal: "XAUUSD SELL ENTRADA: 1993 SL: 2003 TP1: 1991"
 
 Xapi:
 
-  Bars:
-    period: 1440
-    symbol: GOLD
-    price: 1868
-    time: "04 May 2022 09:19:00 GMT-04:00"
-    bars: -20
+  BarsParams:
+    period: 1
+    symbol: US30
+    bars: 40
+    prices:
+      SELL: 30540
+      SL:   30700
+      TP1:  30510
+      TP2:  30440
+      TP3:  30340
+      TP4:  30040
+    time:
+      start: "2022-06-15 13:29:00 UTC"
+      lights:
+        - ["2022-06-15 13:32:00 UTC", "Open"]
+        - ["2022-06-15 13:42:00 UTC", "Close TP"]
