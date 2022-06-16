@@ -34,10 +34,8 @@ export default class XapiStream extends XSocket {
   async #listener (message: MessageEvent) {
     const m = JSON.parse(message.data)
     if (m.command === 'trade') {
-      getLogger().info('Stream message', m.data)
-      // print familys, trades
+      getLogger().info('Stream message trade data', m.data, 'for account', this.account)
       await this.Socket.check(m.data)
-      // print all trades
     }
   }
 
