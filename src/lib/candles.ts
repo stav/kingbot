@@ -54,9 +54,11 @@ function header (low: number, diff: number, blockSize: number, prices: XapiPrice
     }
   }
   headers.push('='.repeat(MAX_GRAPH_LENGTH))
-  headers.push(xChars.join('').trimEnd())
   // Add in the left hand spacing and newline to each header
   headers = headers.map(h => ' '.repeat(SPACER) + h + '\n')
+  headers.push(''
+    + '                             Low    Open   Close    High  '
+    + xChars.join('').trimEnd() + '\n')
 
   return headers.join('')
 }
@@ -147,15 +149,16 @@ export function priceCandles (bars: PriceBar[], priceConfig: XapiPriceBarsConfig
    */
   function highlight (bar: PriceBar, line: string) {
     const barTs = timestamp(bar.BarDate) || 0
+    let label = ''
 
     for (const light of priceConfig.time.lights) {
       const ts = Date.parse(light[0])
       const d = (barTs - ts) / 1000
       if (d >= 0 && d < priceConfig.period * 60) {
-        line = inverse(line) + ' ^ ' + light.slice(1)
+        label += ' < ' + light.slice(1)
       }
     }
-    return line
+    return label ? inverse(line) + label : line
   }
 
   return output
