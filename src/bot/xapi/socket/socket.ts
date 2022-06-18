@@ -10,7 +10,6 @@ import { makeTrade, makeTrades, getOpenTrades, update } from './trade.ts'
 import { getPriceQuotes, getPriceHistory, candles } from './price.ts'
 import { send, sync } from './send.ts'
 import { check } from './profits.ts'
-import hedge from './hedge.ts'
 
 export default class XapiSocket extends XSocket {
 
@@ -25,7 +24,6 @@ export default class XapiSocket extends XSocket {
   candles = candles
   update = update
   check = check
-  hedge = hedge
   send = send
   sync = sync
 

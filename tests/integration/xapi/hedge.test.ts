@@ -1,33 +1,23 @@
-import {
-  // assert,
-  assertEquals,
-  // assertStrictEquals,
-  // assertThrows,
-} from 'std/testing/asserts.ts'
-import { afterEach, beforeEach, describe, it } from "std/testing/bdd.ts"
-
-import * as logging from 'std/log/mod.ts'
 import { deadline, delay } from 'std/async/mod.ts'
-
-await logging.setup({ loggers: { default: { level: "WARNING" } } })
+import { assertEquals, assert } from 'std/testing/asserts.ts'
+import { afterEach, beforeEach, describe, it } from "std/testing/bdd.ts"
+import * as logging from 'std/log/mod.ts'
 
 import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import type { Asset } from 'lib/config.d.ts'
 import { Exchange } from 'lib/config.ts'
-import { input } from 'lib/config.ts'
 
 import type { TICK_RECORD, TRADE_TRANS_INFO } from 'src/bot/xapi/xapi.d.ts'
 import { CMD_FIELD, TYPE_FIELD } from 'src/bot/xapi/xapi.ts'
-
 import XapiSocket from 'src/bot/xapi/socket/socket.ts'
 import XConn from "src/bot/xapi/xconn.ts"
 
+await logging.setup({ loggers: { default: { level: "WARNING" } } })
+
 const TEST_INDEX = 0 // TODO config
+const ASSETS = [ { symbol: "GOLD", volume: 0.01, digits: 2 } as Asset ]
 
 function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_INFO[] {
-
-  console.debug('genHedgeOrders', assets, records)
-
   const tpRates = [ 0.002, 0.004, 0.006 ]
   const timestamp = Date.now()
   const orders: TRADE_TRANS_INFO[] = []
@@ -72,11 +62,10 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
 }
 
 async function getHedgeOrders (socket: XapiSocket): Promise<TRADE_TRANS_INFO[]> {
-  const assets = input().Hedge.Assets
   // deno-lint-ignore no-explicit-any
-  const symbols = assets.map((a: any) => a.symbol)
+  const symbols = ASSETS.map((a: any) => a.symbol)
   const prices = await socket.getPriceQuotes(symbols)
-  return genHedgeOrders(assets, prices)
+  return genHedgeOrders(ASSETS, prices)
 }
 
 describe("Hedge", () => {
@@ -97,10 +86,18 @@ describe("Hedge", () => {
     await deadline(wait(), 2000)
   })
 
-  it("hedge", async function () {
+  it("should generate six orders", async function () {
     const orders = await getHedgeOrders(conn.Socket)
-    const results = await conn.Socket.makeTrades(orders)
-    assertEquals(orders.length, results.length);
+    const result = await Promise.all(
+      orders.map(
+        order => conn.Socket.sync({
+          command: 'tradeTransaction',
+          arguments: { tradeTransInfo: order },
+        })
+      )
+    )
+    assertEquals(result.length, 6)
+    assert(result.every(r => r.status))
   });
 
 });
