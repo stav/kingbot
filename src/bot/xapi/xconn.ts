@@ -90,10 +90,6 @@ export default class XConn implements KingConn {
     return await this.Socket.getOpenTrades()
   }
 
-  async hedge () {
-    return await this.Socket.hedge()
-  }
-
   async quote () {
     return await this.Socket.getPriceQuotes(input().Price)
   }

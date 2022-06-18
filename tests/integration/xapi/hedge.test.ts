@@ -1,26 +1,39 @@
-import { getLogger } from 'std/log/mod.ts'
+import {
+  // assert,
+  assertEquals,
+  // assertStrictEquals,
+  // assertThrows,
+} from 'std/testing/asserts.ts'
+import { afterEach, beforeEach, describe, it } from "std/testing/bdd.ts"
 
+import * as logging from 'std/log/mod.ts'
+import { deadline, delay } from 'std/async/mod.ts'
+
+await logging.setup({ loggers: { default: { level: "WARNING" } } })
+
+import type { XapiExchangeAccount } from 'lib/config.d.ts'
 import type { Asset } from 'lib/config.d.ts'
+import { Exchange } from 'lib/config.ts'
 import { input } from 'lib/config.ts'
-import Logging from 'lib/logging.ts'
 
-import type { TICK_RECORD, TRADE_TRANS_INFO } from '../xapi.d.ts'
-import { CMD_FIELD, TYPE_FIELD } from '../xapi.ts'
+import type { TICK_RECORD, TRADE_TRANS_INFO } from 'src/bot/xapi/xapi.d.ts'
+import { CMD_FIELD, TYPE_FIELD } from 'src/bot/xapi/xapi.ts'
 
-import XapiSocket from './socket.ts'
+import XapiSocket from 'src/bot/xapi/socket/socket.ts'
+import XConn from "src/bot/xapi/xconn.ts"
+
+const TEST_INDEX = 0 // TODO config
 
 function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_INFO[] {
 
-  const tlogger = getLogger('traders')
-  tlogger.debug('genHedgeOrders', assets, records)
-  Logging.flush()
+  console.debug('genHedgeOrders', assets, records)
 
   const tpRates = [ 0.002, 0.004, 0.006 ]
   const timestamp = Date.now()
   const orders: TRADE_TRANS_INFO[] = []
   const _order = {
     type: TYPE_FIELD.OPEN,
-    expiration: timestamp + 60000 * 60 * 24 * 365,
+    expiration: timestamp + 1000 * 2, // two seconds
     offset: 0,
     order: 0,
   }
@@ -66,9 +79,28 @@ async function getHedgeOrders (socket: XapiSocket): Promise<TRADE_TRANS_INFO[]> 
   return genHedgeOrders(assets, prices)
 }
 
-export default async function hedge (this: XapiSocket) {
-  const orders = await getHedgeOrders(this)
-  console.log('Requesting', orders.length, 'orders')
-  const results = await this.makeTrades(orders)
-  return `Requested ${results.length} orders`
-}
+describe("Hedge", () => {
+
+  const account = Exchange().Accounts[TEST_INDEX] as XapiExchangeAccount
+
+  let conn: XConn
+
+  beforeEach(async () => {
+    conn = new XConn(account)
+    await conn.Socket.open()
+    await conn.Socket.login()
+  })
+
+  afterEach(async () => {
+    conn.Socket.close()
+    async function wait () { while (!conn.Socket.isClosed) await delay(200) }
+    await deadline(wait(), 2000)
+  })
+
+  it("hedge", async function () {
+    const orders = await getHedgeOrders(conn.Socket)
+    const results = await conn.Socket.makeTrades(orders)
+    assertEquals(orders.length, results.length);
+  });
+
+});
