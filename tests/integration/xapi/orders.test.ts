@@ -68,7 +68,7 @@ async function getHedgeOrders (socket: XapiSocket): Promise<TRADE_TRANS_INFO[]> 
   return genHedgeOrders(ASSETS, prices)
 }
 
-describe("Hedge", () => {
+describe("Orders", () => {
 
   const account = Exchange().Accounts[TEST_INDEX] as XapiExchangeAccount
 
