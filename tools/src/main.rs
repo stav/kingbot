@@ -272,13 +272,19 @@ fn search_term(logs: Vec<Log>, term: &str) {
     let message_re_string = [PREAMBLE_RE_STRING, MESSAGE_RE_STRING].join(" ");
     let message_re = Regex::new(&message_re_string).unwrap();
     let logs_with_term = logs.iter().filter(|log| log.line.contains(&term));
+    let mut base_time: Option<DateTime<Utc>> = None;
 
     for (i, log) in logs_with_term.enumerate() {
         print!("\n{} ", (i + 1).to_string().black().on_blue());
         // If our regex on the log line parses
         if let Some(message_cap) = message_re.captures(&log.line) {
-            print!("{}. {} ({}) {} ",
+            if base_time.is_none() {
+                base_time = Some(log.dt);
+            }
+            let diff = log.dt.signed_duration_since(base_time.unwrap());
+            print!("{}. {} {} ({}) {} ",
                 log.index + 1,
+                diff.num_seconds().to_string().yellow().on_black().dimmed(),
                 log.dt,
                 log.line.len(),
                 message_cap.name("description").unwrap().as_str(),
