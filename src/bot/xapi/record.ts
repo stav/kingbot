@@ -11,10 +11,10 @@ export function translate (data: IndexableRecord) {
     data.open_length = human({s: (data.close_time - data.open_time) / 1000})
   }
   if (data.open_time) {
-    data.open_time_str = new Date(data.open_time)
+    data.open_time_str = new Date(data.open_time).toUTCString()
   }
   if (data.close_time) {
-    data.close_time_str = new Date(data.close_time)
+    data.close_time_str = new Date(data.close_time).toUTCString()
   }
   data.cmd_field = CMD_FIELD[data.cmd]
   data.type_field = TYPE_FIELD[data.type]
