@@ -8,9 +8,11 @@ Hedge:
     - symbol: BITCOIN
       volume: 0.1
       digits: 2
+      rates: [ 0.001 ]
     - symbol: ETHEREUM
       volume: 1
       digits: 3
+      rates: [ 0.002, 0.004 ]
 
 Price:
   - US30

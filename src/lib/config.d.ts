@@ -41,6 +41,7 @@ interface Asset {
   volume: number
   digits: number
   modify: number
+  rates: number[]
 }
 
 export type XapiPriceBarsTimeConfig = {

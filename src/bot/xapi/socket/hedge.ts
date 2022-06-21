@@ -15,7 +15,6 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
   tlogger.debug('genHedgeOrders', assets, records)
   Logging.flush()
 
-  const tpRates = [ 0.002, 0.004, 0.006 ]
   const timestamp = Date.now()
   const orders: TRADE_TRANS_INFO[] = []
   const _order = {
@@ -27,6 +26,7 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
 
   for (const record of records) {
     const asset = assets.find(a => a.symbol === record.symbol)
+    const rates = asset?.rates ?? [ 0.002, 0.004, 0.006 ]
     const volume = asset?.volume ?? 0.01
     const mod = asset?.modify ?? 1
     const ask = record.ask
@@ -35,7 +35,7 @@ function genHedgeOrders (assets: Asset[], records: TICK_RECORD[]): TRADE_TRANS_I
     const sellPrice = parseFloat((bid - bid * 0.001 * mod).toFixed(asset?.digits))
     let tpLevel = 0
 
-    for (const rate of tpRates) {
+    for (const rate of rates) {
       const order = Object.assign({}, _order, {
         customComment: 'K1NGbot ' + timestamp + ' TP' + ++tpLevel,
         symbol: record.symbol,
