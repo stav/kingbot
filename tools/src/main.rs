@@ -4,8 +4,9 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
-use chrono::Datelike;
+use chrono::{Datelike, Duration};
 use chrono::prelude::{DateTime, NaiveDate, Utc};
+use clap::Parser;
 use colored::{ColoredString, Colorize};
 use regex::{Regex, Captures};
 use serde_derive::Deserialize;
@@ -42,7 +43,7 @@ const ORDER_RE_STRING: &str = r#"(?x)
     account[:"] \s (?P<account>\{[^}]+\})
     "#;
 const MESSAGE_RE_STRING: &str = r#"(?x)
-    (?P<description>[\w\d\s]+) \s
+    (?P<description>[\w\d\s:"/.-]*) \s?
     '?(?P<json>\{.+\})'?
     "#;
 
@@ -58,6 +59,22 @@ struct Account {
     id: usize,
     name: String,
     r#type: String,
+}
+
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    /// How many days back are we going to narrow
+    #[clap(short, long, value_parser)]
+    days: Option<i64>,
+
+    /// What specific date should we narrow for
+    #[clap(short = 'a', long, value_parser)]
+    date: Option<String>,
+
+    /// Search term
+    #[clap(short, long, value_parser)]
+    term: Option<String>,
 }
 
 /**
@@ -102,6 +119,32 @@ fn assemble(logs: &mut Vec<Log>) {
     }
 }
 
+/** */
+fn narrow(logs: Vec<Log>) -> Vec<Log> {
+    let today = || -> NaiveDate {
+        let dt = Utc::now();
+        NaiveDate::from_ymd(dt.year(), dt.month(), dt.day())
+    };
+    let back_date = || -> NaiveDate {
+        match Args::parse().days {
+            Some(days) => today() - Duration::days(days),
+            // Some(days) => today.checked_sub_signed(Duration::days(days)).unwrap(),
+            None => NaiveDate::from_ymd(2022, 1, 1),
+        }
+    };
+    let start_date = match Args::parse().date.as_deref() {
+        Some(d) => NaiveDate::parse_from_str(d, "%Y-%m-%d").unwrap(),
+        None => back_date(),
+    };
+    println!("Start date {start_date}");
+    let later = |log: &Log| -> bool {
+        let dt = log.dt;
+        let log_date = NaiveDate::from_ymd(dt.year(), dt.month(), dt.day());
+        log_date >= start_date
+    };
+    logs.into_iter().filter(later).collect()
+}
+
 /**
  * Main
  *
@@ -119,38 +162,26 @@ fn main() {
     let mut logs: Vec<Log> = Vec::new();
 
     println!("{}", "K1NGLAT: Log Analysis Tool".green());
+    println!("Arguments {} ({:?})", env::args().len(), env::args());
 
     assemble(&mut logs);
+    println!("{} logs assembled", logs.len());
 
-    // If an argument is supplied
-    if let Some(arg) = env::args().nth(1) {
-        println!("Argument ({})", arg);
-        // Check if it's a date
-        if let Ok(date) = NaiveDate::parse_from_str(&arg, "%Y-%m-%d") {
-            express_logs_date(logs, date);
-        }
-        // Else use the arg as a search string
-        else {
-            search_term(logs, &arg);
-        };
-    }
-    // Otherwise no arguments supplied
-    else {
+    logs = narrow(logs);
+    println!("{} logs after narrowing", logs.len());
+
+    let term = match Args::parse().term.as_deref() {
+        Some(t) => t.to_string(),
+        None => String::new(),
+    };
+    if term.is_empty() {
+        println!("Express.\n");
         express_logs(logs);
     }
-}
-
-/**
- * Express logs just for given date
- */
-fn express_logs_date(logs: Vec<Log>, date: NaiveDate) {
-    let same_day = |log: &Log| -> bool {
-        log.dt.day() == date.day() &&
-        log.dt.year() == date.year() &&
-        log.dt.month() == date.month()
-    };
-    let logs_for_date: Vec<Log> = logs .into_iter() .filter(same_day) .collect();
-    express_logs(logs_for_date);
+    else {
+        println!("Search '{term}'.\n");
+        search_term(logs, &term);
+    }
 }
 
 /**
