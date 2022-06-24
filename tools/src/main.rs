@@ -46,6 +46,10 @@ const MESSAGE_RE_STRING: &str = r#"(?x)
     (?P<description>[\w\d\s:"/.-]*) \s?
     '?(?P<json>\{.+\})'?
     "#;
+const TRADE_RE_STRING: &str = r#"(?x)
+    (?P<description>[\w\d\s:"/.-]*) \s?
+    '?(?P<json>\{.+\})'?
+    "#;
 
 #[derive(Debug)]
 struct Log {
@@ -75,6 +79,10 @@ struct Args {
     /// Search term
     #[clap(short, long, value_parser)]
     term: Option<String>,
+
+    /// Order number
+    #[clap(short, long, value_parser)]
+    order: Option<u64>,
 }
 
 /**
@@ -170,17 +178,94 @@ fn main() {
     logs = narrow_date(logs);
     println!("{} logs narrowed", logs.len());
 
+    let order = match Args::parse().order {
+        Some(t) => t.to_string(),
+        None => String::new(),
+    };
     let term = match Args::parse().term.as_deref() {
         Some(t) => t.to_string(),
         None => String::new(),
     };
-    if term.is_empty() {
+
+    if !order.is_empty() {
+        println!("Order: {}", order);
+        analyze_order(logs, &order);
+    }
+    else if !term.is_empty() {
+        println!("Term '{term}'.\n");
+        search_term(logs, &term);
+    }
+    else {
         println!("Express.\n");
         express_logs(logs);
     }
-    else {
-        println!("Search '{term}'.\n");
-        search_term(logs, &term);
+}
+
+fn analyze_order(logs: Vec<Log>, order: &str) {
+    println!();
+    let message_re = Regex::new(&TRADE_RE_STRING).unwrap();
+    let logs_with_order = logs.iter().filter(|log| log.line.contains(&order));
+    let mut base_time: Option<DateTime<Utc>> = None;
+
+    for (i, log) in logs_with_order.enumerate() {
+        print!("{} ", (i + 1).to_string().black().on_blue());
+        // If our regex on the log line parses
+        if let Some(message_cap) = message_re.captures(&log.line) {
+            if base_time.is_none() {
+                base_time = Some(log.dt);
+            }
+            let diff = log.dt.signed_duration_since(base_time.unwrap());
+            let desc = message_cap.name("description")
+                .unwrap()
+                .as_str().trim()
+                .split_whitespace().next()
+                .unwrap_or("");
+            print!("{}. {} {} ({}) {} -",
+                log.index + 1,
+                diff.num_seconds().to_string().yellow().on_black().dimmed(),
+                log.dt,
+                log.line.len(),
+                desc,
+            );
+            let jsonish = message_cap.name("json").unwrap().as_str();
+            let parsed_json: Value = match json5::from_str(jsonish) {
+                Ok(v) => v,
+                Err(_) => Value::Null,
+            };
+            // println!("{}", format_json(&parsed_json, Some(order)));
+            if let Some(object) = parsed_json.as_object() {
+                match desc {
+                    "Message" | "Stream" => {
+                        if let Some(data) = object.get("data") {
+                            print!(" symbol:{}", data.get("symbol").as_deref().unwrap_or(&Value::String(String::new())));
+                        }
+                        if let Some(tag) = object.get("customTag") {
+                            print!(" tag:{}", tag);
+                        }
+                    },
+                    "Sending" => {
+                            let account = object.get("account").unwrap();
+                            let thename = account.get("name").unwrap();
+                            let payload = object.get("payload").unwrap();
+                            let command = payload.get("command").unwrap();
+                            print!(" command:{} account:{}", command, thename);
+                    },
+                    "Trade" => {
+                        let status = object.get("status").unwrap();
+                        let result = status.get("requestStatus").unwrap();
+                        let comment = status.get("customComment").unwrap();
+                        print!(" comment:{} result:{}", comment, result);
+                    },
+                    _ => println!("{}", format_json(&parsed_json, Some(order))),
+                };
+            }
+            println!();
+        }
+        // Else we have an unknown log line format
+        else {
+            let log = format!("{:?}", log).as_str().yellow();
+            println!("{}", log);
+        }
     }
 }
 
@@ -232,7 +317,7 @@ fn express_signal(log: &Log, re: Captures) {
         log.index+1,
         log.dt,
         log.line.len(),
-        format_json(signal, None),
+        format_json(&signal, None),
     );
 }
 
@@ -323,7 +408,7 @@ fn search_term(logs: Vec<Log>, term: &str) {
             let message_str = message_cap.name("json").unwrap().as_str();
             println!("{}",
                 match json5::from_str(message_str) {
-                    Ok(parsed_json) => format_json(parsed_json, Some(term)),
+                    Ok(parsed_json) => format_json(&parsed_json, Some(term)),
                     Err(_) => (&message_str.red()).to_string(),
                 }
             );
@@ -336,7 +421,7 @@ fn search_term(logs: Vec<Log>, term: &str) {
     }
 }
 
-fn format_json(parsed_json: Value, highlight: Option<&str>) -> String {
+fn format_json(parsed_json: &Value, highlight: Option<&str>) -> String {
     let object = parsed_json.as_object().unwrap();
 
     let style = |value: &Value| -> ColoredString {
