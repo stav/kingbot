@@ -120,7 +120,7 @@ fn assemble(logs: &mut Vec<Log>) {
 }
 
 /** */
-fn narrow(logs: Vec<Log>) -> Vec<Log> {
+fn narrow_date(logs: Vec<Log>) -> Vec<Log> {
     let today = || -> NaiveDate {
         let dt = Utc::now();
         NaiveDate::from_ymd(dt.year(), dt.month(), dt.day())
@@ -167,8 +167,8 @@ fn main() {
     assemble(&mut logs);
     println!("{} logs assembled", logs.len());
 
-    logs = narrow(logs);
-    println!("{} logs after narrowing", logs.len());
+    logs = narrow_date(logs);
+    println!("{} logs narrowed", logs.len());
 
     let term = match Args::parse().term.as_deref() {
         Some(t) => t.to_string(),
