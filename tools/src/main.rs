@@ -189,7 +189,7 @@ fn main() {
 
     if !order.is_empty() {
         println!("Order: {}", order);
-        analyze_order(logs, &order);
+        analyze_order(&logs, &order);
     }
     else if !term.is_empty() {
         println!("Term '{term}'.\n");
@@ -201,13 +201,73 @@ fn main() {
     }
 }
 
-fn analyze_order(logs: Vec<Log>, order: &str) {
-    println!();
+fn find_order_numbers(logs: &Vec<Log>, order_nums: Vec<&str>) -> Vec<String> {
     let message_re = Regex::new(&TRADE_RE_STRING).unwrap();
-    let logs_with_order = logs.iter().filter(|log| log.line.contains(&order));
-    let mut base_time: Option<DateTime<Utc>> = None;
+    let mut order_numbers: Vec<String> = Vec::new();
 
-    for (i, log) in logs_with_order.enumerate() {
+    let any_order_num = |&log: &&Log| -> bool {
+        order_nums.iter().any(|n| log.line.contains(n))
+    };
+    let logs_with_orders = logs.iter().filter(any_order_num);
+
+    for log in logs_with_orders {
+        if let Some(message_cap) = message_re.captures(&log.line) {
+            let jsonish = message_cap.name("json").unwrap().as_str();
+            let parsed_json: Value = match json5::from_str(jsonish) {
+                Ok(v) => v,
+                Err(_) => Value::Null,
+            };
+            if let Some(object) = parsed_json.as_object() {
+                if let Some(data) = object.get("data") {
+                    if let Some(data) = data.as_object() {
+                        if data.contains_key("order") &&
+                        data.contains_key("order2") &&
+                        data.contains_key("position") {
+                            // let data = data.to_owned();
+                            let order = data.get("order").unwrap();
+                            let order2 = data.get("order2").unwrap();
+                            let position = data.get("position").unwrap();
+                            order_numbers.push(order.to_string());
+                            order_numbers.push(order2.to_string());
+                            order_numbers.push(position.to_string());
+                        }
+                    }
+                }
+            }
+        }
+    }
+    order_numbers
+}
+
+fn analyze_order(logs: &Vec<Log>, order_num: &str) {
+    println!();
+
+    let mut order_numbers = find_order_numbers(logs, vec![order_num]);
+    println!("\nA. {} {:?}", order_numbers.len(), order_numbers);
+
+    order_numbers.sort();
+    order_numbers.dedup();
+    println!("\nB. {} {:?}", order_numbers.len(), order_numbers);
+
+    order_numbers = find_order_numbers(logs, order_numbers.iter().map(|n| n.as_str()).collect());
+    println!("\nC. {} {:?}", order_numbers.len(), order_numbers);
+
+    order_numbers.sort();
+    order_numbers.dedup();
+    println!("\nD. {} {:?}", order_numbers.len(), order_numbers);
+
+    println!();
+
+    let mut base_time: Option<DateTime<Utc>> = None;
+    let message_re = Regex::new(&TRADE_RE_STRING).unwrap();
+
+    let any_order_num = |&log: &&Log| -> bool {
+        order_numbers.iter().any(|n| log.line.contains(n))
+    };
+    let logs_with_orders = logs.iter().filter(any_order_num);
+    // let logs_with_orders = logs.iter().filter(|log| log.line.contains(&order_num));
+
+    for (i, log) in logs_with_orders.enumerate() {
         print!("{} ", (i + 1).to_string().black().on_blue());
         // If our regex on the log line parses
         if let Some(message_cap) = message_re.captures(&log.line) {
@@ -232,7 +292,7 @@ fn analyze_order(logs: Vec<Log>, order: &str) {
                 Ok(v) => v,
                 Err(_) => Value::Null,
             };
-            // println!("{}", format_json(&parsed_json, Some(order)));
+            // println!("{}", format_json(&parsed_json, Some(order_num)));
             if let Some(object) = parsed_json.as_object() {
                 match desc {
                     "Message" | "Stream" => {
@@ -256,7 +316,7 @@ fn analyze_order(logs: Vec<Log>, order: &str) {
                         let comment = status.get("customComment").unwrap();
                         print!(" comment:{} result:{}", comment, result);
                     },
-                    _ => println!("{}", format_json(&parsed_json, Some(order))),
+                    _ => println!("{}", format_json(&parsed_json, Some(order_num))),
                 };
             }
             println!();
