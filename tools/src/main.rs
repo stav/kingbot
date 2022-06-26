@@ -201,8 +201,8 @@ fn main() {
     }
 }
 
-fn find_order_numbers(logs: &Vec<Log>, order_nums: Vec<&str>) -> Vec<String> {
-    let message_re = Regex::new(&TRADE_RE_STRING).unwrap();
+fn find_order_numbers(logs: &[Log], order_nums: Vec<&str>) -> Vec<String> {
+    let message_re = Regex::new(TRADE_RE_STRING).unwrap();
     let mut order_numbers: Vec<String> = Vec::new();
 
     let any_order_num = |&log: &&Log| -> bool {
@@ -236,30 +236,44 @@ fn find_order_numbers(logs: &Vec<Log>, order_nums: Vec<&str>) -> Vec<String> {
             }
         }
     }
+    order_numbers.sort();
+    order_numbers.dedup();
     order_numbers
 }
 
-fn analyze_order(logs: &Vec<Log>, order_num: &str) {
+fn analyze_order(logs: &[Log], order_num: &str) {
     println!();
 
     let mut order_numbers = find_order_numbers(logs, vec![order_num]);
-    println!("\nA. {} {:?}", order_numbers.len(), order_numbers);
-
-    order_numbers.sort();
-    order_numbers.dedup();
-    println!("\nB. {} {:?}", order_numbers.len(), order_numbers);
-
     order_numbers = find_order_numbers(logs, order_numbers.iter().map(|n| n.as_str()).collect());
-    println!("\nC. {} {:?}", order_numbers.len(), order_numbers);
-
-    order_numbers.sort();
-    order_numbers.dedup();
-    println!("\nD. {} {:?}", order_numbers.len(), order_numbers);
+    println!("{} position numbers {:?}", order_numbers.len(), order_numbers);
 
     println!();
 
+    let show = |object: &Value, key: &str| {
+        if let Some(value) = object.get(key) {
+            let check_orders = || -> String {
+                if (["order", "order2", "position"].contains(&key)) && &*value.to_string() != order_num {
+                    value.to_string().bright_black().to_string()
+                } else {
+                    String::new()
+                }
+            };
+            let highlit: String =  match value.as_str() {
+                Some("Modified") => String::new(),
+                Some("Deleted") => "DELETED".white().to_string(),
+                Some("[S/L]") => "STOPLOSS".red().to_string(),
+                Some(x) => String::from(x),
+                None => check_orders(),
+            };
+            if !highlit.is_empty() {
+                print!(" {key}:{}.", highlit);
+            }
+        }
+    };
+
     let mut base_time: Option<DateTime<Utc>> = None;
-    let message_re = Regex::new(&TRADE_RE_STRING).unwrap();
+    let message_re = Regex::new(TRADE_RE_STRING).unwrap();
 
     let any_order_num = |&log: &&Log| -> bool {
         order_numbers.iter().any(|n| log.line.contains(n))
@@ -297,7 +311,12 @@ fn analyze_order(logs: &Vec<Log>, order_num: &str) {
                 match desc {
                     "Message" | "Stream" => {
                         if let Some(data) = object.get("data") {
-                            print!(" symbol:{}", data.get("symbol").as_deref().unwrap_or(&Value::String(String::new())));
+                            show(data, "order");
+                            show(data, "order2");
+                            show(data, "position");
+                            show(data, "profit");
+                            show(data, "comment");
+                            show(data, "state");
                         }
                         if let Some(tag) = object.get("customTag") {
                             print!(" tag:{}", tag);
