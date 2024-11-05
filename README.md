@@ -1,3 +1,5 @@
+> Trading involves risk and this software and its developer assume none of it. You're on your own. Do not use this softare to trade. It is for developers only, not for traders; this means you! Stay away from trading, you will lose money.
+
 # K1NGBOT
 
 This is a Deno command line application that
